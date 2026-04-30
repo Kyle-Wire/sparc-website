@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import * as React from "react";
 import { BRAND_LONG, COMPANY, TAGLINE_LONG, VERSION, COPYRIGHT_YEAR, OFFICE_CITY, OFFICE_STATE } from "@/lib/brand";
+import { NavUserStatus } from "./NavUserStatus";
 
 export type NavKey = "home" | "product" | "templates" | "pricing" | "about" | "contact" | "download" | "docs" | "account";
 
@@ -68,12 +69,7 @@ export function Nav({ active }: { active?: NavKey }) {
           <Link href="/contact" className="btn btn-ghost btn-sm" style={{ fontWeight: 500, fontSize: 12 }}>
             Contact
           </Link>
-          <Link href="/login" className="btn btn-ghost btn-sm" style={{ fontWeight: 500, fontSize: 12 }}>
-            Sign in
-          </Link>
-          <Link href="/signup" className="btn btn-primary btn-sm">
-            Request access <span className="arrow">→</span>
-          </Link>
+          <NavUserStatus />
         </div>
       </div>
       <div className="ramp-strip" aria-hidden />

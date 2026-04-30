@@ -49,6 +49,18 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
           },
         });
         if (error) throw error;
+        // Fire-and-forget: notify the team and send a confirmation to the user.
+        // Don't block signup if the email provider is slow or down.
+        void fetch("/api/account/request-demo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email,
+            full_name: fullName.trim(),
+            organization: organization.trim(),
+            profession: profession.trim(),
+          }),
+        }).catch(() => {});
         if (!data.session) {
           setState("confirm-sent");
           return;

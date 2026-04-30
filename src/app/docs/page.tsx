@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 
@@ -19,10 +18,10 @@ export default function DocsPage() {
       <Section>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
           {DOCS.map((d) => (
-            <Link key={d.href} href={d.href} className="card" style={{ padding: 24, textDecoration: "none", color: "inherit" }}>
+            <a key={d.href} href={d.href} target="_blank" rel="noopener noreferrer" className="card" style={{ padding: 24, textDecoration: "none", color: "inherit" }}>
               <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.015em", margin: "0 0 8px" }}>{d.t} →</h3>
               <p style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.55, margin: 0 }}>{d.b}</p>
-            </Link>
+            </a>
           ))}
         </div>
       </Section>

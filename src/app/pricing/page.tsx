@@ -121,7 +121,7 @@ function TierCard({ t }: { t: Tier }) {
         ))}
       </ul>
       <div style={{ padding: "0 22px 24px" }}>
-        <Link
+        <a
           href={t.ctaHref}
           className={"btn " + (t.ctaStyle === "accent" ? "btn-accent" : t.ctaStyle === "primary" ? "btn-primary" : "")}
           style={{
@@ -129,7 +129,7 @@ function TierCard({ t }: { t: Tier }) {
             ...(t.featured && t.ctaStyle === "primary" ? { background: t.color, borderColor: t.color, color: "#fff" } : {}),
           }}>
           {t.cta} <span className="arrow">→</span>
-        </Link>
+        </a>
       </div>
     </div>
   );

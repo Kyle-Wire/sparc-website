@@ -1,10 +1,11 @@
 import Link from "next/link";
+import type { Route } from "next";
 import * as React from "react";
 import { BRAND_LONG, COMPANY, TAGLINE_LONG, VERSION, COPYRIGHT_YEAR, OFFICE_CITY, OFFICE_STATE } from "@/lib/brand";
 
 export type NavKey = "home" | "product" | "templates" | "pricing" | "about" | "contact" | "download" | "docs" | "account";
 
-const NAV_LINKS: { href: string; label: string; key: NavKey }[] = [
+const NAV_LINKS: { href: Route; label: string; key: NavKey }[] = [
   { href: "/", label: "Home", key: "home" },
   { href: "/product", label: "Product", key: "product" },
   { href: "/templates", label: "Templates", key: "templates" },

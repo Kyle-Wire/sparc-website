@@ -1,9 +1,10 @@
 import Link from "next/link";
+import type { Route } from "next";
 import { redirect } from "next/navigation";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const NAV = [
+const NAV: { href: Route; label: string }[] = [
   { href: "/account", label: "Overview" },
   { href: "/account/subscription", label: "Subscription" },
   { href: "/account/seats", label: "Seats" },
@@ -12,7 +13,7 @@ const NAV = [
   { href: "/account/usage", label: "Usage" },
   { href: "/account/devices", label: "Devices" },
   { href: "/account/settings", label: "Settings" },
-] as const;
+];
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createSupabaseServerClient();

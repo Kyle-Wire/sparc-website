@@ -19,7 +19,7 @@ const NAV_LINKS: { href: Route; label: string; key: NavKey }[] = [
 // Native aspect ratio of public/sparclabs-logo.png is 3300x2550 ≈ 1.294:1
 const LOGO_ASPECT = 3300 / 2550;
 
-function LogoLockup({ height = 36 }: { height?: number }) {
+function LogoLockup({ height = 56 }: { height?: number }) {
   const width = Math.round(height * LOGO_ASPECT);
   return (
     <Image
@@ -38,7 +38,7 @@ export function Nav({ active }: { active?: NavKey }) {
     <header className="nav">
       <div className="nav-inner">
         <Link className="nav-logo" href="/" aria-label={`${COMPANY} — home`}>
-          <LogoLockup height={30} />
+          <LogoLockup height={56} />
         </Link>
         <nav className="nav-links">
           {NAV_LINKS.map((l) => (

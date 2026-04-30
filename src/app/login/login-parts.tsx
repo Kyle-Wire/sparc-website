@@ -6,11 +6,24 @@ import type { Route } from "next";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { SITE_URL } from "@/lib/brand";
 
+const PROFESSIONS = [
+  "Researcher / Faculty",
+  "Graduate student",
+  "Undergraduate student",
+  "Industry / Practitioner",
+  "Public sector / Government",
+  "Journalist",
+  "Other",
+];
+
 export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") ?? "/account";
 
+  const [fullName, setFullName] = React.useState("");
+  const [organization, setOrganization] = React.useState("");
+  const [profession, setProfession] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [state, setState] = React.useState<"idle" | "submitting" | "confirm-sent" | "error">("idle");
@@ -26,7 +39,14 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: `${SITE_URL}/auth/callback?next=${encodeURIComponent(next)}` },
+          options: {
+            emailRedirectTo: `${SITE_URL}/auth/callback?next=${encodeURIComponent(next)}`,
+            data: {
+              full_name: fullName.trim(),
+              organization: organization.trim(),
+              profession: profession.trim(),
+            },
+          },
         });
         if (error) throw error;
         if (!data.session) {
@@ -63,10 +83,48 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
     <div className="card" style={{ padding: 28 }}>
       <div className="kicker">{mode === "signup" ? "create your account" : "sign in"}</div>
       <h3 style={{ fontSize: 20, fontWeight: 700, margin: "10px 0 16px" }}>
-        {mode === "signup" ? "Email & password" : "Welcome back"}
+        {mode === "signup" ? "Tell us about yourself" : "Welcome back"}
       </h3>
       <form onSubmit={submit}>
-        <label className="label">Email</label>
+        {mode === "signup" && (
+          <>
+            <label className="label">Full name</label>
+            <input
+              className="input"
+              type="text"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Naomi Schaal"
+              autoComplete="name"
+              maxLength={200}
+            />
+            <label className="label" style={{ marginTop: 12 }}>Organization</label>
+            <input
+              className="input"
+              type="text"
+              value={organization}
+              onChange={(e) => setOrganization(e.target.value)}
+              placeholder="UC Berkeley · Geography"
+              autoComplete="organization"
+              maxLength={200}
+            />
+            <label className="label" style={{ marginTop: 12 }}>Profession</label>
+            <select
+              className="input"
+              required
+              value={profession}
+              onChange={(e) => setProfession(e.target.value)}
+            >
+              <option value="" disabled>Select one…</option>
+              {PROFESSIONS.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+            <label className="label" style={{ marginTop: 12 }}>Email</label>
+          </>
+        )}
+        {mode === "signin" && <label className="label">Email</label>}
         <input
           className="input"
           type="email"

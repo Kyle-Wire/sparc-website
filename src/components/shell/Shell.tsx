@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Route } from "next";
 import * as React from "react";
 import { BRAND_LONG, COMPANY, TAGLINE_LONG, VERSION, COPYRIGHT_YEAR, OFFICE_CITY, OFFICE_STATE } from "@/lib/brand";
@@ -15,39 +16,20 @@ const NAV_LINKS: { href: Route; label: string; key: NavKey }[] = [
   { href: "/about", label: "About", key: "about" },
 ];
 
-function LogoLockup({ height = 30 }: { height?: number }) {
-  // Inline SVG placeholder lockup — the prototype's PNG isn't shipped here.
-  // Swap with the real /assets/logo-lockup.png once added to /public.
+// Native aspect ratio of public/sparclabs-logo.png is 3300x2550 ≈ 1.294:1
+const LOGO_ASPECT = 3300 / 2550;
+
+function LogoLockup({ height = 36 }: { height?: number }) {
+  const width = Math.round(height * LOGO_ASPECT);
   return (
-    <span
-      aria-label={`${COMPANY} — home`}
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 10,
-        fontFamily: "var(--font-sans)",
-        fontWeight: 800,
-        fontSize: Math.round(height * 0.46),
-        letterSpacing: "-0.01em",
-        color: "var(--ink)",
-        height,
-      }}
-    >
-      <svg
-        width={height}
-        height={height}
-        viewBox="0 0 64 64"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="3"
-        aria-hidden
-      >
-        <path d="M10 16 L32 6 L54 16 L54 48 L32 58 L10 48 Z" />
-        <path d="M10 16 L32 26 L54 16" />
-        <path d="M32 26 L32 58" />
-      </svg>
-      SPARC<span style={{ color: "var(--muted)", marginLeft: 4 }}>LABS</span>
-    </span>
+    <Image
+      src="/sparclabs-logo.png"
+      alt={`${COMPANY} — home`}
+      width={width}
+      height={height}
+      priority
+      style={{ height, width: "auto", display: "block" }}
+    />
   );
 }
 

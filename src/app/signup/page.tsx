@@ -13,7 +13,7 @@ export default function SignupPage() {
       <PageHero
         kicker="create account"
         title="Request access to SPARC."
-        lead="One magic link, no passwords. We'll create your account on first sign-in. Add Pursue, Converge, or Transcend after you're in."
+        lead="Create an account with email and password. We'll send a confirmation link to verify your email."
         accent="var(--crimson)"
       />
       <Section>

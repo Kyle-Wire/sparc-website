@@ -27,7 +27,7 @@ const TIERS: Tier[] = [
     poet: "For the curious.",
     body: "Explore spatial relationships, run your first analyses, and get a feel for the terrain. No commitment, no ceiling on curiosity.",
     price: "$0", unit: "forever",
-    cta: "Download", ctaStyle: "ghost", ctaHref: "/download",
+    cta: "Request access", ctaStyle: "ghost", ctaHref: "/demo",
     color: "var(--purple)",
     features: [
       "1 active project", "Local-only · no cloud sync", "All 13 domain templates",
@@ -243,7 +243,7 @@ export default function PricingPage() {
             Wander is free and has no time limit. Run a project end-to-end and see if SPARC fits the way you actually work.
           </p>
           <div className="row" style={{ justifyContent: "center", gap: 10 }}>
-            <Link href="/download" className="btn btn-accent">Start with Wander</Link>
+            <Link href="/demo" className="btn btn-accent">Request beta access</Link>
             <Link href="/contact" className="btn">Talk to a human</Link>
           </div>
         </div>

@@ -108,9 +108,32 @@ footer { border-top: 1px solid var(--line); padding: 60px 0 40px; background: va
 .input:focus { border-color: var(--accent); }
 .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px; }
 
+/* Stage stack (Product page) */
+.stage-stack { position: relative; }
+.stage-stack .stage-rail { position: absolute; left: 32px; top: 0; bottom: 0; width: 2px; background: var(--line); }
+.stage-stack .stage-rail-fill { position: absolute; left: 0; top: 0; width: 100%; background: linear-gradient(to bottom, var(--purple), var(--magenta), var(--pink), var(--crimson), var(--orange), var(--amber), var(--gold)); transition: height .5s ease; }
+.stage-block { position: relative; border-bottom: 1px solid var(--line); padding: 56px 0; transition: background .4s ease; }
+.stage-block .stage-num { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: #fff; }
+.stage-block .stage-head { display: grid; grid-template-columns: 50px 1fr auto; gap: 18px; align-items: center; }
+.stage-block .stage-title { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin: 6px 0 0; }
+.stage-block .stage-body { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-top: 32px; padding-left: 68px; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .55s ease, opacity .35s ease, margin-top .35s ease; }
+.stage-block.open .stage-body { max-height: 1200px; opacity: 1; }
+.stage-block .stage-chevron { font-family: var(--font-mono); font-size: 11px; color: var(--muted); transition: transform .35s ease, color .35s ease; }
+.stage-block.open .stage-chevron { transform: rotate(180deg); color: var(--ink); }
+.stage-block .stage-lead { font-size: 16px; color: var(--ink-2); line-height: 1.6; margin: 0 0 18px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-block .stage-body { transition: none; max-height: none; opacity: 1; }
+  .stage-stack .stage-rail-fill { transition: none; height: 100% !important; }
+  .fadeup { animation: none; }
+}
+
 @media (max-width: 900px) {
   .nav-links { display: none; }
   .foot-grid { grid-template-columns: 1fr 1fr; }
   .page-hero h1 { font-size: 40px; }
   .section-head { flex-direction: column; align-items: flex-start; }
+  .stage-block .stage-body { grid-template-columns: 1fr; gap: 24px; padding-left: 0; }
+  .stage-block .stage-title { font-size: 24px; }
+  .stage-stack .stage-rail { left: 16px; }
 }

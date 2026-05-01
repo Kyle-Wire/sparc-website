@@ -83,9 +83,9 @@ export default function HomePage() {
       </section>
 
       <Section
-        kicker="13 templates · 1 blank slate"
+        kicker="private beta · 2 active domains · more on the roadmap"
         title="Domain-agnostic, not domain-naive."
-        action={<Link href="/templates" className="btn">All templates <span className="arrow">→</span></Link>}
+        action={<Link href="/domains" className="btn">All domains <span className="arrow">→</span></Link>}
       >
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
           {TEMPLATES_PEEK.map((it) => (

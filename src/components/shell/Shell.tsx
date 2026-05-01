@@ -5,13 +5,12 @@ import * as React from "react";
 import { BRAND_LONG, COMPANY, TAGLINE_LONG, VERSION, COPYRIGHT_YEAR, OFFICE_CITY, OFFICE_STATE } from "@/lib/brand";
 import { NavUserStatus } from "./NavUserStatus";
 
-export type NavKey = "home" | "product" | "templates" | "pricing" | "about" | "contact" | "download" | "docs" | "account" | "demo";
+export type NavKey = "home" | "product" | "domains" | "pricing" | "about" | "contact" | "download" | "docs" | "account" | "demo";
 
 const NAV_LINKS: { href: Route; label: string; key: NavKey }[] = [
   { href: "/", label: "Home", key: "home" },
   { href: "/product", label: "Product", key: "product" },
-  { href: "/templates", label: "Templates", key: "templates" },
-  { href: "/download", label: "Download", key: "download" },
+  { href: "/domains", label: "Domains", key: "domains" },
   { href: "/demo", label: "Demo", key: "demo" },
   { href: "/about", label: "About", key: "about" },
 ];
@@ -80,9 +79,8 @@ export function Footer() {
             <Link href="/product#pipeline">Pipeline</Link>
             <Link href="/product#causal">Causal model</Link>
             <Link href="/product#scenarios">Scenarios</Link>
-            <Link href="/templates">Templates</Link>
+            <Link href="/domains">Domains</Link>
             <Link href="/demo">Demo</Link>
-            <Link href="/download">Download</Link>
             <Link href="/changelog">Changelog</Link>
           </div>
           <div>

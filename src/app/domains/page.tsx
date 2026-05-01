@@ -129,8 +129,8 @@ export default function DomainsPage() {
         lead="SPARC is a general-purpose causal pipeline for spatial science. We're currently validating it on Urban Heat Island and ForceSMIP with our beta partners — and expanding to new domains as physics integrations land. The list below is where we're heading; tell us where you want it to go next."
       />
       <Section>
-        <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 28, alignItems: "start" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        <div className="split-14-10" style={{ gap: 28, alignItems: "start" }}>
+          <div className="grid-3" style={{ gap: 12 }}>
             {DOMAINS.map((d) => {
               const active = sel.id === d.id;
               const dim = d.status === "roadmap" && !active;
@@ -162,7 +162,7 @@ export default function DomainsPage() {
               );
             })}
           </div>
-          <div style={{ position: "sticky", top: 80 }}>
+          <div className="sticky-md-up" style={{ position: "sticky", top: 80 }}>
             <div className="card" style={{ padding: 0, overflow: "hidden", borderLeft: `3px solid ${sel.c}` }}>
               <div style={{ padding: 18, borderBottom: "1px solid var(--line)" }}>
                 <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
@@ -188,7 +188,7 @@ export default function DomainsPage() {
       </Section>
 
       <Section sunken kicker="bring your own" title="What if your domain isn't here?">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 18 }}>
+        <div className="grid-3" style={{ gap: 18 }}>
           {[
             { k: "01", t: "Start from a blank slate.", b: "The Blank domain is a project skeleton — project.yml, an empty DAG, an empty variable registry. Add your variables, propose your edges, and run." },
             { k: "02", t: "Adapt the closest domain.", b: "Geotech for ground stability? Hydrology for surface water? Most spatial domains share more structure than they look — we'll help you adapt the nearest one." },

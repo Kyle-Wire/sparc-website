@@ -151,7 +151,7 @@ function ComparisonTable() {
     { k: "Co-authored research", v: ["—", "—", "—", "Where appropriate"] },
   ];
   return (
-    <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+    <div className="card table-scroll" style={{ padding: 0, overflow: "hidden" }}>
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
         <thead>
           <tr style={{ borderBottom: "1px solid var(--line)", background: "var(--paper-2)" }}>
@@ -220,7 +220,7 @@ export default function PricingPage() {
         lead="Four ways to use SPARC, named for the arc of an investigation. Start curious, get serious, work in concert, and — when the question is big enough — make SPARC the infrastructure."
       />
       <Section>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, alignItems: "stretch" }}>
+        <div className="grid-4 pricing-tiers" style={{ gap: 14, alignItems: "stretch" }}>
           {TIERS.map((t) => <TierCard key={t.id} t={t} />)}
         </div>
         <p className="kicker" style={{ marginTop: 28, textAlign: "center" }}>
@@ -238,7 +238,7 @@ export default function PricingPage() {
 
       <section style={{ borderTop: "1px solid var(--line)", padding: "56px 0" }} className="grid-bg">
         <div className="wrap" style={{ textAlign: "center" }}>
-          <h2 style={{ fontSize: 36, fontWeight: 800, letterSpacing: "-0.025em", margin: "0 0 16px" }}>Still deciding?</h2>
+          <h2 style={{ fontSize: "var(--fs-h2-section)", fontWeight: 800, letterSpacing: "-0.025em", margin: "0 0 16px" }}>Still deciding?</h2>
           <p style={{ color: "var(--ink-2)", maxWidth: 520, margin: "0 auto 24px", fontSize: 15 }}>
             Wander is free and has no time limit. Run a project end-to-end and see if SPARC fits the way you actually work.
           </p>

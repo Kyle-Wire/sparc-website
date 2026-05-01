@@ -12,7 +12,7 @@ export default async function SettingsPage() {
       <form className="card" style={{ padding: 24 }} action="/api/account/profile" method="post">
         <div className="kicker">profile</div>
         <h2 style={{ fontSize: 22, fontWeight: 700, margin: "8px 0 16px" }}>Display name</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        <div className="grid-2" style={{ gap: 12 }}>
           <div><label className="label">Email</label><input className="input mono" value={user.email ?? ""} readOnly /></div>
           <div><label className="label">Full name</label><input className="input" name="full_name" defaultValue={user.user_metadata?.full_name ?? ""} placeholder="Naomi Schaal" /></div>
           <div><label className="label">Profession</label>

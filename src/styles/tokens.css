@@ -64,4 +64,27 @@
     linear-gradient(rgba(0,0,0,0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,0,0,0.035) 1px, transparent 1px);
   --tex-grid-size: 24px 24px;
+
+  /* Spacing scale (px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Type scale — values match the current desktop sizing.
+     Mobile overrides live in globals.css under @media (max-width: 640px). */
+  --fs-hero: 64px;        /* landing hero h1 */
+  --fs-page-hero: 56px;   /* PageHero h1 */
+  --fs-h1: 48px;
+  --fs-h2: 28px;
+  --fs-h2-section: 36px;  /* .section-head h2 */
+  --fs-h3: 22px;
+  --fs-display: 40px;     /* large inline numerics (pricing, about) */
+
+  /* Container side padding */
+  --wrap-pad: 32px;
 }

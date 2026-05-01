@@ -23,6 +23,10 @@ export default function PrivacyPage() {
           <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Subprocessors</h2>
           <ul><li>Supabase — auth + database (US/EU)</li><li>Lemon Squeezy — billing & merchant of record (US/EU)</li><li>Vercel — website hosting (US)</li><li>Resend — transactional email (US)</li></ul>
 
+          <h2 id="cookies" style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0, scrollMarginTop: 96 }}>Cookies</h2>
+          <p>This site uses only strictly necessary cookies. When you sign in, Supabase sets an HttpOnly, Secure, SameSite session cookie (<code>sb-*-auth-token</code>) so we can keep you logged in across pages. That&apos;s it — no advertising cookies, no analytics cookies, no third-party trackers, no cross-site identifiers.</p>
+          <p>Because these cookies are strictly necessary to provide the service you requested, they&apos;re exempt from prior consent under GDPR and the ePrivacy Directive. You can clear them at any time from your browser&apos;s site settings; doing so will sign you out.</p>
+
           <p style={{ fontSize: 13, color: "var(--muted)" }}>© {COPYRIGHT_YEAR} {COMPANY_LEGAL} · {OFFICE_FULL}</p>
         </article>
       </Section>

@@ -16,7 +16,7 @@ export default function DocsPage() {
       <Nav />
       <PageHero kicker="documentation" title="The manual, the methods, the pipelines." lead="All technical documentation lives in the open-source repository. Here are the most useful entry points." accent="var(--purple)" />
       <Section>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+        <div className="grid-2" style={{ gap: 14 }}>
           {DOCS.map((d) => (
             <a key={d.href} href={d.href} target="_blank" rel="noopener noreferrer" className="card" style={{ padding: 24, textDecoration: "none", color: "inherit" }}>
               <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.015em", margin: "0 0 8px" }}>{d.t} →</h3>

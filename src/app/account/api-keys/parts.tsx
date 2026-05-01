@@ -41,7 +41,7 @@ export function ApiKeysClient({ initial }: { initial: ApiKeyRow[] }) {
     <>
       <form className="card" style={{ padding: 22 }} onSubmit={add}>
         <div className="kicker">add a key</div>
-        <div style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr auto", gap: 8, marginTop: 12, alignItems: "flex-end" }}>
+        <div className="api-key-form" style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr auto", gap: 8, marginTop: 12, alignItems: "flex-end" }}>
           <div>
             <label className="label">Provider</label>
             <select className="input" value={provider} onChange={(e) => setProvider(e.target.value as typeof PROVIDERS[number])}>
@@ -61,7 +61,7 @@ export function ApiKeysClient({ initial }: { initial: ApiKeyRow[] }) {
         {err && <p style={{ color: "var(--crimson)", marginTop: 10, fontSize: 13 }}>{err}</p>}
       </form>
 
-      <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+      <div className="card table-scroll" style={{ padding: 0, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
           <thead><tr style={{ background: "var(--paper-2)", borderBottom: "1px solid var(--line)" }}>
             {["provider", "label", "key", "added", ""].map((h) => (

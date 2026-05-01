@@ -4,6 +4,7 @@ import type { Route } from "next";
 import * as React from "react";
 import { BRAND_LONG, COMPANY, TAGLINE_LONG, VERSION, COPYRIGHT_YEAR, OFFICE_CITY, OFFICE_STATE } from "@/lib/brand";
 import { NavUserStatus } from "./NavUserStatus";
+import { MobileNav } from "./MobileNav";
 
 export type NavKey = "home" | "product" | "domains" | "pricing" | "about" | "contact" | "download" | "docs" | "account" | "demo";
 
@@ -13,6 +14,13 @@ const NAV_LINKS: { href: Route; label: string; key: NavKey }[] = [
   { href: "/domains", label: "Domains", key: "domains" },
   { href: "/demo", label: "Demo", key: "demo" },
   { href: "/about", label: "About", key: "about" },
+];
+
+const DRAWER_EXTRA: { href: Route; label: string }[] = [
+  { href: "/pricing", label: "Pricing" },
+  { href: "/docs", label: "Docs" },
+  { href: "/research", label: "Research" },
+  { href: "/changelog", label: "Changelog" },
 ];
 
 // Native aspect ratio of public/sparclabs-logo.png is 3300x2550 ≈ 1.294:1
@@ -37,7 +45,8 @@ export function Nav({ active }: { active?: NavKey }) {
     <header className="nav">
       <div className="nav-inner">
         <Link className="nav-logo" href="/" aria-label={`${COMPANY} — home`}>
-          <LogoLockup height={56} />
+          <span className="hide-mobile"><LogoLockup height={56} /></span>
+          <span className="show-mobile"><LogoLockup height={36} /></span>
         </Link>
         <nav className="nav-links">
           {NAV_LINKS.map((l) => (
@@ -46,11 +55,14 @@ export function Nav({ active }: { active?: NavKey }) {
             </Link>
           ))}
         </nav>
-        <div className="nav-cta">
+        <div className="nav-cta hide-tablet">
           <Link href="/contact" className="btn btn-ghost btn-sm" style={{ fontWeight: 500, fontSize: 12 }}>
             Contact
           </Link>
           <NavUserStatus />
+        </div>
+        <div className="nav-cta show-tablet" style={{ marginLeft: "auto" }}>
+          <MobileNav links={NAV_LINKS} extraLinks={DRAWER_EXTRA} />
         </div>
       </div>
       <div className="ramp-strip" aria-hidden />
@@ -94,6 +106,7 @@ export function Footer() {
           <div>
             <h6>Legal</h6>
             <Link href="/privacy">Privacy</Link>
+            <Link href={{ pathname: "/privacy", hash: "cookies" }}>Cookies</Link>
             <Link href="/terms">Terms</Link>
             <Link href="/data-use">Data use</Link>
             <Link href="/docs">Docs</Link>

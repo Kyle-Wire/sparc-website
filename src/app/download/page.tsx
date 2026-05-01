@@ -39,7 +39,7 @@ export default function DownloadPage() {
       </Section>
 
       <Section sunken kicker="system requirements" title="What you'll need.">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+        <div className="grid-3" style={{ gap: 14 }}>
           {[
             { k: "minimum", v: ["8 GB RAM", "4-core CPU", "20 GB disk", "OpenGL 3.3+"] },
             { k: "recommended", v: ["32 GB RAM", "NVIDIA GPU + CUDA 11.8", "100 GB SSD", "Discrete GPU (Apple Silicon = native MPS)"] },

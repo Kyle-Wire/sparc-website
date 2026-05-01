@@ -29,7 +29,7 @@ export default async function UsagePage() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+      <div className="grid-3" style={{ gap: 14 }}>
         {(rows.length === 0 ? [
           { metric: "pipeline_runs", total: 0 },
           { metric: "scenarios", total: 0 },

@@ -74,10 +74,10 @@ export function Hero() {
         background: "radial-gradient(circle, rgba(231,60,37,0.08), transparent 60%)",
         pointerEvents: "none",
       }} />
-      <div className="wrap" style={{ display: "grid", gridTemplateColumns: "1.05fr 0.95fr", gap: 56, alignItems: "center" }}>
+      <div className="wrap split-105-95" style={{ alignItems: "center" }}>
         <div>
           <Kicker dot dotColor="var(--accent)">{TAGLINE_SHORT.toLowerCase()}</Kicker>
-          <h1 style={{ fontSize: 64, fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.0, margin: "18px 0 22px", textWrap: "balance" }}>
+          <h1 style={{ fontSize: "var(--fs-hero)", fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.0, margin: "18px 0 22px", textWrap: "balance" }}>
             <span style={{
               backgroundImage: "var(--grad-ramp)",
               backgroundSize: "200% 100%",
@@ -113,7 +113,7 @@ export function ProofStrip() {
   return (
     <section className="compact" style={{ borderBottom: "1px solid var(--line)" }}>
       <div className="wrap">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24 }}>
+        <div className="grid-4">
           {items.map((it, i) => (
             <div key={i} style={{ borderLeft: `2px solid ${it.color}`, paddingLeft: 16 }}>
               <div className="kicker">{it.kicker}</div>
@@ -152,7 +152,7 @@ export function PipelineFlow() {
         {stages.map((s, i) => {
           const status = i < stage ? "done" : i === stage ? "live" : "queued";
           return (
-            <button key={i} onClick={() => setStage(i)} style={{
+            <button key={i} onClick={() => setStage(i)} className="pipeline-row" style={{
               display: "grid", gridTemplateColumns: "44px 130px 1fr 90px", gap: 10, alignItems: "center",
               padding: "10px 12px", borderRadius: 5, cursor: "pointer", textAlign: "left",
               fontFamily: "inherit",

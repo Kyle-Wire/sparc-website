@@ -41,7 +41,7 @@ export default async function SeatsPage() {
         {max === 0 && <p className="mono" style={{ marginTop: 10, fontSize: 11, color: "var(--muted)" }}>▸ upgrade to converge to invite teammates</p>}
       </form>
 
-      <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+      <div className="card table-scroll" style={{ padding: 0, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
           <thead><tr style={{ background: "var(--paper-2)", borderBottom: "1px solid var(--line)" }}>
             <th style={{ textAlign: "left", padding: "12px 18px", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--muted)" }}>email</th>

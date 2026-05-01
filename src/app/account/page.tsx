@@ -33,7 +33,7 @@ export default async function AccountOverview() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 14 }}>
+      <div className="grid-2" style={{ gap: 14 }}>
         <Link href="/account/subscription" className="card" style={{ padding: 22, textDecoration: "none", color: "inherit" }}>
           <div className="kicker">subscription</div>
           <div style={{ fontSize: 22, fontWeight: 700, marginTop: 6, textTransform: "capitalize" }}>{sub?.tier ?? "Wander (free)"}</div>

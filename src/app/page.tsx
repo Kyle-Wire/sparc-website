@@ -49,7 +49,7 @@ export default function HomePage() {
       <Hero />
 
       <Section kicker="what it does" title="Three ideas, one workflow." lead="A practical tool for spatial science. You can audit every step, question every coefficient, and put a confidence number next to every claim.">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 18 }}>
+        <div className="grid-3" style={{ gap: 18 }}>
           {PILLARS.map((it, i) => (
             <div key={i} className="card" style={{ padding: 24, position: "relative" }}>
               <div className="kicker">{it.kicker}</div>
@@ -72,7 +72,7 @@ export default function HomePage() {
             </div>
             <p className="lead">A simplified urban-heat run on Providence, RI. Every stage is reproducible from one <code className="mono">project.yml</code>.</p>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 18, alignItems: "stretch" }}>
+          <div className="split-14-10" style={{ gap: 18, alignItems: "stretch" }}>
             <PipelineFlow />
             <div className="col" style={{ gap: 18 }}>
               <PosteriorTrace />
@@ -87,7 +87,7 @@ export default function HomePage() {
         title="Domain-agnostic, not domain-naive."
         action={<Link href="/domains" className="btn">All domains <span className="arrow">→</span></Link>}
       >
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+        <div className="grid-4" style={{ gap: 14 }}>
           {TEMPLATES_PEEK.map((it) => (
             <div key={it.name} className="card" style={{ padding: 16, borderLeft: `2px solid ${it.c}` }}>
               <div className="row" style={{ justifyContent: "space-between", alignItems: "baseline" }}>
@@ -101,9 +101,9 @@ export default function HomePage() {
       </Section>
 
       <Section kicker="how it works" title="Explore → Learn → Reason → Adapt." lead="Four steps, in plain language. The same flow whether you're studying heat in a city or moisture in a watershed.">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0, borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
+        <div className="steps-row" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0, borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
           {STEPS.map((s, i) => (
-            <div key={i} style={{ padding: "26px 22px", borderRight: i < 3 ? "1px solid var(--line)" : "none", position: "relative" }}>
+            <div key={i} className="steps-cell" data-last={i === 3 ? "true" : undefined} style={{ padding: "26px 22px", borderRight: i < 3 ? "1px solid var(--line)" : "none", position: "relative" }}>
               <div className="row" style={{ alignItems: "baseline", gap: 10, marginBottom: 12 }}>
                 <span className="mono" style={{ fontSize: 11, fontWeight: 700, padding: "2px 6px", borderRadius: 3, background: "var(--ink)", color: "#fff" }}>{s.no}</span>
                 <span className="kicker">{s.k}</span>
@@ -118,7 +118,7 @@ export default function HomePage() {
       <section style={{ borderTop: "1px solid var(--line)" }} className="grid-bg">
         <div className="wrap" style={{ textAlign: "center", padding: "48px 0" }}>
           <Kicker dot dotColor="var(--accent)">pilot program · private beta</Kicker>
-          <h2 style={{ fontSize: 48, fontWeight: 800, letterSpacing: "-0.025em", lineHeight: 1.05, margin: "16px auto 18px", maxWidth: 800, textWrap: "balance" }}>
+          <h2 style={{ fontSize: "var(--fs-h1)", fontWeight: 800, letterSpacing: "-0.025em", lineHeight: 1.05, margin: "16px auto 18px", maxWidth: 800, textWrap: "balance" }}>
             We&apos;re still polishing the app.<br />Pilot with us.
           </h2>
           <p style={{ color: "var(--ink-2)", maxWidth: 580, margin: "0 auto 24px", fontSize: 16 }}>

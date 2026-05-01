@@ -62,7 +62,7 @@ function ContactForm() {
     <form className="card" style={{ padding: 28 }} onSubmit={submit}>
       <div className="kicker">request access · waitlist</div>
       <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.015em", margin: "8px 0 18px" }}>Tell us about your work.</h3>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <div className="grid-2" style={{ gap: 14 }}>
         <div><label className="label">Name</label><input className="input" required value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Dr. Naomi Schaal" /></div>
         <div><label className="label">Email</label><input className="input" type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="naomi@berkeley.edu" /></div>
         <div><label className="label">Organization</label><input className="input" value={form.org} onChange={(e) => update("org", e.target.value)} placeholder="UC Berkeley · Geography" /></div>
@@ -101,7 +101,7 @@ export default function ContactPage() {
       />
 
       <Section>
-        <div id="waitlist" style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 32, alignItems: "start" }}>
+        <div id="waitlist" className="split-12-10" style={{ gap: 32, alignItems: "start" }}>
           <ContactForm />
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             <div className="card" style={{ borderLeft: "2px solid var(--crimson)" }}>
@@ -127,7 +127,7 @@ export default function ContactPage() {
       </Section>
 
       <Section sunken kicker="response times · honest" title="What to expect.">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+        <div className="grid-4" style={{ gap: 14 }}>
           {[
             { k: "waitlist", v: "≤ 5 days", c: "var(--purple)" },
             { k: "support · pursue", v: "≤ 48 hrs", c: "var(--crimson)" },

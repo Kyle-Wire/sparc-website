@@ -26,7 +26,7 @@ export default async function DevicesPage() {
         </p>
       </div>
 
-      <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+      <div className="card table-scroll" style={{ padding: 0, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
           <thead><tr style={{ background: "var(--paper-2)", borderBottom: "1px solid var(--line)" }}>
             {["name", "os", "last seen", "added", ""].map((h) => (

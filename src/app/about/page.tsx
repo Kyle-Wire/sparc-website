@@ -15,10 +15,10 @@ export default function AboutPage() {
       />
 
       <Section>
-        <div id="thesis" style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 56, alignItems: "start" }}>
+        <div id="thesis" className="split-12-10" style={{ gap: 56, alignItems: "start" }}>
           <div>
             <Kicker>our thesis</Kicker>
-            <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.025em", lineHeight: 1.1, margin: "12px 0 18px" }}>Spatial science deserves better instruments.</h2>
+            <h2 style={{ fontSize: "var(--fs-display)", fontWeight: 800, letterSpacing: "-0.025em", lineHeight: 1.1, margin: "12px 0 18px" }}>Spatial science deserves better instruments.</h2>
             <p style={{ fontSize: 16, color: "var(--ink-2)", lineHeight: 1.65, marginBottom: 14 }}>
               Most spatial ML tools today are either too academic to ship or too commercial to trust. The first ones don&apos;t have install scripts. The second ones don&apos;t tell you what their models actually optimize.
             </p>
@@ -29,7 +29,7 @@ export default function AboutPage() {
               The model is neural. The structure is causal. The promise is that you can simulate adaptation with error bars — not just describe the world.
             </p>
           </div>
-          <div className="card" style={{ padding: 28, position: "sticky", top: 80 }}>
+          <div className="card sticky-md-up" style={{ padding: 28, position: "sticky", top: 80 }}>
             <div className="kicker">at a glance</div>
             <dl className="dl" style={{ marginTop: 12 }}>
               <dt>founded</dt><dd className="mono">{FOUNDED_YEAR} · {OFFICE_CITY}, {OFFICE_STATE}</dd>
@@ -45,7 +45,7 @@ export default function AboutPage() {
       </Section>
 
       <Section sunken kicker="principles · 04" title="What we'll never compromise on." id="principles">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 18 }}>
+        <div className="grid-2" style={{ gap: 18 }}>
           {[
             { k: "01", t: "Models that show their work.", b: "If you can't read the coefficients, set the priors, or audit the chain, it isn't science. It's marketing." },
             { k: "02", t: "Reproducibility, not replicability.", b: "A SPARC project from 2026 will run identically on a fresh install in 2031. We pin our way out of dependency hell so you don't have to." },
@@ -64,7 +64,7 @@ export default function AboutPage() {
       </Section>
 
       <Section kicker="get in touch" title="Want to talk?">
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+        <div className="grid-2" style={{ gap: 18 }}>
           <div className="card" style={{ padding: 28, borderLeft: "3px solid var(--crimson)" }}>
             <div className="kicker">researchers · waitlist</div>
             <h3 style={{ fontSize: 22, fontWeight: 700, margin: "10px 0 10px" }}>Try the private beta.</h3>

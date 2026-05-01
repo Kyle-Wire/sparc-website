@@ -89,7 +89,7 @@ function DemoForm({ initialIsInvestor }: { initialIsInvestor: boolean }) {
       <div className="kicker">request access</div>
       <h3 style={{ fontSize: 20, fontWeight: 700, margin: "10px 0 18px" }}>Tell us about your work</h3>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+      <div className="grid-2" style={{ gap: 14 }}>
         <div>
           <label className="label">Full name</label>
           <input
@@ -222,7 +222,7 @@ export default function DemoPage() {
         lead="We're piloting SPARC with a small group of planners, researchers, and agencies. Tell us about your work and we'll get back to you with a build."
       />
       <Section>
-        <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 28, alignItems: "start" }}>
+        <div className="split-12-10" style={{ gap: 28, alignItems: "start" }}>
           <React.Suspense fallback={<div className="card" style={{ padding: 28 }}>Loading…</div>}>
             <DemoFormShell />
           </React.Suspense>

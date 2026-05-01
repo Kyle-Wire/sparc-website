@@ -219,7 +219,7 @@ export default function ProductPage() {
         <div className="wrap" style={{ textAlign: "center" }}>
           <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.025em", margin: "0 0 16px" }}>Ready to run the pipeline?</h2>
           <div className="row" style={{ justifyContent: "center", gap: 10 }}>
-            <Link href="/signup" className="btn btn-accent">Request access <span className="arrow">→</span></Link>
+            <Link href="/demo" className="btn btn-accent">Request access <span className="arrow">→</span></Link>
             <Link href="/templates" className="btn">Browse templates</Link>
           </div>
         </div>

@@ -71,7 +71,7 @@ export default function AboutPage() {
             <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, margin: "0 0 16px" }}>
               Tell us your domain and CRS. We&apos;ll send a build with the right template pre-loaded.
             </p>
-            <Link href="/signup" className="btn btn-accent">Request access <span className="arrow">→</span></Link>
+            <Link href="/demo" className="btn btn-accent">Request access <span className="arrow">→</span></Link>
           </div>
           <div className="card" style={{ padding: 28, borderLeft: "3px solid var(--purple)" }}>
             <div className="kicker">institutions · partnerships</div>

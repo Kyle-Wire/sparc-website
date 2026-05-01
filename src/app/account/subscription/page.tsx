@@ -59,7 +59,7 @@ export default async function SubscriptionPage({ searchParams }: { searchParams:
           {sub?.customer_portal_url ? (
             <Link className="btn btn-primary" href="/api/portal">Manage billing & invoices →</Link>
           ) : (
-            <Link className="btn btn-accent" href="/pricing">Upgrade plan →</Link>
+            <Link className="btn btn-accent" href="/demo">Request access →</Link>
           )}
           <Link className="btn" href="/contact?tier=transcend">Talk about Transcend</Link>
         </div>

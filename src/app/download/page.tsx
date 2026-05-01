@@ -56,7 +56,7 @@ export default function DownloadPage() {
       </Section>
 
       <Section kicker="not ready yet?" title="Join the waitlist.">
-        <Link href="/signup" className="btn btn-accent">Request access →</Link>
+        <Link href="/demo" className="btn btn-accent">Request access →</Link>
       </Section>
 
       <Footer />

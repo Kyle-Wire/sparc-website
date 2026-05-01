@@ -1,26 +1,26 @@
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { Kicker, Section } from "@/components/marketing/page-shell";
-import { Hero, ProofStrip, PipelineFlow, PosteriorTrace, ScenarioCompare } from "@/components/marketing/landing-parts";
+import { Hero, PipelineFlow, PosteriorTrace, ScenarioCompare } from "@/components/marketing/landing-parts";
 
 const PILLARS = [
   {
-    kicker: "01 · neural model",
-    title: "Locally-weighted neural ensembles.",
-    body: "Every prediction has a local model. Coefficients vary smoothly across space; uncertainty travels with them. Spatial heterogeneity is a feature, not noise.",
-    tag: "physics-constrained",
+    kicker: "01 · the model",
+    title: "A spatial neural model.",
+    body: "SPARC learns how variables behave here vs. there. Instead of one global formula, every location gets its own little model — and they share what they learn.",
+    tag: "local + spatial",
   },
   {
-    kicker: "02 · causal inference",
-    title: "Causal, not just correlational.",
-    body: "The pipeline learns under directed causal structure. Edges have direction, signs are physically grounded, and counterfactuals respect the graph.",
-    tag: "monotone constraints",
+    kicker: "02 · causal, not correlational",
+    title: "Knows why, not just what.",
+    body: "You tell SPARC what causes what (or let it propose a structure). It respects direction and physics — so the relationships it finds aren't just patterns, they're explanations.",
+    tag: "directed structure",
   },
   {
-    kicker: "03 · adaptation engine",
-    title: "Simulate \"what-if\" — with error bars.",
-    body: "Increase canopy 12%. Lower impervious 8%. Get a posterior mean, σ, and a pixel-wise uncertainty raster — never a single number.",
-    tag: "uncertainty quantified",
+    kicker: "03 · simulate",
+    title: "Try the change before you make it.",
+    body: "Add canopy. Reduce impervious surface. SPARC shows you what would likely happen — and how confident it is, pixel by pixel.",
+    tag: "with uncertainty",
   },
 ];
 
@@ -36,10 +36,10 @@ const TEMPLATES_PEEK = [
 ];
 
 const STEPS = [
-  { no: "01", k: "Setup", title: "Bring your project", body: "Drop a project.yml, point at your raster + vector data, set CRS and time window. Or fork one of 13 templates." },
-  { no: "02", k: "Causal", title: "Set the structure", body: "SPARC proposes a causal graph from the correlogram; you accept, reject, or rewrite. Physics constraints (signs, monotones) are first-class." },
-  { no: "03", k: "Pipeline", title: "Run the neural ensemble", body: "Locally-weighted models train in parallel across the grid. Posterior traces stream live. χ² and σ gate every stage." },
-  { no: "04", k: "Adapt", title: "Simulate and report", body: "Compare adaptation scenarios on a single map. Export pixel-wise uncertainty rasters and a fully reproducible audit trail." },
+  { no: "01", k: "correlogram", title: "Explore", body: "Start with the data. SPARC maps how things vary across space and flags the patterns worth chasing." },
+  { no: "02", k: "SPARC neural", title: "Learn", body: "Train local models everywhere at once. Each location gets coefficients that fit it, not the average." },
+  { no: "03", k: "causal", title: "Reason", body: "Lay out what causes what. Accept SPARC's proposed structure, edit it, or write your own — physics constraints are first-class." },
+  { no: "04", k: "simulate", title: "Adapt", body: "Compare scenarios on one map. Get pixel-wise uncertainty and a reproducible audit trail." },
 ];
 
 export default function HomePage() {
@@ -47,9 +47,8 @@ export default function HomePage() {
     <>
       <Nav active="home" />
       <Hero />
-      <ProofStrip />
 
-      <Section kicker="what it does" title="Three things, done with rigor." lead="An engineer's notebook for spatial science. Every step is auditable, every coefficient is interrogable, every claim has a confidence interval.">
+      <Section kicker="what it does" title="Three ideas, one workflow." lead="A practical tool for spatial science. You can audit every step, question every coefficient, and put a confidence number next to every claim.">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 18 }}>
           {PILLARS.map((it, i) => (
             <div key={i} className="card" style={{ padding: 24, position: "relative" }}>
@@ -69,9 +68,9 @@ export default function HomePage() {
           <div className="section-head">
             <div>
               <Kicker dot dotColor="var(--purple)">live · interactive</Kicker>
-              <h2 style={{ marginTop: 8 }}>The pipeline is the product.</h2>
+              <h2 style={{ marginTop: 8 }}>The Pipeline.</h2>
             </div>
-            <p className="lead">A simplified urban-heat run on Philadelphia census tracts. Every stage is reproducible from <code className="mono">project.yml</code>.</p>
+            <p className="lead">A simplified urban-heat run on Providence, RI. Every stage is reproducible from one <code className="mono">project.yml</code>.</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 18, alignItems: "stretch" }}>
             <PipelineFlow />
@@ -101,7 +100,7 @@ export default function HomePage() {
         </div>
       </Section>
 
-      <Section kicker="how it works" title="Setup → Causal → Pipeline → Adapt." lead="Four stages, hand-numbered. The same flow whether you're modeling drought across a watershed or noise around a runway.">
+      <Section kicker="how it works" title="Explore → Learn → Reason → Adapt." lead="Four steps, in plain language. The same flow whether you're studying heat in a city or moisture in a watershed.">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0, borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
           {STEPS.map((s, i) => (
             <div key={i} style={{ padding: "26px 22px", borderRight: i < 3 ? "1px solid var(--line)" : "none", position: "relative" }}>
@@ -118,17 +117,25 @@ export default function HomePage() {
 
       <section style={{ borderTop: "1px solid var(--line)" }} className="grid-bg">
         <div className="wrap" style={{ textAlign: "center", padding: "48px 0" }}>
-          <Kicker dot dotColor="var(--accent)">join the waitlist</Kicker>
+          <Kicker dot dotColor="var(--accent)">pilot program · private beta</Kicker>
           <h2 style={{ fontSize: 48, fontWeight: 800, letterSpacing: "-0.025em", lineHeight: 1.05, margin: "16px auto 18px", maxWidth: 800, textWrap: "balance" }}>
-            The desktop app is in private beta.<br />Researchers go first.
+            We&apos;re still polishing the app.<br />Pilot with us.
           </h2>
-          <p style={{ color: "var(--ink-2)", maxWidth: 540, margin: "0 auto 24px", fontSize: 16 }}>
-            Tell us your domain and your CRS. We&apos;ll send a build with the right
-            template pre-loaded and a sidecar binary that talks to your GPU.
+          <p style={{ color: "var(--ink-2)", maxWidth: 580, margin: "0 auto 24px", fontSize: 16 }}>
+            SPARC is in private beta. We&apos;re upgrading the application,
+            smoothing rough edges, and partnering with planners and researchers
+            on real projects. Tell us about your area of interest and we&apos;ll
+            see if there&apos;s a fit.
           </p>
           <div className="row" style={{ justifyContent: "center", gap: 10 }}>
-            <Link href="/signup" className="btn btn-accent">Request access <span className="arrow">→</span></Link>
+            <Link href="/demo" className="btn btn-accent">Request access <span className="arrow">→</span></Link>
             <Link href="/product" className="btn">Tour the pipeline</Link>
+          </div>
+        </div>
+        <div style={{ borderTop: "1px dashed var(--line)" }}>
+          <div className="wrap" style={{ padding: "18px 0", display: "flex", justifyContent: "center", alignItems: "center", gap: 12, flexWrap: "wrap", color: "var(--muted)", fontSize: 13 }}>
+            <span>Building tools for places? <strong style={{ color: "var(--ink-2)" }}>We&apos;re talking to a small group of mission-aligned investors.</strong></span>
+            <Link href={{ pathname: "/demo", query: { role: "investor" } }} className="mono" style={{ fontSize: 12, color: "var(--accent)", textDecoration: "none", letterSpacing: "0.04em" }}>get in touch →</Link>
           </div>
         </div>
       </section>

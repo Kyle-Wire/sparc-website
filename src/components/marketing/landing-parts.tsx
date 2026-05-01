@@ -31,6 +31,7 @@ function TerminalSplash() {
       fontFamily: "var(--font-mono)", fontSize: 12, lineHeight: 1.7,
       position: "relative", overflow: "hidden",
       boxShadow: "0 24px 60px -20px rgba(26,20,22,0.35)",
+      height: 360, display: "flex", flexDirection: "column",
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 10, borderBottom: "1px solid #2a2227", marginBottom: 12 }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 10, letterSpacing: "0.12em", color: "#8a7d72", textTransform: "uppercase" }}>
@@ -38,20 +39,22 @@ function TerminalSplash() {
         </span>
         <span style={{ fontSize: 10, color: "#8a7d72", letterSpacing: "0.1em" }}>{VERSION} · {String(Math.floor(progress)).padStart(3, "0")}%</span>
       </div>
-      {BOOT_LINES.slice(0, shown).map((l, i) => (
-        <div key={i} className="fadeup" style={{
-          color: l.kind === "cmd" ? "#fbdd46" : l.kind === "ready" ? "#e73c25" : "#d8d0c2",
-          fontWeight: l.kind === "ready" ? 700 : 400, whiteSpace: "pre",
-        }}>
-          {l.text}
-          {l.kind === "ok" && <span style={{ color: "#9e337d", marginLeft: 8 }}>✓</span>}
-        </div>
-      ))}
-      {shown < BOOT_LINES.length && (
-        <div style={{ color: "#f0b632" }}>
-          ▸ <span style={{ background: "#f5efe4", color: "#0e0a0c", padding: "0 1px", animation: "blink 1s steps(2) infinite" }}>&nbsp;</span>
-        </div>
-      )}
+      <div style={{ flex: 1, overflow: "hidden" }}>
+        {BOOT_LINES.slice(0, shown).map((l, i) => (
+          <div key={i} className="fadeup" style={{
+            color: l.kind === "cmd" ? "#fbdd46" : l.kind === "ready" ? "#e73c25" : "#d8d0c2",
+            fontWeight: l.kind === "ready" ? 700 : 400, whiteSpace: "pre",
+          }}>
+            {l.text}
+            {l.kind === "ok" && <span style={{ color: "#9e337d", marginLeft: 8 }}>✓</span>}
+          </div>
+        ))}
+        {shown < BOOT_LINES.length && (
+          <div style={{ color: "#f0b632" }}>
+            ▸ <span style={{ background: "#f5efe4", color: "#0e0a0c", padding: "0 1px", animation: "blink 1s steps(2) infinite" }}>&nbsp;</span>
+          </div>
+        )}
+      </div>
       <div style={{ marginTop: 14, height: 3, background: "#2a2227", borderRadius: 2, overflow: "hidden" }}>
         <div style={{
           height: "100%", width: `${progress}%`,
@@ -75,7 +78,6 @@ export function Hero() {
         <div>
           <Kicker dot dotColor="var(--accent)">{TAGLINE_SHORT.toLowerCase()}</Kicker>
           <h1 style={{ fontSize: 64, fontWeight: 800, letterSpacing: "-0.03em", lineHeight: 1.0, margin: "18px 0 22px", textWrap: "balance" }}>
-            A neural pipeline that{" "}
             <span style={{
               backgroundImage: "var(--grad-ramp)",
               backgroundSize: "200% 100%",
@@ -83,22 +85,16 @@ export function Hero() {
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
               animation: "rampShift 12s ease-in-out infinite",
-            }}>simulates adaptation</span>.
+            }}>Understand. Simulate. Adapt.</span>
           </h1>
           <p style={{ fontSize: 18, color: "var(--ink-2)", maxWidth: 560, lineHeight: 1.5, margin: "0 0 28px" }}>
-            SPARC ({BRAND_LONG}) is a spatial neural model with built-in causal
-            inference. The pipeline ingests your data, learns local
-            relationships, and simulates how a place adapts under interventions
-            — with posterior uncertainty on every pixel.
+            Spatial causal models for planners working on real places. SPARC
+            ({BRAND_LONG}) learns how local variables connect, then simulates
+            how a place might change under different decisions.
           </p>
-          <div className="row" style={{ gap: 10, marginBottom: 28 }}>
-            <Link href="/signup" className="btn btn-accent">Request access <span className="arrow">→</span></Link>
+          <div className="row" style={{ gap: 10, marginBottom: 8 }}>
+            <Link href="/demo" className="btn btn-accent">Request access <span className="arrow">→</span></Link>
             <Link href="/product" className="btn">See the pipeline</Link>
-          </div>
-          <div className="row" style={{ gap: 24, flexWrap: "wrap", color: "var(--muted)", fontSize: 12 }}>
-            <span className="row" style={{ gap: 6 }}><span className="dot" style={{ background: "var(--crimson)" }} /> neural · causal</span>
-            <span className="row" style={{ gap: 6 }}><span className="dot" style={{ background: "var(--purple)" }} /> 13 domain templates</span>
-            <span className="row" style={{ gap: 6 }}><span className="dot" style={{ background: "var(--amber)" }} /> CUDA · GPU-accelerated</span>
           </div>
         </div>
         <TerminalSplash />
@@ -140,16 +136,16 @@ export function PipelineFlow() {
   const stages = [
     { n: "00", k: "ingest", note: "raster + vector + project.yml", c: "var(--purple)" },
     { n: "01", k: "correlogram", note: "Moran's I · spatial structure", c: "var(--magenta)" },
-    { n: "02", k: "causal graph", note: "24 nodes · 41 edges", c: "var(--pink)" },
-    { n: "03", k: "neural train", note: "GW3C · χ² 0.93", c: "var(--crimson)" },
-    { n: "04", k: "posterior", note: "8 chains · σ 0.154", c: "var(--orange)" },
-    { n: "05", k: "scenario", note: "adaptation · uncertainty", c: "var(--amber)" },
+    { n: "02", k: "SPARC neural", note: "GW3C · local models", c: "var(--pink)" },
+    { n: "03", k: "causal graph", note: "structure + constraints", c: "var(--crimson)" },
+    { n: "04", k: "posterior", note: "8 chains · uncertainty", c: "var(--orange)" },
+    { n: "05", k: "simulate", note: "scenarios · what-if", c: "var(--amber)" },
     { n: "06", k: "report", note: "audit trail · pdf · md", c: "var(--gold)" },
   ];
   return (
     <div className="card" style={{ padding: 0 }}>
       <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div className="kicker">pipeline · 7 stages · the product</div>
+        <div className="kicker">pipeline · 7 stages</div>
         <span className="pill"><span className="live-dot" /> running · stage {String(stage).padStart(2, "0")}</span>
       </div>
       <div style={{ padding: 14, display: "flex", flexDirection: "column", gap: 6 }}>
@@ -186,30 +182,35 @@ export function PosteriorTrace() {
   }, []);
   const chains = [0, 1, 2, 3].map((c) => {
     const seed = c * 13 + 7;
+    const amp = 0.18 + c * 0.07;
+    const freq = 0.45 + c * 0.18;
+    const drift = 0.08 + c * 0.05;
+    const offset = -0.4 + c * 0.28;
     const pts: [number, number][] = [];
     for (let i = 0; i < 80; i++) {
       const x = i / 79;
-      const noise = Math.sin((i + seed + t * 0.4) * 0.6) * 0.15
-                  + Math.sin((i * 0.3 + seed) * 1.2) * 0.07;
-      pts.push([x, -0.258 + noise]);
+      const noise = Math.sin((i + seed + t * 0.4) * freq) * amp
+                  + Math.sin((i * 0.3 + seed) * 1.2 + c) * drift
+                  + Math.cos((i * 0.17 + c * 2.1 + t * 0.22) * 0.9) * (amp * 0.4);
+      pts.push([x, offset + noise]);
     }
     return pts;
   });
   const chainColors = ["var(--crimson)", "var(--purple)", "var(--amber)", "var(--magenta)"];
+  const chainStrokes = [1.6, 1.1, 1.8, 1.3];
+  const chainOpacities = [0.95, 0.7, 0.85, 0.6];
   return (
     <div className="card" style={{ padding: 0 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--line)" }}>
-        <div className="kicker">posterior trace · ΔAAT_z</div>
+        <div className="kicker">posterior trace</div>
         <span className="pill"><span className="live-dot" /> live · 8 chains</span>
       </div>
       <div style={{ padding: 16 }}>
         <svg width="100%" height="160" viewBox="0 0 400 160" preserveAspectRatio="none">
-          <line x1="0" y1="100" x2="400" y2="100" stroke="var(--line)" strokeDasharray="3 3" />
-          <text x="6" y="96" fontSize="9" fontFamily="var(--font-mono)" fill="var(--muted)">μ = −0.258</text>
           {chains.map((pts, c) => (
             <polyline key={c}
-              points={pts.map(([x, y]) => `${x * 400},${100 + y * 40}`).join(" ")}
-              fill="none" stroke={chainColors[c]} strokeWidth="1.2" opacity="0.85" />
+              points={pts.map(([x, y]) => `${x * 400},${80 + y * 60}`).join(" ")}
+              fill="none" stroke={chainColors[c]} strokeWidth={chainStrokes[c]} opacity={chainOpacities[c]} />
           ))}
         </svg>
         <div className="row" style={{ gap: 16, marginTop: 8, fontSize: 10, color: "var(--muted)" }}>
@@ -229,12 +230,12 @@ export function ScenarioCompare() {
     <div className="card" style={{ padding: 0 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--line)" }}>
         <div className="kicker">adaptation scenario</div>
-        <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>philadelphia · 1.2km grid</span>
+        <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>providence · 1km grid</span>
       </div>
       <div style={{ padding: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         {[
-          { label: "Baseline", value: "+11.8 °C", color: "var(--crimson)", sigma: "σ 0.42" },
-          { label: "+12% canopy", value: "+9.4 °C", color: "var(--amber)", sigma: "σ 0.51" },
+          { label: "Baseline", value: "+10.6 °C", color: "var(--crimson)", sigma: "σ 0.38" },
+          { label: "+12% canopy", value: "+8.9 °C", color: "var(--amber)", sigma: "σ 0.44" },
         ].map((s, i) => (
           <div key={i} style={{ border: "1px dashed var(--line)", borderRadius: 6, padding: "10px 12px" }}>
             <div className="kicker" style={{ fontSize: 9 }}>{s.label}</div>
@@ -244,7 +245,11 @@ export function ScenarioCompare() {
         ))}
         <div style={{ gridColumn: "1 / -1", padding: "8px 0 2px", borderTop: "1px dotted var(--line)", display: "flex", justifyContent: "space-between" }}>
           <span className="kicker">Δ predicted mean</span>
-          <span className="mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--purple)" }}>−2.4 °C</span>
+          <span className="mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--purple)" }}>−1.7 °C</span>
+        </div>
+        <div style={{ gridColumn: "1 / -1", paddingTop: 4, display: "flex", justifyContent: "space-between" }}>
+          <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>R² 0.94</span>
+          <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>Moran's I 0.71 → 0.18</span>
         </div>
       </div>
     </div>

@@ -169,9 +169,9 @@ export function IngestVisual() {
       <div style={{ border: "1px dashed var(--line)", borderRadius: 6, padding: 14, background: "var(--paper)", marginBottom: 12 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {files.map((f, i) => (
-            <div key={i} style={{ display: "grid", gridTemplateColumns: "70px 1fr 70px", gap: 10, alignItems: "center", fontSize: 12 }}>
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "70px minmax(0,1fr) 70px", gap: 10, alignItems: "center", fontSize: 12 }}>
               <span className="mono" style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 3, background: f.c, color: "#fff", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.08em" }}>{f.k}</span>
-              <span className="mono" style={{ fontSize: 12, color: "var(--ink)" }}>{f.n}</span>
+              <span className="mono" style={{ fontSize: 12, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.n}</span>
               <span className="mono" style={{ fontSize: 10, color: "var(--purple)", textAlign: "right" }}>✓ parsed</span>
             </div>
           ))}
@@ -249,7 +249,7 @@ export function GwenVisual() {
           const w = (Math.abs(v.b) / max) * 100;
           const pos = v.b >= 0;
           return (
-            <div key={i} style={{ display: "grid", gridTemplateColumns: "130px 1fr 50px", gap: 10, alignItems: "center", fontSize: 12, opacity: v.kept ? 1 : 0.45 }}>
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "minmax(0,130px) minmax(0,1fr) 50px", gap: 10, alignItems: "center", fontSize: 12, opacity: v.kept ? 1 : 0.45 }}>
               <span className="mono" style={{ fontSize: 11, textDecoration: v.kept ? "none" : "line-through" }}>{v.n}</span>
               <div style={{ position: "relative", height: 10, background: "var(--paper)", borderRadius: 2 }}>
                 <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: 1, background: "var(--line)" }} />

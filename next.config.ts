@@ -1,9 +1,11 @@
 import type { NextConfig } from "next";
 
 // Content-Security-Policy.
-// Rolled out as Report-Only first; flip the header name to `Content-Security-Policy`
-// once production logs are clean. `'unsafe-inline'` in script-src is retained because
-// Next.js App Router inlines hydration data; tighten to nonces in a future pass.
+// Enforcing mode (verified clean in Report-Only on production). `'unsafe-inline'`
+// in script-src is retained because Next.js App Router inlines hydration data;
+// tighten to nonces in a future pass.
+// To re-enter Report-Only mode (e.g. when adding a new third-party origin),
+// rename the header below to `Content-Security-Policy-Report-Only`.
 const CSP = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline'",
@@ -19,13 +21,15 @@ const CSP = [
 ].join("; ");
 
 const SECURITY_HEADERS = [
-  { key: "Content-Security-Policy-Report-Only", value: CSP },
+  { key: "Content-Security-Policy", value: CSP },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), interest-cohort=()" },
   { key: "X-DNS-Prefetch-Control", value: "on" },
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
 ];
 
 const config: NextConfig = {

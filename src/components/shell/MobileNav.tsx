@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import type { Route } from "next";
 
@@ -14,10 +15,13 @@ export function MobileNav({
   extraLinks?: Item[];
 }) {
   const [open, setOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
   const closeBtnRef = React.useRef<HTMLButtonElement>(null);
   const openBtnRef = React.useRef<HTMLButtonElement>(null);
 
   const close = React.useCallback(() => setOpen(false), []);
+
+  React.useEffect(() => { setMounted(true); }, []);
 
   React.useEffect(() => {
     if (!open) return;
@@ -34,28 +38,13 @@ export function MobileNav({
     };
   }, [open]);
 
-  return (
+  const drawer = (
     <>
-      <button
-        ref={openBtnRef}
-        type="button"
-        className="mobile-menu-btn show-tablet"
-        aria-label="Open menu"
-        aria-expanded={open}
-        aria-controls="mobile-drawer"
-        onClick={() => setOpen(true)}
-      >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
-          <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        </svg>
-      </button>
-
       <div
         className={`drawer-backdrop${open ? " open" : ""}`}
         onClick={close}
         aria-hidden
       />
-
       <aside
         id="mobile-drawer"
         className={`drawer${open ? " open" : ""}`}
@@ -113,4 +102,24 @@ export function MobileNav({
       </aside>
     </>
   );
+
+  return (
+    <>
+      <button
+        ref={openBtnRef}
+        type="button"
+        className="mobile-menu-btn show-tablet"
+        aria-label="Open menu"
+        aria-expanded={open}
+        aria-controls="mobile-drawer"
+        onClick={() => setOpen(true)}
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+          <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+      </button>
+      {mounted ? createPortal(drawer, document.body) : null}
+    </>
+  );
 }
+

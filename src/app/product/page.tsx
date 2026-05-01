@@ -145,7 +145,7 @@ export default function ProductPage() {
       </StageStack>
 
       <section style={{ background: "var(--ink)", color: "var(--paper)", padding: "60px 0", borderBottom: "1px solid var(--ink)" }}>
-        <div className="wrap" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 36 }}>
+        <div className="wrap grid-4" style={{ gap: 36 }}>
           {[
             { k: "philosophy · 01", t: "No black boxes.", b: "Every coefficient is interrogable. Every edge has a sign. Every prediction has a posterior." },
             { k: "philosophy · 02", t: "Physics, not vibes.", b: "Monotone constraints, mass balance, conservation laws — the model honors them or it doesn't run." },
@@ -162,7 +162,7 @@ export default function ProductPage() {
       </section>
 
       <Section kicker="under the hood" title="What's actually running.">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+        <div className="grid-4" style={{ gap: 14 }}>
           {[
             { k: "frontend", v: "Tauri 2.0 · React 18 · TypeScript", c: "var(--crimson)" },
             { k: "backend", v: "Python 3.12 · sidecar binary :8008", c: "var(--purple)" },

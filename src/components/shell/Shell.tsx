@@ -16,13 +16,6 @@ const NAV_LINKS: { href: Route; label: string; key: NavKey }[] = [
   { href: "/about", label: "About", key: "about" },
 ];
 
-const DRAWER_EXTRA: { href: Route; label: string }[] = [
-  { href: "/pricing", label: "Pricing" },
-  { href: "/docs", label: "Docs" },
-  { href: "/research", label: "Research" },
-  { href: "/changelog", label: "Changelog" },
-];
-
 // Native aspect ratio of public/sparclabs-logo.png is 3300x2550 ≈ 1.294:1
 const LOGO_ASPECT = 3300 / 2550;
 
@@ -62,7 +55,7 @@ export function Nav({ active }: { active?: NavKey }) {
           <NavUserStatus />
         </div>
         <div className="nav-cta show-tablet" style={{ marginLeft: "auto" }}>
-          <MobileNav links={NAV_LINKS} extraLinks={DRAWER_EXTRA} />
+          <MobileNav links={NAV_LINKS} />
         </div>
       </div>
       <div className="ramp-strip" aria-hidden />

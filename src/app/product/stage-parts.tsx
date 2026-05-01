@@ -61,33 +61,6 @@ export function StageBlock({
   const ref = React.useRef<HTMLDivElement | null>(null);
   const [open, setOpen] = React.useState(false);
 
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) {
-      setOpen(true);
-      ctx?.register(index, true);
-      return;
-    }
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            setOpen(true);
-            ctx?.register(index, true);
-            io.disconnect();
-            break;
-          }
-        }
-      },
-      { threshold: 0.2, rootMargin: "0px 0px -10% 0px" }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [ctx, index]);
-
   // open if hash matches on mount
   React.useEffect(() => {
     if (typeof window === "undefined") return;
@@ -97,6 +70,14 @@ export function StageBlock({
     }
   }, [anchor, ctx, index]);
 
+  function toggle() {
+    setOpen((prev) => {
+      const next = !prev;
+      ctx?.register(index, next);
+      return next;
+    });
+  }
+
   return (
     <div
       ref={ref}
@@ -104,15 +85,21 @@ export function StageBlock({
       className={`stage-block${open ? " open" : ""}`}
       style={{ scrollMarginTop: 80 }}
     >
-      <div className="stage-head">
+      <button
+        type="button"
+        className="stage-head"
+        onClick={toggle}
+        aria-expanded={open}
+        aria-controls={`${anchor}-body`}
+      >
         <span className="stage-num" style={{ background: accent }}>{num}</span>
         <div>
           <div className="kicker" style={{ color: accent }}>{kicker}</div>
           <h2 className="stage-title">{title}</h2>
         </div>
         <span className="stage-chevron" aria-hidden>▾</span>
-      </div>
-      <div className="stage-body">
+      </button>
+      <div className="stage-body" id={`${anchor}-body`}>
         <div>
           <p className="stage-lead">{lead}</p>
           <dl className="dl">

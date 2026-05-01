@@ -202,7 +202,8 @@ body.no-scroll { overflow: hidden; }
 .stage-stack .stage-rail-fill { position: absolute; left: 0; top: 0; width: 100%; background: linear-gradient(to bottom, var(--purple), var(--magenta), var(--pink), var(--crimson), var(--orange), var(--amber), var(--gold)); transition: height .5s ease; }
 .stage-block { position: relative; border-bottom: 1px solid var(--line); padding: 56px 0; transition: background .4s ease; }
 .stage-block .stage-num { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: #fff; }
-.stage-block .stage-head { display: grid; grid-template-columns: 50px 1fr auto; gap: 18px; align-items: center; }
+.stage-block .stage-head { display: grid; grid-template-columns: 50px 1fr auto; gap: 18px; align-items: center; width: 100%; background: transparent; border: 0; padding: 0; margin: 0; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+.stage-block .stage-head:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
 .stage-block .stage-title { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin: 6px 0 0; }
 .stage-block .stage-body { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-top: 32px; padding-left: 68px; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .55s ease, opacity .35s ease, margin-top .35s ease; }
 .stage-block.open .stage-body { max-height: 1200px; opacity: 1; }

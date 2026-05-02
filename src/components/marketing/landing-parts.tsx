@@ -230,7 +230,7 @@ export function ScenarioCompare() {
     <div className="card" style={{ padding: 0 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--line)" }}>
         <div className="kicker">adaptation scenario</div>
-        <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>providence · 1km grid</span>
+        <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>boston · 1km grid</span>
       </div>
       <div style={{ padding: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         {[

@@ -123,7 +123,7 @@ function DemoForm({ initialIsInvestor }: { initialIsInvestor: boolean }) {
             type="text"
             value={organization}
             onChange={(e) => setOrganization(e.target.value)}
-            placeholder="City of Providence · Planning"
+            placeholder="City of Boston · Planning"
             autoComplete="organization"
             maxLength={200}
           />
@@ -174,7 +174,7 @@ function DemoForm({ initialIsInvestor }: { initialIsInvestor: boolean }) {
         rows={4}
         value={useCase}
         onChange={(e) => setUseCase(e.target.value)}
-        placeholder="Modeling urban heat across Providence neighborhoods to prioritize canopy investment…"
+        placeholder="Modeling urban heat across Boston neighborhoods to prioritize canopy investment…"
         maxLength={2000}
         style={{ resize: "vertical" }}
       />

@@ -4,6 +4,12 @@ import { Nav, Footer } from "@/components/shell/Shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AccountNav } from "./AccountNav";
 
+// Authenticated pages must never be cached by shared caches and must not be indexed.
+export const dynamic = "force-dynamic";
+export const metadata = {
+  robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
+};
+
 const NAV: { href: Route; label: string }[] = [
   { href: "/account", label: "Overview" },
   { href: "/account/subscription", label: "Subscription" },

@@ -70,7 +70,7 @@ export default function HomePage() {
               <Kicker dot dotColor="var(--purple)">live · interactive</Kicker>
               <h2 style={{ marginTop: 8 }}>The Pipeline.</h2>
             </div>
-            <p className="lead">A simplified urban-heat run on Providence, RI. Every stage is reproducible from one <code className="mono">project.yml</code>.</p>
+            <p className="lead">A simplified urban-heat run on Boston, MA. Every stage is reproducible from one <code className="mono">project.yml</code>.</p>
           </div>
           <div className="split-14-10" style={{ gap: 18, alignItems: "stretch" }}>
             <PipelineFlow />

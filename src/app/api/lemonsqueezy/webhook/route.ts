@@ -50,6 +50,26 @@ export async function POST(req: NextRequest) {
 
   const admin = createSupabaseAdminClient();
 
+  // Idempotency: short-circuit replays. Table created in migration 0004.
+  // Use the LS event id header (set per delivery) as the dedup key.
+  const eventId = req.headers.get("x-event-id") ?? `${event}:${payload.data.id}`;
+  try {
+    const { error: dupErr } = await admin
+      .from("lemonsqueezy_events")
+      .insert({ event_id: eventId, event_name: event });
+    if (dupErr) {
+      // 23505 = unique_violation → we've seen this delivery before.
+      const code = (dupErr as { code?: string }).code;
+      if (code === "23505") {
+        return NextResponse.json({ ok: true, deduped: true });
+      }
+      // Table may not exist yet (migration not applied) — log and continue.
+      console.warn("[lemonsqueezy] dedup insert failed (continuing):", dupErr);
+    }
+  } catch (err) {
+    console.warn("[lemonsqueezy] dedup check error (continuing):", err);
+  }
+
   try {
     if (event.startsWith("subscription_")) {
       const status = attr.status ?? (event === "subscription_cancelled" ? "cancelled" : event === "subscription_expired" ? "expired" : "active");

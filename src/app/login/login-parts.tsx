@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { Route } from "next";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { SITE_URL } from "@/lib/brand";
+import { safeNext } from "@/lib/safe-redirect";
 
 const PROFESSIONS = [
   "Researcher / Faculty",
@@ -19,7 +20,7 @@ const PROFESSIONS = [
 export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") ?? "/account";
+  const next = safeNext(params.get("next"), "/account");
 
   const [fullName, setFullName] = React.useState("");
   const [organization, setOrganization] = React.useState("");

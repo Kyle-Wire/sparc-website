@@ -1,6 +1,7 @@
 // Refresh Supabase session on every request and gate /account/* routes.
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { safeNext } from "@/lib/safe-redirect";
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
@@ -19,7 +20,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
   if (path.startsWith("/account") && !user) {
-    const next = encodeURIComponent(path);
+    const next = encodeURIComponent(safeNext(path, "/account"));
     return NextResponse.redirect(new URL(`/login?next=${next}`, request.url));
   }
   return response;

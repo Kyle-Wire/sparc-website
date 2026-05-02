@@ -1,16 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/supabase/server";
+import { isSameOrigin } from "@/lib/require-same-origin";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
+const ALLOWED_PROVIDERS = new Set([
+  "openai",
+  "anthropic",
+  "google",
+  "mistral",
+  "openrouter",
+  "ollama",
+  "cohere",
+  "groq",
+]);
+const LABEL_RE = /^[A-Za-z0-9 _.\-]{1,64}$/;
+const MAX_SECRET_LEN = 4096;
+
 export async function POST(req: NextRequest) {
+  if (!isSameOrigin(req)) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
+
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
 
+  const rl = await checkRateLimit("apiWrite", `api-keys:${user.id}`);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "rate_limited" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds ?? 60) } },
+    );
+  }
+
   const body = await req.json().catch(() => null) as { provider?: string; label?: string; secret?: string } | null;
   if (!body?.provider || !body?.label || !body?.secret) {
     return NextResponse.json({ error: "provider, label, and secret are required" }, { status: 400 });
+  }
+
+  const provider = body.provider.toLowerCase();
+  if (!ALLOWED_PROVIDERS.has(provider)) {
+    return NextResponse.json({ error: "unsupported provider" }, { status: 400 });
+  }
+  if (!LABEL_RE.test(body.label)) {
+    return NextResponse.json({ error: "invalid label" }, { status: 400 });
+  }
+  if (typeof body.secret !== "string" || body.secret.length === 0 || body.secret.length > MAX_SECRET_LEN) {
+    return NextResponse.json({ error: "invalid secret" }, { status: 400 });
   }
 
   try {
@@ -19,7 +57,7 @@ export async function POST(req: NextRequest) {
     // The function wraps Supabase Vault and returns the row WITHOUT the secret.
     const { data, error } = await admin.rpc("encrypt_api_key", {
       p_user_id: user.id,
-      p_provider: body.provider,
+      p_provider: provider,
       p_label: body.label,
       p_secret: body.secret,
     });
@@ -32,12 +70,17 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  if (!isSameOrigin(req)) {
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  }
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
 
   const id = new URL(req.url).searchParams.get("id");
-  if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+  if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+    return NextResponse.json({ error: "valid id required" }, { status: 400 });
+  }
 
   try {
     const admin = createSupabaseAdminClient();

@@ -1,26 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
+import { checkRateLimit, clientIp } from "@/lib/rate-limit";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 
+const NO_CTRL = (s: string) => s.replace(/[\r\n\0]/g, "");
+
 export async function POST(req: NextRequest) {
+  const ip = clientIp(req);
+  const rl = await checkRateLimit("publicForm", `waitlist:${ip}`);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "rate_limited" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds ?? 60) } },
+    );
+  }
+
   let body: Record<string, unknown>;
   try { body = await req.json(); } catch { return NextResponse.json({ error: "invalid json" }, { status: 400 }); }
 
-  const email = String(body.email ?? "").trim().toLowerCase();
+  const captcha = await verifyTurnstile(body.turnstileToken, ip);
+  if (!captcha.ok) return NextResponse.json({ error: "captcha_failed" }, { status: 403 });
+
+  const email = String(body.email ?? "").trim().toLowerCase().slice(0, 320);
   if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return NextResponse.json({ error: "valid email required" }, { status: 400 });
   }
 
   const row = {
     email,
-    name: String(body.name ?? "").slice(0, 200) || null,
-    organization: String(body.org ?? "").slice(0, 200) || null,
-    domain: String(body.domain ?? "").slice(0, 64) || null,
-    crs: String(body.crs ?? "").slice(0, 64) || null,
-    reason: String(body.reason ?? "").slice(0, 4000) || null,
-    user_agent: req.headers.get("user-agent") ?? null,
-    referer: req.headers.get("referer") ?? null,
+    name: NO_CTRL(String(body.name ?? "")).slice(0, 200) || null,
+    organization: NO_CTRL(String(body.org ?? "")).slice(0, 200) || null,
+    domain: NO_CTRL(String(body.domain ?? "")).slice(0, 64) || null,
+    crs: NO_CTRL(String(body.crs ?? "")).slice(0, 64) || null,
+    reason: NO_CTRL(String(body.reason ?? "")).slice(0, 4000) || null,
+    user_agent: (req.headers.get("user-agent") ?? "").slice(0, 500) || null,
+    referer: (req.headers.get("referer") ?? "").slice(0, 500) || null,
   };
 
   try {

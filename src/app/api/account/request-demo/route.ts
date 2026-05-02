@@ -1,5 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { checkRateLimit, clientIp } from "@/lib/rate-limit";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 
@@ -7,16 +9,28 @@ const NOTIFY_TO = process.env.DEMO_NOTIFY_TO ?? "kylewire1899@gmail.com";
 // Until you verify sparclabs.co in Resend, keep using the sandbox sender.
 const FROM = process.env.RESEND_FROM ?? "SPARC Labs <onboarding@resend.dev>";
 
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+const stripCtl = (s: string) => s.replace(/[\r\n\0]/g, "");
+
 function escape(s: string) {
   return s.replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!),
   );
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ ok: false, error: "RESEND_API_KEY not set" }, { status: 500 });
+  }
+
+  const ip = clientIp(req);
+  const rl = await checkRateLimit("publicForm", `request-demo:${ip}`);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { ok: false, error: "rate_limited" },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfterSeconds ?? 60) } },
+    );
   }
 
   let body: {
@@ -28,6 +42,7 @@ export async function POST(req: Request) {
     org_size?: string;
     team_size?: string | number;
     is_investor?: boolean;
+    turnstileToken?: string;
   };
   try {
     body = await req.json();
@@ -35,17 +50,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "invalid json" }, { status: 400 });
   }
 
-  const email = String(body.email ?? "").trim().slice(0, 320);
-  const full_name = String(body.full_name ?? "").trim().slice(0, 200);
-  const organization = String(body.organization ?? "").trim().slice(0, 200);
-  const profession = String(body.profession ?? "").trim().slice(0, 100);
-  const use_case = String(body.use_case ?? "").trim().slice(0, 2000);
-  const org_size = String(body.org_size ?? "").trim().slice(0, 50);
-  const team_size = String(body.team_size ?? "").trim().slice(0, 20);
+  const captcha = await verifyTurnstile(body.turnstileToken, ip);
+  if (!captcha.ok) {
+    return NextResponse.json({ ok: false, error: "captcha_failed" }, { status: 403 });
+  }
+
+  const email = stripCtl(String(body.email ?? "").trim()).slice(0, 320);
+  const full_name = stripCtl(String(body.full_name ?? "").trim()).slice(0, 200);
+  const organization = stripCtl(String(body.organization ?? "").trim()).slice(0, 200);
+  const profession = stripCtl(String(body.profession ?? "").trim()).slice(0, 100);
+  const use_case = stripCtl(String(body.use_case ?? "").trim()).slice(0, 2000);
+  const org_size = stripCtl(String(body.org_size ?? "").trim()).slice(0, 50);
+  const team_size = stripCtl(String(body.team_size ?? "").trim()).slice(0, 20);
   const is_investor = Boolean(body.is_investor);
 
-  if (!email) {
-    return NextResponse.json({ ok: false, error: "email required" }, { status: 400 });
+  if (!email || !EMAIL_RE.test(email)) {
+    return NextResponse.json({ ok: false, error: "valid email required" }, { status: 400 });
   }
 
   const resend = new Resend(apiKey);

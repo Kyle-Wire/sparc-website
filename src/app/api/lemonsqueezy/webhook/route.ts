@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { verifyWebhookSignature, type LemonSqueezyEvent } from "@/lib/lemonsqueezy";
+import { sendEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -88,6 +89,11 @@ export async function POST(req: NextRequest) {
         raw: attr,
         updated_at: new Date().toISOString(),
       }, { onConflict: "ls_subscription_id" });
+
+      // Transactional emails — fire-and-forget so a Resend hiccup never fails the webhook.
+      void notifySubscription(admin, event, userId, tier ?? null, attr).catch((e) =>
+        console.warn("[lemonsqueezy] email notify failed:", e),
+      );
     } else if (event === "order_created") {
       await admin.from("orders").upsert({
         user_id: userId,
@@ -105,4 +111,97 @@ export async function POST(req: NextRequest) {
     console.error("[lemonsqueezy] persist failed:", event, err);
     return NextResponse.json({ error: "persist failed" }, { status: 500 });
   }
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+
+type SubAttr = LSWebhook["data"]["attributes"];
+
+function formatDate(iso?: string | null): string | undefined {
+  if (!iso) return undefined;
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return undefined;
+  return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+}
+
+function formatPlan(tier: string | null, attr: SubAttr): string {
+  const productName = (attr as { product_name?: string }).product_name;
+  const variantName = (attr as { variant_name?: string }).variant_name;
+  if (productName && variantName) return `${productName} (${variantName})`;
+  if (productName) return productName;
+  if (tier) return tier.charAt(0).toUpperCase() + tier.slice(1);
+  return "SPARC";
+}
+
+async function resolveUserEmail(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  userId: string,
+  attr: SubAttr,
+): Promise<{ email: string; firstName?: string } | null> {
+  // Prefer the email on the LS payload; fall back to Supabase auth lookup.
+  let email = attr.user_email ?? null;
+  let firstName: string | undefined;
+  try {
+    const { data } = await admin.auth.admin.getUserById(userId);
+    if (data?.user) {
+      email = email ?? data.user.email ?? null;
+      const meta = (data.user.user_metadata ?? {}) as { full_name?: string; name?: string };
+      const fullName = meta.full_name ?? meta.name;
+      if (fullName) firstName = fullName.split(" ")[0];
+    }
+  } catch {
+    // Non-fatal — we may still have an email from the LS payload.
+  }
+  if (!email) return null;
+  return { email, firstName };
+}
+
+async function notifySubscription(
+  admin: ReturnType<typeof createSupabaseAdminClient>,
+  event: LemonSqueezyEvent,
+  userId: string,
+  tier: string | null,
+  attr: SubAttr,
+) {
+  if (event !== "subscription_created" && event !== "subscription_cancelled") return;
+  const recipient = await resolveUserEmail(admin, userId, attr);
+  if (!recipient) return;
+
+  const planName = formatPlan(tier, attr);
+
+  if (event === "subscription_created") {
+    const renewsOn = formatDate(attr.renews_at);
+    await sendEmail({
+      to: recipient.email,
+      template: "subscription-receipt",
+      props: {
+        firstName: recipient.firstName,
+        planName,
+        amount:
+          (attr as { total_formatted?: string; subtotal_formatted?: string })
+            .total_formatted ??
+          (attr as { subtotal_formatted?: string }).subtotal_formatted ??
+          "—",
+        currency: (attr as { currency?: string }).currency ?? "USD",
+        nextBillingDate: renewsOn,
+        invoiceUrl: (attr.urls as { invoice_url?: string } | undefined)?.invoice_url,
+        manageUrl: attr.urls?.customer_portal,
+      },
+    });
+    return;
+  }
+
+  // subscription_cancelled
+  const endsOn = formatDate(attr.ends_at) ?? formatDate(attr.renews_at) ?? "the end of your billing period";
+  await sendEmail({
+    to: recipient.email,
+    template: "subscription-canceled",
+    props: {
+      firstName: recipient.firstName,
+      planName,
+      endsOn,
+      reactivateUrl: attr.urls?.customer_portal,
+    },
+  });
 }

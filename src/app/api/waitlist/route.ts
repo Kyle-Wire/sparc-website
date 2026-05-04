@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { sendEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -44,10 +45,19 @@ export async function POST(req: NextRequest) {
     const { data, error } = await admin.from("waitlist").upsert(row, { onConflict: "email" }).select("id").single();
     if (error) throw error;
 
+    const ticket = String(data.id).slice(0, 8);
+
     // Optional notification — fire-and-forget so the user isn't blocked on email delivery.
     void notify(row).catch(() => {});
 
-    return NextResponse.json({ ok: true, ticket: String(data.id).slice(0, 8) });
+    // User-facing waitlist confirmation (branded React Email template).
+    void sendEmail({
+      to: email,
+      template: "waitlist-confirmation",
+      props: { email, ticket },
+    }).catch(() => {});
+
+    return NextResponse.json({ ok: true, ticket });
   } catch (err) {
     // If Supabase isn't configured yet we still want the form to feel real in dev.
     if (process.env.NODE_ENV !== "production") {

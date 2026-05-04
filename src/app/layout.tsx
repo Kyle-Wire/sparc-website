@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../styles/globals.css";
 import { COMPANY, BRAND_LONG, TAGLINE_LONG, SITE_URL } from "@/lib/brand";
 import { CookieNotice } from "@/components/shell/CookieNotice";
@@ -36,6 +38,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {children}
         <CookieNotice />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

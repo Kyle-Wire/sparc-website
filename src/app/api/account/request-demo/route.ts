@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { sendEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -92,22 +93,14 @@ export async function POST(req: NextRequest) {
     `,
   });
 
-  // 2) Friendly confirmation back to the user
-  const confirm = await resend.emails.send({
-    from: FROM,
+  // 2) Friendly confirmation back to the user — branded React Email template.
+  const confirm = await sendEmail({
     to: email,
-    subject: "Thanks — your SPARC Labs demo request is in",
-    html: `
-      <div style="font-family:system-ui;font-size:15px;line-height:1.55;color:#111">
-        <p>Hi ${escape(firstName)},</p>
-        <p>Thanks for signing up for SPARC Labs. We received your request and will be in touch shortly to schedule a demo and answer any questions.</p>
-        <p>In the meantime, you can sign in at <a href="https://sparclabs.co/login">sparclabs.co/login</a>.</p>
-        <p>— The SPARC Labs team</p>
-      </div>
-    `,
+    template: "demo-request-received",
+    props: { firstName },
   });
 
-  if (notify.error || confirm.error) {
+  if (notify.error || !confirm.ok) {
     return NextResponse.json(
       { ok: false, notify: notify.error, confirm: confirm.error },
       { status: 502 },

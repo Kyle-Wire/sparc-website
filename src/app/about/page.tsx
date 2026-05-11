@@ -36,7 +36,7 @@ export default function AboutPage() {
               <dt>entity</dt><dd className="mono">{COMPANY_LEGAL}</dd>
               <dt>stage</dt><dd className="mono">private beta · {VERSION}</dd>
               <dt>license</dt><dd className="mono">AGPL · open core</dd>
-              <dt>runtime</dt><dd className="mono">Tauri · React · Python sidecar</dd>
+              <dt>runtime</dt><dd className="mono">Tauri · React · Python</dd>
               <dt>compute</dt><dd className="mono">CUDA 11.8 · MPS · CPU</dd>
               <dt>contact</dt><dd className="mono">{EMAIL_PRIMARY}</dd>
             </dl>
@@ -47,9 +47,9 @@ export default function AboutPage() {
       <Section sunken kicker="principles · 04" title="What we'll never compromise on." id="principles">
         <div className="grid-2" style={{ gap: 18 }}>
           {[
-            { k: "01", t: "Models that show their work.", b: "If you can't read the coefficients, set the priors, or audit the chain, it isn't science. It's marketing." },
+            { k: "01", t: "Models that show their work.", b: "If you can't see the numbers, question the assumptions, or trace every step — it isn't science. It's marketing." },
             { k: "02", t: "Reproducibility, not replicability.", b: "A SPARC project from 2026 will run identically on a fresh install in 2031. We pin our way out of dependency hell so you don't have to." },
-            { k: "03", t: "Physics is a feature.", b: "Monotone constraints, conservation laws, sign locks — these aren't restrictions, they're the reason the model is worth listening to." },
+            { k: "03", t: "Physics is a feature.", b: "Physical laws, conservation rules, effect directions — these aren't limitations, they're what make the model trustworthy." },
             { k: "04", t: "Your data stays yours.", b: "Local-first by default. We don't proxy, log, or train on your projects. We sell software, not your work." },
           ].map((p, i) => (
             <div key={i} className="card" style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 16, padding: 22 }}>
@@ -69,7 +69,7 @@ export default function AboutPage() {
             <div className="kicker">researchers · waitlist</div>
             <h3 style={{ fontSize: 22, fontWeight: 700, margin: "10px 0 10px" }}>Try the private beta.</h3>
             <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, margin: "0 0 16px" }}>
-              Tell us your domain and CRS. We&apos;ll send a build with the right template pre-loaded.
+              Tell us what you&apos;re studying and where. We&apos;ll send a build with the right template pre-loaded.
             </p>
             <Link href="/demo" className="btn btn-accent">Request access <span className="arrow">→</span></Link>
           </div>

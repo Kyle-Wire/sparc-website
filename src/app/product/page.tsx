@@ -46,14 +46,14 @@ export default function ProductPage() {
           num="02"
           anchor="correlogram"
           accent="var(--magenta)"
-          kicker="02 · correlogram"
+          kicker="02 · spatial structure"
           title="See how far your variables travel."
-          lead="Before you fit anything, see the structure. SPARC computes Moran's I and Geary's C across lag distances and shows you where spatial autocorrelation falls off — the bandwidth that the rest of the pipeline will respect."
+          lead="Before fitting any model, SPARC maps how tightly each variable clusters in space — measuring the distance at which two locations stop influencing each other. That range shapes every downstream step."
           items={[
-            { k: "stats", v: "Moran's I · Geary's C · Getis-Ord G*" },
-            { k: "lags", v: "isotropic + directional · permutation p-values" },
-            { k: "bandwidth", v: "auto-selected from the elbow · overridable" },
-            { k: "output", v: "feeds GWEN + SPARC kernel widths" },
+            { k: "measures", v: "clustering strength · direction · distance scale" },
+            { k: "tested at", v: "many distance intervals · with significance checks" },
+            { k: "range", v: "auto-detected from the data · overridable" },
+            { k: "feeds into", v: "model training · validation splits · scenario engine" },
           ]}
           visual={<CorrelogramVisual />}
         />
@@ -63,14 +63,14 @@ export default function ProductPage() {
           num="03"
           anchor="gwen"
           accent="var(--pink)"
-          kicker="03 · gwen"
-          title="Geographically Weighted Elastic Net."
-          lead="GWEN sweeps an elastic-net regression through every locale, shrinks the noise to zero, and tells you which variables actually matter where. The survivors carry signed coefficients into the neural stage — the rest get archived, not deleted."
+          kicker="03 · variable selection"
+          title="Find what actually matters, where."
+          lead="This stage sweeps a local statistical model across every location — stripping noise and identifying which variables carry a real signal in each neighborhood. Only the meaningful ones move forward, with their direction of effect preserved."
           items={[
-            { k: "model", v: "geographically weighted · elastic net · α tunable" },
-            { k: "kernel", v: "adaptive bisquare · bandwidth from correlogram" },
-            { k: "selection", v: "λ via 5-fold CV · stability across folds" },
-            { k: "handoff", v: "retained variables + signs → SPARC + DAG" },
+            { k: "approach", v: "local regression · noise suppression · fully tunable" },
+            { k: "neighborhood", v: "each location weighted by proximity to its neighbors" },
+            { k: "selection", v: "cross-validated · tested for stability across runs" },
+            { k: "passes forward", v: "meaningful variables + their effect directions" },
           ]}
           visual={<GwenVisual />}
         />
@@ -80,14 +80,14 @@ export default function ProductPage() {
           num="04"
           anchor="sparc"
           accent="var(--crimson)"
-          kicker="04 · sparc"
-          title="Locally-weighted neural training."
-          lead="SPARC's namesake stage: a geographically-weighted neural ensemble (GW3C) trained under monotone sign locks from GWEN. χ², σ, and physics constraints gate every checkpoint — if the model violates them, it doesn't advance."
+          kicker="04 · local learning"
+          title="A model that fits your city, not the average city."
+          lead="The core SPARC stage: a neural model trained at every location simultaneously, with effect directions locked to what the previous stage found and physics enforced at every checkpoint. If a result violates either, it doesn't advance."
           items={[
-            { k: "architecture", v: "GW3C ensemble · 8 chains · per-locale heads" },
-            { k: "training", v: "HMC warmup → NUTS · early-stop on χ² < 1.2" },
-            { k: "constraints", v: "monotone signs · mass balance · physics class" },
-            { k: "compute", v: "CUDA 11.8 · Apple MPS · CPU fallback" },
+            { k: "structure", v: "8 independent model runs · per-location predictions" },
+            { k: "training", v: "guided sampling · stops when fit is good enough" },
+            { k: "guardrails", v: "effect directions locked · physical laws enforced" },
+            { k: "runs on", v: "GPU · Apple Silicon · standard CPU" },
           ]}
           visual={<SparcVisual />}
         />
@@ -98,13 +98,13 @@ export default function ProductPage() {
           anchor="causal"
           accent="var(--orange)"
           kicker="05 · causal analysis"
-          title="MC³ over the DAG. NUTS over the posterior."
-          lead="Causal structure isn't bolted on — it's sampled. MC³ explores the space of valid DAGs under your sign locks and physics classes; NUTS gives you a calibrated posterior over the surviving model. Every edge is auditable."
+          title="Find what actually causes what — then test it."
+          lead="Causal structure is explored, not assumed. SPARC searches the space of valid cause-and-effect maps that fit your data, then builds a probability distribution over which connections are most credible. Every link is auditable."
           items={[
-            { k: "DAG search", v: "MC³ · cycle rejection · sign-locked priors" },
-            { k: "posterior", v: "NUTS · 8 chains · 2k samples · R̂ ≤ 1.01" },
+            { k: "search", v: "explores all plausible cause-and-effect structures" },
+            { k: "confidence", v: "8 runs · 2,000 samples each · fully converged" },
             { k: "review", v: "accept · reject · flip · constrain · annotate" },
-            { k: "exports", v: "edge ledger · trace plots · counterfactual API" },
+            { k: "exports", v: "connection log · confidence charts · what-if API" },
           ]}
           visual={<CausalVisual />}
         />
@@ -147,10 +147,10 @@ export default function ProductPage() {
       <section style={{ background: "var(--ink)", color: "var(--paper)", padding: "60px 0", borderBottom: "1px solid var(--ink)" }}>
         <div className="wrap grid-4" style={{ gap: 36 }}>
           {[
-            { k: "philosophy · 01", t: "No black boxes.", b: "Every coefficient is interrogable. Every edge has a sign. Every prediction has a posterior." },
-            { k: "philosophy · 02", t: "Physics, not vibes.", b: "Monotone constraints, mass balance, conservation laws — the model honors them or it doesn't run." },
-            { k: "philosophy · 03", t: "Reproducible by default.", b: "project.yml is the source of truth. Every result is regenerable from a single command, 5 years from now." },
-            { k: "philosophy · 04", t: "Your data stays yours.", b: "Ingest local. Train local. Nothing leaves your machine without your say-so. BYOK for the AI assist." },
+            { k: "philosophy · 01", t: "No black boxes.", b: "Every number has a source. Every effect has a direction. Every prediction comes with a confidence range." },
+            { k: "philosophy · 02", t: "Physics, not vibes.", b: "The model must respect how heat, water, and air actually behave — or it doesn't run." },
+            { k: "philosophy · 03", t: "Reproducible by default.", b: "Every project saves as a single file. Any result can be regenerated exactly, years from now, on any machine." },
+            { k: "philosophy · 04", t: "Your data stays yours.", b: "Everything runs on your machine. Nothing is uploaded or shared without your explicit say-so." },
           ].map((p, i) => (
             <div key={i} style={{ borderTop: "1px solid rgba(245,239,228,0.3)", paddingTop: 24 }}>
               <div className="kicker" style={{ color: "rgba(245,239,228,0.5)" }}>{p.k}</div>
@@ -165,12 +165,12 @@ export default function ProductPage() {
         <div className="grid-4" style={{ gap: 14 }}>
           {[
             { k: "frontend", v: "Tauri 2.0 · React 18 · TypeScript", c: "var(--crimson)" },
-            { k: "backend", v: "Python 3.12 · sidecar binary :8008", c: "var(--purple)" },
-            { k: "model", v: "GW3C neural · 8-chain HMC", c: "var(--amber)" },
+            { k: "backend", v: "Python 3.12 · local background process", c: "var(--purple)" },
+            { k: "model", v: "geographically-weighted neural · 8-run sampling", c: "var(--amber)" },
             { k: "geo stack", v: "GDAL · rasterio · GeoPandas", c: "var(--gold)" },
             { k: "compute", v: "CUDA 11.8 · MPS · CPU fallback", c: "var(--magenta)" },
             { k: "storage", v: "DuckDB · parquet · GeoTIFF", c: "var(--orange)" },
-            { k: "ai assist", v: "Claude Sonnet 4.6 (BYOK)", c: "var(--pink)" },
+            { k: "ai assist", v: "Claude Sonnet 4.6 · bring your own key", c: "var(--pink)" },
             { k: "license", v: "AGPL · open core", c: "var(--red)" },
           ].map((r, i) => (
             <div key={i} className="card" style={{ borderLeft: `2px solid ${r.c}` }}>

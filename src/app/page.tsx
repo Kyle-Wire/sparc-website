@@ -6,40 +6,40 @@ import { Hero, PipelineFlow, PosteriorTrace, ScenarioCompare } from "@/component
 const PILLARS = [
   {
     kicker: "01 · the model",
-    title: "A spatial neural model.",
-    body: "SPARC learns how variables behave here vs. there. Instead of one global formula, every location gets its own little model — and they share what they learn.",
-    tag: "local + spatial",
+    title: "Learns the rules of your specific place.",
+    body: "SPARC doesn't use one formula for an entire city. It fits local patterns — so the relationship between trees and temperature in a dense downtown is different from a leafy suburb.",
+    tag: "local + adaptive",
   },
   {
-    kicker: "02 · causal, not correlational",
+    kicker: "02 · cause, not correlation",
     title: "Knows why, not just what.",
-    body: "You tell SPARC what causes what (or let it propose a structure). It respects direction and physics — so the relationships it finds aren't just patterns, they're explanations.",
-    tag: "directed structure",
+    body: "You tell SPARC what causes what — or let it propose. Either way, it tracks the direction of effects, not just patterns in the data. That's the difference between description and explanation.",
+    tag: "causal reasoning",
   },
   {
     kicker: "03 · simulate",
     title: "Try the change before you make it.",
-    body: "Add canopy. Reduce impervious surface. SPARC shows you what would likely happen — and how confident it is, pixel by pixel.",
-    tag: "with uncertainty",
+    body: "Add tree canopy. Resurface roads with lighter materials. SPARC shows what would likely happen — with an honest range of uncertainty, location by location.",
+    tag: "with confidence bands",
   },
 ];
 
 const TEMPLATES_PEEK = [
   { name: "UHI", sub: "Urban Heat Island", n: 24, c: "var(--crimson)" },
   { name: "Coastal", sub: "Erosion + sea level", n: 18, c: "var(--purple)" },
-  { name: "Drought", sub: "Soil moisture · ET", n: 21, c: "var(--amber)" },
+  { name: "Drought", sub: "Soil moisture · evapotranspiration", n: 21, c: "var(--amber)" },
   { name: "Geotechnical", sub: "Bearing capacity", n: 16, c: "var(--gold)" },
   { name: "Groundwater", sub: "Aquifer drawdown", n: 19, c: "var(--magenta)" },
-  { name: "Wildfire", sub: "Fuel · weather · ROS", n: 27, c: "var(--orange)" },
+  { name: "Wildfire", sub: "Fuel · weather · spread rate", n: 27, c: "var(--orange)" },
   { name: "Air Quality", sub: "PM₂.₅ + dispersion", n: 22, c: "var(--pink)" },
   { name: "Stormwater", sub: "Runoff · flooding", n: 17, c: "var(--red)" },
 ];
 
 const STEPS = [
-  { no: "01", k: "correlogram", title: "Explore", body: "Start with the data. SPARC maps how things vary across space and flags the patterns worth chasing." },
-  { no: "02", k: "SPARC neural", title: "Learn", body: "Train local models everywhere at once. Each location gets coefficients that fit it, not the average." },
-  { no: "03", k: "causal", title: "Reason", body: "Lay out what causes what. Accept SPARC's proposed structure, edit it, or write your own — physics constraints are first-class." },
-  { no: "04", k: "simulate", title: "Adapt", body: "Compare scenarios on one map. Get pixel-wise uncertainty and a reproducible audit trail." },
+  { no: "01", k: "spatial patterns", title: "Explore", body: "Start with the data. SPARC maps how things vary across space and flags the patterns worth chasing." },
+  { no: "02", k: "local models", title: "Learn", body: "Fit models everywhere at once — each location gets relationships calibrated to it, not to a city-wide average." },
+  { no: "03", k: "cause & effect", title: "Reason", body: "Lay out what causes what. Accept SPARC's proposed structure, edit it, or write your own — physics constraints are built in." },
+  { no: "04", k: "scenarios", title: "Adapt", body: "Compare interventions on one map. Get location-by-location confidence ranges and a full reproducible record." },
 ];
 
 export default function HomePage() {
@@ -70,7 +70,7 @@ export default function HomePage() {
               <Kicker dot dotColor="var(--purple)">live · interactive</Kicker>
               <h2 style={{ marginTop: 8 }}>The Pipeline.</h2>
             </div>
-            <p className="lead">A simplified urban-heat run on Boston, MA. Every stage is reproducible from one <code className="mono">project.yml</code>.</p>
+            <p className="lead">A simplified urban-heat study on Boston, MA. Every step is tracked and can be reproduced exactly.</p>
           </div>
           <div className="split-14-10" style={{ gap: 18, alignItems: "stretch" }}>
             <PipelineFlow />

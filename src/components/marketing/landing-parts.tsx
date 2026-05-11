@@ -6,13 +6,13 @@ import { Kicker } from "@/components/marketing/page-shell";
 import { TAGLINE_SHORT, BRAND_LONG, VERSION } from "@/lib/brand";
 
 const BOOT_LINES = [
-  { t: 80, text: "▸ sparc init --version 0.4.2", kind: "cmd" },
-  { t: 220, text: "  loading sidecar :8008 ················ ok", kind: "ok" },
-  { t: 360, text: "  binding CUDA · 11.8 · RTX A6000 ······· ok", kind: "ok" },
-  { t: 480, text: "  warming neural · causal kernel ········ ok", kind: "ok" },
-  { t: 620, text: "  validating causal graph · 24 nodes ···· ok", kind: "ok" },
-  { t: 760, text: "  posterior trace · χ²=0.93 ············· ok", kind: "ok" },
-  { t: 900, text: "  scenario engine · adaptation ready ···· ok", kind: "ok" },
+  { t: 80, text: "▸ sparc open boston-heat.project", kind: "cmd" },
+  { t: 220, text: "  loading your data ·················· ok", kind: "ok" },
+  { t: 360, text: "  reading spatial patterns ··········· ok", kind: "ok" },
+  { t: 480, text: "  learning local relationships ······· ok", kind: "ok" },
+  { t: 620, text: "  mapping causes and effects ········· ok", kind: "ok" },
+  { t: 760, text: "  checking model confidence ·········· ok", kind: "ok" },
+  { t: 900, text: "  scenario engine ready ·············· ok", kind: "ok" },
   { t: 1020, text: "▸ ready", kind: "ready" },
 ];
 
@@ -105,10 +105,10 @@ export function Hero() {
 
 export function ProofStrip() {
   const items = [
-    { kicker: "n=1,247 · missing 12", value: "ΔAAT_z = −0.258", sub: "Pct_Canopy (−) · σ 0.154", color: "var(--crimson)" },
-    { kicker: "ensemble · posterior", value: "χ² = 0.93", sub: "8 chains · R̂ < 1.01", color: "var(--purple)" },
-    { kicker: "philadelphia · scenario", value: "+12.4 °C", sub: "UHI peak · jul 2025", color: "var(--amber)" },
-    { kicker: "causal · validated", value: "24 → 41", sub: "nodes → directed edges", color: "var(--gold)" },
+    { kicker: "canopy cooling effect · Boston", value: "−0.258", sub: "temperature effect per 1% canopy added", color: "var(--crimson)" },
+    { kicker: "model fit · 8 independent runs", value: "0.93", sub: "all runs converged · fully stable", color: "var(--purple)" },
+    { kicker: "philadelphia · heat scenario", value: "+12.4 °C", sub: "peak heat island · Jul 2025", color: "var(--amber)" },
+    { kicker: "causes mapped · validated", value: "24 → 41", sub: "causal factors · connections found", color: "var(--gold)" },
   ];
   return (
     <section className="compact" style={{ borderBottom: "1px solid var(--line)" }}>
@@ -134,13 +134,13 @@ export function PipelineFlow() {
     return () => clearInterval(iv);
   }, []);
   const stages = [
-    { n: "00", k: "ingest", note: "raster + vector + project.yml", c: "var(--purple)" },
-    { n: "01", k: "correlogram", note: "Moran's I · spatial structure", c: "var(--magenta)" },
-    { n: "02", k: "SPARC neural", note: "GW3C · local models", c: "var(--pink)" },
-    { n: "03", k: "causal graph", note: "structure + constraints", c: "var(--crimson)" },
-    { n: "04", k: "posterior", note: "8 chains · uncertainty", c: "var(--orange)" },
-    { n: "05", k: "simulate", note: "scenarios · what-if", c: "var(--amber)" },
-    { n: "06", k: "report", note: "audit trail · pdf · md", c: "var(--gold)" },
+    { n: "00", k: "load data", note: "maps · boundaries · data layers", c: "var(--purple)" },
+    { n: "01", k: "explore", note: "how variables cluster in space", c: "var(--magenta)" },
+    { n: "02", k: "learn", note: "local models · one per location", c: "var(--pink)" },
+    { n: "03", k: "reason", note: "map causes and effects", c: "var(--crimson)" },
+    { n: "04", k: "confidence", note: "8 runs · uncertainty ranges", c: "var(--orange)" },
+    { n: "05", k: "simulate", note: "what-if scenarios · tradeoffs", c: "var(--amber)" },
+    { n: "06", k: "report", note: "audit trail · pdf · shareable", c: "var(--gold)" },
   ];
   return (
     <div className="card" style={{ padding: 0 }}>
@@ -248,8 +248,8 @@ export function ScenarioCompare() {
           <span className="mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--purple)" }}>−1.7 °C</span>
         </div>
         <div style={{ gridColumn: "1 / -1", paddingTop: 4, display: "flex", justifyContent: "space-between" }}>
-          <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>R² 0.94</span>
-          <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>Moran's I 0.71 → 0.18</span>
+          <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>model fit R² 0.94</span>
+          <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>spatial clustering 0.71 → 0.18</span>
         </div>
       </div>
     </div>

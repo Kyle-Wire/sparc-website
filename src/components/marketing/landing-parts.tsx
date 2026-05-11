@@ -134,13 +134,13 @@ export function PipelineFlow() {
     return () => clearInterval(iv);
   }, []);
   const stages = [
-    { n: "00", k: "load data", note: "maps · boundaries · data layers", c: "var(--purple)" },
-    { n: "01", k: "explore", note: "how variables cluster in space", c: "var(--magenta)" },
-    { n: "02", k: "learn", note: "local models · one per location", c: "var(--pink)" },
-    { n: "03", k: "reason", note: "map causes and effects", c: "var(--crimson)" },
-    { n: "04", k: "confidence", note: "8 runs · uncertainty ranges", c: "var(--orange)" },
-    { n: "05", k: "simulate", note: "what-if scenarios · tradeoffs", c: "var(--amber)" },
-    { n: "06", k: "report", note: "audit trail · pdf · shareable", c: "var(--gold)" },
+    { n: "00", k: "Load Data", note: "maps · boundaries · data layers", c: "var(--purple)" },
+    { n: "01", k: "Explore", note: "how variables cluster in space", c: "var(--magenta)" },
+    { n: "02", k: "Learn", note: "local models · one per location", c: "var(--pink)" },
+    { n: "03", k: "Reason", note: "map causes and effects", c: "var(--crimson)" },
+    { n: "04", k: "Confidence", note: "8 runs · uncertainty ranges", c: "var(--orange)" },
+    { n: "05", k: "Simulate", note: "what-if scenarios · tradeoffs", c: "var(--amber)" },
+    { n: "06", k: "Report", note: "audit trail · pdf · shareable", c: "var(--gold)" },
   ];
   return (
     <div className="card" style={{ padding: 0 }}>

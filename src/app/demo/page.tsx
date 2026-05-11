@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useSearchParams } from "next/navigation";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section, Kicker } from "@/components/marketing/page-shell";
 
@@ -11,7 +10,6 @@ const PROFESSIONS = [
   "Engineer",
   "Government / Public sector",
   "Student",
-  "Investor",
   "Other",
 ];
 
@@ -23,21 +21,43 @@ const ORG_SIZES = [
   "500+",
 ];
 
+const PILOT_STRUCTURE = [
+  {
+    n: "01",
+    t: "Scope it together.",
+    body: "You bring the spatial question — an existing proposal, a policy decision, a planning scenario under review. We map it to the model together: domain template, causal structure, scenario parameters. No off-the-shelf setup.",
+  },
+  {
+    n: "02",
+    t: "~6 months.",
+    body: "Enough time to run a complete pipeline, validate outputs against your domain knowledge, iterate on the causal structure, and produce a final report. Timelines flex to your data availability and review cycles.",
+  },
+  {
+    n: "03",
+    t: "What you provide.",
+    body: "Your spatial data: rasters, shapefiles, parcel records, permits, any existing layers. The scenarios you want to test — the interventions, zoning changes, or infrastructure investments currently on the table.",
+  },
+  {
+    n: "04",
+    t: "What you get.",
+    body: "Scenario outputs with location-level confidence intervals. A reproducible audit trail — every coefficient, every assumption, every step logged. A report formatted for your audience: planning committee, grant application, or capital plan.",
+  },
+];
+
 const NEXT_STEPS = [
   { n: "01", t: "We review", body: "We read every request personally \u2014 usually within a few business days." },
   { n: "02", t: "30-min walkthrough", body: "If there's a fit, we schedule a short call to learn about your project and show the app." },
   { n: "03", t: "Build + template", body: "We send a build with the right template pre-loaded for your domain and help you get rolling." },
 ];
 
-function DemoForm({ initialIsInvestor }: { initialIsInvestor: boolean }) {
+function DemoForm() {
   const [fullName, setFullName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [organization, setOrganization] = React.useState("");
-  const [profession, setProfession] = React.useState(initialIsInvestor ? "Investor" : "");
+  const [profession, setProfession] = React.useState("");
   const [useCase, setUseCase] = React.useState("");
   const [orgSize, setOrgSize] = React.useState("");
   const [teamSize, setTeamSize] = React.useState("");
-  const [isInvestor, setIsInvestor] = React.useState(initialIsInvestor);
   const [state, setState] = React.useState<"idle" | "submitting" | "sent" | "error">("idle");
   const [error, setError] = React.useState("");
 
@@ -57,7 +77,6 @@ function DemoForm({ initialIsInvestor }: { initialIsInvestor: boolean }) {
           use_case: useCase.trim(),
           org_size: orgSize.trim(),
           team_size: teamSize.trim(),
-          is_investor: isInvestor,
         }),
       });
       const body = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
@@ -179,15 +198,6 @@ function DemoForm({ initialIsInvestor }: { initialIsInvestor: boolean }) {
         style={{ resize: "vertical" }}
       />
 
-      <label style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 14, fontSize: 13, color: "var(--ink-2)" }}>
-        <input
-          type="checkbox"
-          checked={isInvestor}
-          onChange={(e) => setIsInvestor(e.target.checked)}
-        />
-        I&apos;m reaching out as an investor
-      </label>
-
       {state === "error" && (
         <div style={{ marginTop: 14, padding: "10px 12px", border: "1px solid var(--crimson)", borderRadius: 6, color: "var(--crimson)", fontSize: 13 }}>
           {error}
@@ -207,9 +217,7 @@ function DemoForm({ initialIsInvestor }: { initialIsInvestor: boolean }) {
 }
 
 function DemoFormShell() {
-  const params = useSearchParams();
-  const initialIsInvestor = params.get("role") === "investor";
-  return <DemoForm initialIsInvestor={initialIsInvestor} />;
+  return <DemoForm />;
 }
 
 export default function DemoPage() {
@@ -219,7 +227,7 @@ export default function DemoPage() {
       <PageHero
         kicker="pilot program · private beta"
         title="Request access."
-        lead="We're piloting SPARC with a small group of planners, researchers, and agencies. Tell us about your work and we'll get back to you with a build."
+        lead="We run structured research pilots with a small cohort of planning teams, researchers, and agencies. Tell us about your spatial question and we'll be in touch."
       />
       <Section>
         <div className="split-12-10" style={{ gap: 28, alignItems: "start" }}>
@@ -244,6 +252,23 @@ export default function DemoPage() {
             </p>
           </div>
         </div>
+      </Section>
+
+      <Section sunken kicker="structure · research pilot" title="What a pilot looks like.">
+        <div className="grid-2" style={{ gap: 18 }}>
+          {PILOT_STRUCTURE.map((p) => (
+            <div key={p.n} className="card" style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 16, padding: 22 }}>
+              <span className="mono" style={{ fontSize: 11, fontWeight: 700, padding: "4px 8px", borderRadius: 3, background: "var(--ink)", color: "#fff", height: "fit-content", letterSpacing: "0.1em" }}>{p.n}</span>
+              <div>
+                <h3 style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.015em", margin: "0 0 8px" }}>{p.t}</h3>
+                <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, margin: 0 }}>{p.body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p style={{ marginTop: 24, fontSize: 13, color: "var(--muted)", lineHeight: 1.6, borderTop: "1px dashed var(--line)", paddingTop: 18 }}>
+          Built on a patent-pending causal inference methodology. Outputs are reproducible — a project from today runs identically on a fresh install five years from now.
+        </p>
       </Section>
       <Footer />
     </>

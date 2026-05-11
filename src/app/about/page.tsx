@@ -34,7 +34,7 @@ export default function AboutPage() {
             <dl className="dl" style={{ marginTop: 12 }}>
               <dt>founded</dt><dd className="mono">{FOUNDED_YEAR} · {OFFICE_CITY}, {OFFICE_STATE}</dd>
               <dt>entity</dt><dd className="mono">{COMPANY_LEGAL}</dd>
-              <dt>stage</dt><dd className="mono">private beta · {VERSION}</dd>
+              <dt>stage</dt><dd className="mono">pilot stage · {VERSION}</dd>
               <dt>license</dt><dd className="mono">AGPL · open core</dd>
               <dt>runtime</dt><dd className="mono">Tauri · React · Python</dd>
               <dt>compute</dt><dd className="mono">CUDA 11.8 · MPS · CPU</dd>
@@ -66,20 +66,20 @@ export default function AboutPage() {
       <Section kicker="get in touch" title="Want to talk?">
         <div className="grid-2" style={{ gap: 18 }}>
           <div className="card" style={{ padding: 28, borderLeft: "3px solid var(--crimson)" }}>
-            <div className="kicker">researchers · waitlist</div>
-            <h3 style={{ fontSize: 22, fontWeight: 700, margin: "10px 0 10px" }}>Try the private beta.</h3>
+            <div className="kicker">researchers · early access</div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, margin: "10px 0 10px" }}>Join the research pilot.</h3>
             <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, margin: "0 0 16px" }}>
-              Tell us what you&apos;re studying and where. We&apos;ll send a build with the right template pre-loaded.
+              Tell us your spatial question and we&apos;ll scope a pilot together. You bring the data and scenarios — we produce outputs, confidence intervals, and a report built for your audience.
             </p>
-            <Link href="/demo" className="btn btn-accent">Request access <span className="arrow">→</span></Link>
+            <Link href="/demo" className="btn btn-accent">Apply for access <span className="arrow">→</span></Link>
           </div>
           <div className="card" style={{ padding: 28, borderLeft: "3px solid var(--purple)" }}>
-            <div className="kicker">institutions · partnerships</div>
-            <h3 style={{ fontSize: 22, fontWeight: 700, margin: "10px 0 10px" }}>Bigger questions, longer arcs.</h3>
+            <div className="kicker">planning agencies · research groups</div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, margin: "10px 0 10px" }}>Bring a real planning question.</h3>
             <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.55, margin: "0 0 16px" }}>
-              Embedded deployments, custom domain templates, audit-grade compliance. Annual contracts.
+              We work with city agencies, infrastructure teams, and academic groups to design pilots around active decisions — zoning, capital investment, adaptation strategy.
             </p>
-            <Link href="/contact" className="btn">Talk to us <span className="arrow">→</span></Link>
+            <Link href="/demo" className="btn">Start the conversation <span className="arrow">→</span></Link>
           </div>
         </div>
         <p className="mono" style={{ marginTop: 24, fontSize: 11, color: "var(--muted)", textAlign: "center", letterSpacing: "0.1em" }}>

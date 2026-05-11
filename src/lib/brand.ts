@@ -17,7 +17,7 @@ export const OFFICE_STATE = "PA";
 export const OFFICE_ZIP = "19147";
 export const OFFICE_FULL = `${OFFICE_STREET} · ${OFFICE_CITY} · ${OFFICE_STATE} ${OFFICE_ZIP}`;
 
-export const VERSION = "v0.4.2";
+export const VERSION = "v1.0.0";
 export const FOUNDED_YEAR = 2024;
 export const COPYRIGHT_YEAR = 2026;
 

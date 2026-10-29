@@ -1,0 +1,19 @@
+Proprietary License
+
+Copyright (c) 2026 SPARC Labs LLC. All rights reserved.
+
+This software and its associated documentation (the "Software") are the
+proprietary and confidential property of SPARC Labs LLC. Unauthorized
+copying, distribution, modification, or use of the Software, in whole or in
+part, is strictly prohibited without prior written permission from
+SPARC Labs LLC.
+
+No licence to use, copy, modify, publish or distribute the Software is
+granted by this file or by access to this repository.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+
+Third-party software retains its own licences and terms; nothing in this file
+alters them. See package.json for declared dependencies.

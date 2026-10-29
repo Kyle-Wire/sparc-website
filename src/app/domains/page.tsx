@@ -123,10 +123,13 @@ export default function DomainsPage() {
   return (
     <>
       <Nav active="domains" />
+      {/* "with our beta partners" removed from the lead on 2026-10-29: there
+          are no beta partners. Do not reinstate a partner claim without naming
+          who, and without their written agreement to be named. */}
       <PageHero
         kicker="private beta · 2 active domains · more on the roadmap"
         title="Built for any spatial domain."
-        lead="SPARC is a general-purpose causal pipeline for spatial science. We're currently validating it on Urban Heat Island and ForceSMIP with our beta partners — and expanding to new domains as physics integrations land. The list below is where we're heading; tell us where you want it to go next."
+        lead="SPARC is a general-purpose causal pipeline for spatial science. We're currently validating it on Urban Heat Island and ForceSMIP — and expanding to new domains as physics integrations land. The list below is where we're heading; tell us where you want it to go next."
       />
       <Section>
         <div className="split-14-10" style={{ gap: 28, alignItems: "start" }}>

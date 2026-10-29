@@ -50,7 +50,7 @@ export default async function DownloadsPage() {
         <div className="kicker">license keys</div>
         <h2 style={{ fontSize: 20, fontWeight: 700, margin: "8px 0 16px" }}>Your activations</h2>
         {keys.length === 0 ? (
-          <p style={{ color: "var(--muted)", fontSize: 14, margin: 0 }}>No license keys issued yet. Subscribe to Pursue or Converge to receive one.</p>
+          <p style={{ color: "var(--muted)", fontSize: 14, margin: 0 }}>No license keys issued yet. Self-serve purchasing is switched off while pricing is being re-established — contact us and we will sort out access directly.</p>
         ) : (
           <div style={{ display: "grid", gap: 8 }}>
             {keys.map((k) => (

@@ -11,13 +11,17 @@ export default function TermsPage() {
       <PageHero kicker="terms · honest" title="Terms of Service." accent="var(--crimson)" />
       <Section>
         <article style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 18, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
-          <p>By using {COMPANY} you agree to these terms. SPARC is <strong>proprietary software</strong> owned by {COMPANY_LEGAL} and licensed to you for use under an active subscription; it is not open source and no source-code rights are granted. Paid tiers require an active subscription.</p>
+          <p>By using {COMPANY} you agree to these terms. SPARC is <strong>proprietary software</strong> owned by {COMPANY_LEGAL} and licensed to you under the terms of a written licence or subscription agreement; it is not open source and no source-code rights are granted.</p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Subscriptions</h2>
-          <p>Billing is handled by Lemon Squeezy as merchant of record. You can cancel any time from the customer portal. Yearly plans are pro-rated on cancellation; monthly plans run to the end of the current period.</p>
-
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Refunds</h2>
-          <p>Full refund within 30 days, no questions asked. Email <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a>.</p>
+          {/* Checkout is disabled and no tier prices are published (2026-10-29).
+              The previous Subscriptions and Refunds sections promised merchant-of-record
+              billing, pro-rated cancellation and a 30-day no-questions refund against a
+              self-serve purchase flow that is now switched off. Billing terms get
+              republished here only alongside prices we can stand behind — and before
+              any charge is taken, not after. */}
+          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Subscriptions and billing</h2>
+          <p>{COMPANY_LEGAL} is not currently selling subscriptions. Self-serve checkout is switched off and no tier prices are published. Any paid licence at this stage is agreed directly with us in writing, and the billing, cancellation and refund terms that apply are the ones set out in that agreement.</p>
+          <p>If self-serve purchasing is reintroduced, the terms governing it — including cancellation and refunds — will be published on this page before any charge is taken. Questions in the meantime: <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a>.</p>
 
           <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Acceptable use</h2>
           <p>Don&apos;t use SPARC to harm people. Don&apos;t use it to misrepresent uncertainty in ways a court would call fraud. Don&apos;t scrape our marketing site.</p>

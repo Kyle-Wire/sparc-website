@@ -267,7 +267,7 @@ export default function DemoPage() {
           ))}
         </div>
         <p style={{ marginTop: 24, fontSize: 13, color: "var(--muted)", lineHeight: 1.6, borderTop: "1px dashed var(--line)", paddingTop: 18 }}>
-          Built on a patent-pending causal inference methodology. Outputs are reproducible — a project from today runs identically on a fresh install five years from now.
+          Outputs are built for reproducibility: every project pins its dependencies and records a run manifest, so a result can be regenerated from the project file it came from.
         </p>
       </Section>
       <Footer />

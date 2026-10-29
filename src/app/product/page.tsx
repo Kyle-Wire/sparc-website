@@ -102,7 +102,7 @@ export default function ProductPage() {
           lead="Causal structure is explored, not assumed. SPARC searches the space of valid cause-and-effect maps that fit your data, then builds a probability distribution over which connections are most credible. Every link is auditable."
           items={[
             { k: "search", v: "explores all plausible cause-and-effect structures" },
-            { k: "confidence", v: "8 runs · 2,000 samples each · fully converged" },
+            { k: "confidence", v: "8 runs · 2,000 samples each · convergence reported" },
             { k: "review", v: "accept · reject · flip · constrain · annotate" },
             { k: "exports", v: "connection log · confidence charts · what-if API" },
           ]}
@@ -171,7 +171,7 @@ export default function ProductPage() {
             { k: "compute", v: "CUDA 11.8 · MPS · CPU fallback", c: "var(--magenta)" },
             { k: "storage", v: "DuckDB · parquet · GeoTIFF", c: "var(--orange)" },
             { k: "ai assist", v: "Claude Sonnet 4.6 · bring your own key", c: "var(--pink)" },
-            { k: "license", v: "AGPL · open core", c: "var(--red)" },
+            { k: "license", v: "proprietary · subscription", c: "var(--red)" },
           ].map((r, i) => (
             <div key={i} className="card" style={{ borderLeft: `2px solid ${r.c}` }}>
               <div className="kicker">{r.k}</div>

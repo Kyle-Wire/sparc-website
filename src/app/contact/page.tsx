@@ -132,7 +132,7 @@ export default function ContactPage() {
             { k: "waitlist", v: "≤ 5 days", c: "var(--purple)" },
             { k: "support · pursue", v: "≤ 48 hrs", c: "var(--crimson)" },
             { k: "support · converge", v: "≤ 24 hrs", c: "var(--amber)" },
-            { k: "support · transcend", v: "24/7 · 99.9% SLA", c: "var(--gold)" },
+            { k: "support · transcend", v: "Agreed per contract", c: "var(--gold)" },
           ].map((r, i) => (
             <div key={i} className="card" style={{ padding: 22, borderTop: `3px solid ${r.c}` }}>
               <div className="kicker">{r.k}</div>

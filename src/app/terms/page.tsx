@@ -11,7 +11,7 @@ export default function TermsPage() {
       <PageHero kicker="terms · honest" title="Terms of Service." accent="var(--crimson)" />
       <Section>
         <article style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 18, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
-          <p>By using {COMPANY} you agree to these terms. The SPARC source code is licensed under <strong>AGPL-3.0</strong>; the desktop client requires an active subscription for non-Wander tiers.</p>
+          <p>By using {COMPANY} you agree to these terms. SPARC is <strong>proprietary software</strong> owned by {COMPANY_LEGAL} and licensed to you for use under an active subscription; it is not open source and no source-code rights are granted. Paid tiers require an active subscription.</p>
 
           <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Subscriptions</h2>
           <p>Billing is handled by Lemon Squeezy as merchant of record. You can cancel any time from the customer portal. Yearly plans are pro-rated on cancellation; monthly plans run to the end of the current period.</p>

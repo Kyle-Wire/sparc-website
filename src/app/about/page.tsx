@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section, Kicker } from "@/components/marketing/page-shell";
-import { COMPANY, COMPANY_LEGAL, COMPANY_LONG, EMAIL_PRIMARY, OFFICE_FULL, FOUNDED_YEAR, OFFICE_CITY, OFFICE_STATE, VERSION, BRAND_LONG } from "@/lib/brand";
+import { COMPANY, COMPANY_LEGAL, EMAIL_PRIMARY, OFFICE_FULL, FOUNDED_YEAR, OFFICE_CITY, OFFICE_STATE, VERSION, BRAND_LONG } from "@/lib/brand";
 
 export default function AboutPage() {
   return (
@@ -23,7 +23,7 @@ export default function AboutPage() {
               Most spatial ML tools today are either too academic to ship or too commercial to trust. The first ones don&apos;t have install scripts. The second ones don&apos;t tell you what their models actually optimize.
             </p>
             <p style={{ fontSize: 16, color: "var(--ink-2)", lineHeight: 1.65, marginBottom: 14 }}>
-              We started {COMPANY} ({COMPANY_LONG}) to make a third thing — a working desktop application built around a single neural pipeline that takes the rigor of academic geostatistics seriously, with the engineering hygiene of a product you can hand to a colleague.
+              We started {COMPANY} — SPARC for {BRAND_LONG} — to make a third thing — a working desktop application built around a single neural pipeline that takes the rigor of academic geostatistics seriously, with the engineering hygiene of a product you can hand to a colleague.
             </p>
             <p style={{ fontSize: 16, color: "var(--ink-2)", lineHeight: 1.65, marginBottom: 0 }}>
               The model is neural. The structure is causal. The promise is that you can simulate adaptation with error bars — not just describe the world.
@@ -35,7 +35,7 @@ export default function AboutPage() {
               <dt>founded</dt><dd className="mono">{FOUNDED_YEAR} · {OFFICE_CITY}, {OFFICE_STATE}</dd>
               <dt>entity</dt><dd className="mono">{COMPANY_LEGAL}</dd>
               <dt>stage</dt><dd className="mono">pilot stage · {VERSION}</dd>
-              <dt>license</dt><dd className="mono">AGPL · open core</dd>
+              <dt>license</dt><dd className="mono">proprietary · {COMPANY_LEGAL}</dd>
               <dt>runtime</dt><dd className="mono">Tauri · React · Python</dd>
               <dt>compute</dt><dd className="mono">CUDA 11.8 · MPS · CPU</dd>
               <dt>contact</dt><dd className="mono">{EMAIL_PRIMARY}</dd>
@@ -48,7 +48,7 @@ export default function AboutPage() {
         <div className="grid-2" style={{ gap: 18 }}>
           {[
             { k: "01", t: "Models that show their work.", b: "If you can't see the numbers, question the assumptions, or trace every step — it isn't science. It's marketing." },
-            { k: "02", t: "Reproducibility, not replicability.", b: "A SPARC project from 2026 will run identically on a fresh install in 2031. We pin our way out of dependency hell so you don't have to." },
+            { k: "02", t: "Reproducibility, not replicability.", b: "Every project pins its dependencies and ships a run manifest, so a result can be regenerated from the project file that produced it. We do the version-pinning work so you don't have to." },
             { k: "03", t: "Physics is a feature.", b: "Physical laws, conservation rules, effect directions — these aren't limitations, they're what make the model trustworthy." },
             { k: "04", t: "Your data stays yours.", b: "Local-first by default. We don't proxy, log, or train on your projects. We sell software, not your work." },
           ].map((p, i) => (

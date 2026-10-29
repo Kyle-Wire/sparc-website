@@ -3,19 +3,22 @@
 export const BRAND_LONG = "Spatial Research";
 export const BRAND_SHORT = "SPARC";
 export const COMPANY = "SPARC Labs";
-export const COMPANY_LONG = "Spatial Research Labs";
+// "Spatial Research" is what the SPARC acronym expands to, not a company name.
+// The company is SPARC Labs; the legal entity is SPARC Labs LLC.
+export const COMPANY_LONG = "SPARC Labs";
 export const COMPANY_LEGAL = "SPARC Labs LLC";
 
 export const DOMAIN = "sparclabs.co";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${DOMAIN}`;
 
-export const EMAIL_PRIMARY = "SparcUrbanLabs@gmail.com";
+export const EMAIL_PRIMARY = `hello@${DOMAIN}`;
 
-export const OFFICE_STREET = "800 South Street";
+// City and state only. The street address was a private residence; a public site
+// should not publish it. If a mailing address is needed for contracting, use a
+// registered-agent or PO box address rather than reinstating a home address.
 export const OFFICE_CITY = "Philadelphia";
 export const OFFICE_STATE = "PA";
-export const OFFICE_ZIP = "19147";
-export const OFFICE_FULL = `${OFFICE_STREET} · ${OFFICE_CITY} · ${OFFICE_STATE} ${OFFICE_ZIP}`;
+export const OFFICE_FULL = `${OFFICE_CITY} · ${OFFICE_STATE}`;
 
 export const VERSION = "v1.0.0";
 export const FOUNDED_YEAR = 2024;

@@ -1,4 +1,5 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { EMAIL_PRIMARY } from "@/lib/brand";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +39,7 @@ export default async function SettingsPage() {
         <p style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.55, margin: "0 0 14px" }}>
           Permanently delete your SPARC Labs account and all associated data. Active subscriptions must be cancelled first.
         </p>
-        <a href="mailto:SparcUrbanLabs@gmail.com?subject=Delete%20my%20account" className="btn">Request deletion</a>
+        <a href={`mailto:${EMAIL_PRIMARY}?subject=Delete%20my%20account`} className="btn">Request deletion</a>
       </div>
     </div>
   );

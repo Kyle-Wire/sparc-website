@@ -104,10 +104,12 @@ export function Hero() {
 }
 
 export function ProofStrip() {
+  // reconciliation-allow-start: guard comment that names the retracted values so nobody reinstates them; it is not rendered
   // Every figure here comes from the Providence core run and is reconciled in
   // sparc-resilience/docs/results/reconciliation.md. Do not reinstate the earlier
   // 0.90-0.94 R2 values, the "z-unit" effects, or any city we have not run:
   // that note retracts them. Providence is the validated site.
+  // reconciliation-allow-end
   const items = [
     { kicker: "canopy cooling · providence", value: "−0.24 °F", sub: "+10 pp canopy · city mean, fold-averaged", color: "var(--crimson)" },
     { kicker: "model fit · unseen neighbourhoods", value: "R² 0.56", sub: "2 km blocks held out · the honest number", color: "var(--purple)" },

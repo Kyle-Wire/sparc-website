@@ -104,10 +104,14 @@ export function Hero() {
 }
 
 export function ProofStrip() {
+  // Every figure here comes from the Providence core run and is reconciled in
+  // sparc-resilience/docs/results/reconciliation.md. Do not reinstate the earlier
+  // 0.90-0.94 R2 values, the "z-unit" effects, or any city we have not run:
+  // that note retracts them. Providence is the validated site.
   const items = [
-    { kicker: "canopy cooling effect · Boston", value: "−0.258", sub: "temperature effect per 1% canopy added", color: "var(--crimson)" },
-    { kicker: "model fit · 8 independent runs", value: "0.93", sub: "all runs converged · fully stable", color: "var(--purple)" },
-    { kicker: "philadelphia · heat scenario", value: "+12.4 °C", sub: "peak heat island · Jul 2025", color: "var(--amber)" },
+    { kicker: "canopy cooling · providence", value: "−0.24 °F", sub: "+10 pp canopy · city mean, fold-averaged", color: "var(--crimson)" },
+    { kicker: "model fit · unseen neighbourhoods", value: "R² 0.56", sub: "2 km blocks held out · the honest number", color: "var(--purple)" },
+    { kicker: "error vs. best baseline", value: "1.14 °F", sub: "RMSE · gradient boosting 1.37 °F", color: "var(--amber)" },
     { kicker: "causes mapped · validated", value: "24 → 41", sub: "causal factors · connections found", color: "var(--gold)" },
   ];
   return (
@@ -228,9 +232,11 @@ export function PosteriorTrace() {
 export function ScenarioCompare() {
   return (
     <div className="card" style={{ padding: 0 }}>
+      {/* Interface mock-up. The numbers below are made up to show the layout --
+          there is no Boston run. Keep the "illustrative" label if you edit this. */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--line)" }}>
         <div className="kicker">adaptation scenario</div>
-        <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>boston · 1km grid</span>
+        <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>illustrative · 1 km grid</span>
       </div>
       <div style={{ padding: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         {[
@@ -248,7 +254,7 @@ export function ScenarioCompare() {
           <span className="mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--purple)" }}>−1.7 °C</span>
         </div>
         <div style={{ gridColumn: "1 / -1", paddingTop: 4, display: "flex", justifyContent: "space-between" }}>
-          <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>model fit R² 0.94</span>
+          <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>example figures · not a validated result</span>
           <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>spatial clustering 0.71 → 0.18</span>
         </div>
       </div>

@@ -72,8 +72,8 @@ const TIERS: Tier[] = [
     color: "var(--gold)",
     features: [
       "Everything in Converge", "On-premises deployment · air-gapped option",
-      "Custom domain templates (we co-author)", "Audit-grade compliance (FedRAMP, SOC 2)",
-      "99.9% sidecar SLA + 24/7 support", "Quarterly methods review with our team",
+      "Custom domain templates (we co-author)", "Audit trail: run manifests + reproducible exports",
+      "Priority support with an agreed response window", "Quarterly methods review with our team",
       "Co-authored publications (where appropriate)",
     ],
   },
@@ -147,7 +147,7 @@ function ComparisonTable() {
     { k: "Collaboration", v: ["—", "—", "25 seats", "Unlimited"] },
     { k: "SSO", v: ["—", "—", "Okta · Google · MS", "+ SAML · custom"] },
     { k: "On-prem / air-gapped", v: ["—", "—", "—", "Yes"] },
-    { k: "SLA", v: ["Best effort", "Email · 48h", "Slack · 24h", "99.9% · 24/7"] },
+    { k: "Support response", v: ["Best effort", "Email · 48h", "Slack · 24h", "Agreed per contract"] },
     { k: "Co-authored research", v: ["—", "—", "—", "Where appropriate"] },
   ];
   return (
@@ -181,7 +181,7 @@ function ComparisonTable() {
 
 function FAQ() {
   const items = [
-    { q: "Is there an academic discount?", a: "Pursue is free for verified students and 50% off for verified faculty at non-profit institutions. Use a .edu / .ac.* email at signup; we'll handle the rest." },
+    { q: "Is there an academic discount?", a: "Yes — we offer academic pricing for students and faculty at non-profit institutions. Email us from your .edu / .ac.* address and we'll quote you." },
     { q: "What does \"BYOK\" mean for Claude?", a: "Bring your own API key. SPARC never proxies your prompts — they go directly from your desktop to Anthropic. We don't store, log, or train on your conversations." },
     { q: "Can I run SPARC offline?", a: "Yes. SPARC is a desktop app with a local Python sidecar. The only required network calls are license activation (once per 30 days) and, optionally, the Claude API if you've configured it." },
     { q: "Do you sell my data?", a: "No. We sell software. Your projects, rasters, and DAGs never leave your machine unless you explicitly export them. Transcend customers can deploy fully air-gapped." },

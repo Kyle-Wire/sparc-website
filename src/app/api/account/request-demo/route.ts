@@ -3,10 +3,11 @@ import { Resend } from "resend";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { sendEmail } from "@/lib/email";
+import { EMAIL_PRIMARY } from "@/lib/brand";
 
 export const runtime = "nodejs";
 
-const NOTIFY_TO = process.env.DEMO_NOTIFY_TO ?? "kylewire1899@gmail.com";
+const NOTIFY_TO = process.env.DEMO_NOTIFY_TO ?? EMAIL_PRIMARY;
 // Until you verify sparclabs.co in Resend, keep using the sandbox sender.
 const FROM = process.env.RESEND_FROM ?? "SPARC Labs <onboarding@resend.dev>";
 

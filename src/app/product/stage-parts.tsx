@@ -412,6 +412,9 @@ export function ReportVisual() {
     { k: "planner", label: "Planner", c: "var(--orange)" },
     { k: "public", label: "Public", c: "var(--gold)" },
   ];
+  // Sample report text showing the three output audiences. "District 7", the
+  // $2.4M figure and the diagnostics below are invented for the mock-up -- they
+  // are not from any run. The card is labelled illustrative for that reason.
   const previews = {
     technical: { title: "Methods & Posterior Diagnostics", body: "Geographically-weighted neural ensemble (GW3C). 8-chain NUTS, 2k samples post-warmup. R̂ ≤ 1.01. Validation χ² 0.93. Edge-level signs and physics constraints itemized in Appendix B. Reproducible from project.yml@a1b2c3d.", chips: ["χ² · σ · R̂", "DAG manifest", "code refs"] },
     planner: { title: "Adaptation Brief — District 7", body: "$2.4M canopy expansion across 218 priority tracts is projected to reduce mean afternoon air-temperature by 0.26 °C (σ 0.15). Highest-vulnerability tracts gain the most. Trade-offs and sensitivity tables on p. 4.", chips: ["maps", "tradeoff table", "equity overlay"] },
@@ -419,7 +422,7 @@ export function ReportVisual() {
   };
   const p = previews[tab];
   return (
-    <VCard label="report · audience" meta="signed manifest · v0.4.2" accent="var(--gold)">
+    <VCard label="report · audience" meta="sample output · illustrative" accent="var(--gold)">
       <div style={{ display: "flex", gap: 4, marginBottom: 12, padding: 3, background: "var(--paper)", borderRadius: 5, border: "1px solid var(--line)" }}>
         {tabs.map((t) => (
           <button
@@ -438,7 +441,7 @@ export function ReportVisual() {
         ))}
       </div>
       <div style={{ border: "1px solid var(--line)", borderRadius: 6, padding: 14, background: "var(--paper)", marginBottom: 12 }}>
-        <div className="kicker" style={{ marginBottom: 6 }}>preview · {tab}</div>
+        <div className="kicker" style={{ marginBottom: 6 }}>sample preview · {tab}</div>
         <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6, letterSpacing: "-0.01em" }}>{p.title}</div>
         <div style={{ fontSize: 12, color: "var(--ink-2)", lineHeight: 1.55, marginBottom: 10 }}>{p.body}</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>

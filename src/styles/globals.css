@@ -10,6 +10,37 @@ html, body {
   font-size: var(--fs-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+
+  /* Tabular-lining numerals, site-wide, declared once.
+
+     The rule from the common design layer is "tabular-lining numerals
+     everywhere a number can change", and the cheapest honest reading of
+     "everywhere" is the root. Inter's default figures are proportional, which
+     means a column of them does not line up and a value that changes shifts
+     the glyphs around it -- so a reader comparing two readings is comparing two
+     different rhythms, and a number that updates appears to move. On a surface
+     whose whole argument is "check this figure", that is not a nicety.
+
+     Declared here rather than on the components that happen to hold numbers
+     today, because the failure mode is the number that arrives tomorrow in a
+     component nobody thought to tag. Opting a surface out is then a visible,
+     deliberate line of CSS rather than the default.
+
+     font-variant-numeric and not font-feature-settings: the low-level property
+     overrides the high-level one and takes an opaque OpenType tag list, so one
+     component setting font-feature-settings for an unrelated feature silently
+     drops tabular figures. scripts/check-numerals.mjs forbids it for that
+     reason. */
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Form controls do not inherit this. The UA stylesheet applies the `font`
+   shorthand to inputs, buttons and selects, and that shorthand resets
+   font-variant-numeric to normal -- so a quantity typed into a field, or a
+   count on a button, would be the one place on the site where numerals are
+   proportional. `font-family: inherit` on .input does not cover it. */
+input, button, select, textarea, optgroup {
+  font-variant-numeric: inherit;
 }
 body { overflow-x: hidden; }
 
@@ -292,7 +323,10 @@ body.no-scroll { overflow: hidden; }
 .mu-link:hover { text-decoration-color: var(--accent); }
 
 /* Slot 1. The largest thing in the unit, and tabular-lining so that a column
-   of them lines up and a value that changes does not re-flow its neighbours. */
+   of them lines up and a value that changes does not re-flow its neighbours.
+   The three font-variant-numeric declarations in this block are redundant with
+   the root rule and are kept deliberately: if a future surface ever opts out of
+   tabular figures, it must not be able to take a reading with it. */
 .mu-value {
   font-size: 32px;
   font-weight: 800;
@@ -448,11 +482,13 @@ body.no-scroll { overflow: hidden; }
 
 [data-placeholder] .ph-body { padding: 16px; }
 
-/* Every numeral slot. Tabular-lining and inheriting its surroundings' metrics,
-   so the layout reads exactly as it would with a number in it -- that is what
-   makes this a placeholder rather than a deletion. */
+/* Every numeral slot. It inherits its surroundings' metrics, so the layout
+   reads exactly as it would with a number in it -- that is what makes this a
+   placeholder rather than a deletion. The figures are tabular-lining from the
+   root rule; this used to say font-feature-settings: 'tnum' here, which is the
+   low-level property and would silently have overridden the root declaration
+   with a one-feature list. */
 [data-placeholder] .ph-em {
-  font-feature-settings: 'tnum';
   color: var(--fg-2);
 }
 

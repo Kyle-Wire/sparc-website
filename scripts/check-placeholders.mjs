@@ -52,6 +52,11 @@ const TEXT_PROPS = new Set([
   "label", "note", "title", "alt", "placeholder", "caption", "meta",
   "value", "sub", "text", "heading", "keys", "rows", "chips", "items",
   "labels", "options", "aria-label", "ariaLabel", "aria-description",
+  // The measurement unit's four slots and its subject. A unit nested inside a
+  // placeholder is the intended composition -- four nulls, four em dashes --
+  // so these have to owe the rule, or the register would have a hole shaped
+  // exactly like the thing it exists to stop.
+  "of", "interval", "spread", "verdict", "support",
 ]);
 
 /** Runtime numeral factories. A placeholder has no reason to format a number. */

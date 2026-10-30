@@ -1,6 +1,40 @@
 "use client";
 
 import * as React from "react";
+import {
+  Em,
+  Placeholder,
+  PlaceholderPlot,
+  PlaceholderSlider,
+  PlaceholderTrack,
+} from "@/components/system/placeholder";
+
+/* ============================================================================
+   Every visual below is a placeholder, and that is a decision rather than an
+   accident of the current data situation.
+
+   Before this pass, seven panels on this page rendered numbers that no run
+   produced: a passing validation chi-squared, a Philadelphia scenario with a
+   dollar budget and a tract count, an eight-chain architecture with an R-hat,
+   a Moran's I with a p-value, elastic-net coefficients to two decimal places,
+   and a planner brief recommending a canopy intervention the validation
+   register records as not established. Two of them carried honest source
+   comments saying exactly that. The comments were accurate and the panels
+   still read as results, because VCard rendered its disclaimer at 10px muted
+   mono -- the weakest register in the system, and visually identical to the
+   decorative metadata sitting beside it.
+
+   So the disclaimer is gone and the register replaced it. The rule is that a
+   placeholder panel shows layout and never shows digits, the marker is
+   data-placeholder, and `npm run check:placeholders` fails the build on a
+   numeral inside one of these subtrees. See
+   docs/design/placeholder-register.md and src/components/system/placeholder.tsx.
+
+   If you have a real figure for one of these panels: it does not go in a
+   placeholder. It goes in a panel whose numbers trace to
+   sparc-resilience/docs/results/reconciliation.md, and it takes that panel's
+   register, not this one.
+   ========================================================================== */
 
 /* ---------- StageStack: owns the rail-fill state ---------- */
 
@@ -43,7 +77,6 @@ export function StageBlock({
   title,
   lead,
   items,
-  accent,
   anchor,
   visual,
 }: {
@@ -53,7 +86,6 @@ export function StageBlock({
   title: string;
   lead: string;
   items: { k: string; v: string }[];
-  accent: string;
   anchor: string;
   visual: React.ReactNode;
 }) {
@@ -92,9 +124,14 @@ export function StageBlock({
         aria-expanded={open}
         aria-controls={`${anchor}-body`}
       >
-        <span className="stage-num" style={{ background: accent }}>{num}</span>
+        {/* The badge no longer takes a per-stage accent. Stage index is an
+            ordered quantity and the brand ramp is not ordered -- stages 02-05
+            were one colour in greyscale and for a red-green deficient reader.
+            The number and the position already carry identity, and the only
+            thing colour adds here is state: open, from globals.css. */}
+        <span className="stage-num">{num}</span>
         <div>
-          <div className="kicker" style={{ color: accent }}>{kicker}</div>
+          <div className="kicker">{kicker}</div>
           <h2 className="stage-title">{title}</h2>
         </div>
         <span className="stage-chevron" aria-hidden>▾</span>
@@ -117,26 +154,58 @@ export function StageBlock({
   );
 }
 
-/* ---------- Shared visual chrome ---------- */
+/* ---------- Shared placeholder furniture ----------
 
-function VCard({
-  label,
-  meta,
-  accent,
-  children,
-}: {
-  label: string;
-  meta?: string;
-  accent: string;
-  children: React.ReactNode;
-}) {
+   VCard is gone on purpose. It was the component that rendered a panel's
+   `meta` slot at 10px mono --muted, right-aligned, which is how "sample
+   output · illustrative" came to be indistinguishable from "philadelphia ·
+   2026" two panels away. Keeping it around would mean keeping the register
+   that failed. Panels that one day carry real numbers get a card primitive
+   designed for that job, with the measurement unit in it. */
+
+/** A text block with no text in it. Shows that prose goes here, says nothing. */
+function PlaceholderLines({ widths }: { widths: string[] }) {
   return (
-    <div className="card" style={{ padding: 0, borderTop: `2px solid ${accent}` }}>
-      <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div className="kicker">{label}</div>
-        {meta && <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>{meta}</span>}
+    <div aria-hidden style={{ display: "flex", flexDirection: "column", gap: 7, padding: "3px 0" }}>
+      {widths.map((w, i) => (
+        <span key={i} style={{ display: "block", height: 1, width: w, background: "var(--rule)", opacity: 0.55 }} />
+      ))}
+    </div>
+  );
+}
+
+/** The em-dash row list that replaces every diagnostics table on this page. */
+function EmptyDl({ keys }: { keys: string[] }) {
+  return (
+    <dl className="dl" style={{ marginTop: 10 }}>
+      {keys.map((k) => (
+        <React.Fragment key={k}>
+          <dt>{k}</dt>
+          <dd className="mono"><Em /></dd>
+        </React.Fragment>
+      ))}
+    </dl>
+  );
+}
+
+/** Axis furniture for a plot with nothing in it: the frame reads, the ticks
+ *  read as em dashes, and there is no curve, because a drawn curve crops into
+ *  a result. */
+function EmptyAxes({ rows }: { rows: string[] }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <div className="row" style={{ gap: 14, fontSize: "var(--fs-label)" }}>
+        {rows.map((r) => (
+          <span key={r} className="row mono" style={{ gap: 5, color: "var(--fg-2)" }}>
+            <span aria-hidden style={{ width: 10, height: 1, background: "var(--rule)" }} />
+            {r}
+          </span>
+        ))}
       </div>
-      <div style={{ padding: 16 }}>{children}</div>
+      <div className="row mono" style={{ justifyContent: "space-between", fontSize: "var(--fs-label)", color: "var(--fg-2)" }}>
+        <Em />
+        <Em />
+      </div>
     </div>
   );
 }
@@ -144,295 +213,255 @@ function VCard({
 /* ---------- 01 · IngestVisual ---------- */
 
 export function IngestVisual() {
+  /* File names are format exemplars and carry no digits: the originals named
+     a summer, a year range and a city, which is a study someone could believe
+     had been run. */
   const files = [
-    { n: "lst_summer_2024.tif", k: "raster", c: "var(--purple)" },
-    { n: "tracts_phl.shp", k: "vector", c: "var(--magenta)" },
-    { n: "city_boundary.geojson", k: "boundary", c: "var(--pink)" },
-    { n: "permits_2018-2024.parquet", k: "table", c: "var(--orange)" },
-    { n: "project.yml", k: "manifest", c: "var(--gold)" },
+    { n: "land_surface_temp.tif", k: "raster" },
+    { n: "tracts.shp", k: "vector" },
+    { n: "city_boundary.geojson", k: "boundary" },
+    { n: "permits.parquet", k: "table" },
+    { n: "project.yml", k: "manifest" },
   ];
   return (
-    <VCard label="ingest · drop zone" meta="5 of 5 · ready" accent="var(--purple)">
-      <div style={{ border: "1px dashed var(--line)", borderRadius: 6, padding: 14, background: "var(--paper)", marginBottom: 12 }}>
+    <Placeholder
+      label="ingest · drop zone"
+      note="This is the layout of the drop zone. No files have been ingested and no parse has run."
+    >
+      <div data-ph-surface style={{ padding: 14, marginBottom: 12 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {files.map((f, i) => (
-            <div key={i} style={{ display: "grid", gridTemplateColumns: "70px minmax(0,1fr) 70px", gap: 10, alignItems: "center", fontSize: 12 }}>
-              <span className="mono" style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 3, background: f.c, color: "#fff", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.08em" }}>{f.k}</span>
-              <span className="mono" style={{ fontSize: 12, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.n}</span>
-              <span className="mono" style={{ fontSize: 10, color: "var(--purple)", textAlign: "right" }}>✓ parsed</span>
+          {files.map((f) => (
+            <div key={f.n} style={{ display: "grid", gridTemplateColumns: "76px minmax(0,1fr) 44px", gap: 10, alignItems: "center", fontSize: "var(--fs-body)" }}>
+              {/* Type badges were brand-hue fills under white text -- white on
+                  gold is 1.84:1. They are outlined ink now: a format name is
+                  not a quantity and never needed a colour. */}
+              <span className="mono" style={{ fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 3, border: "1px solid var(--rule)", color: "var(--fg-2)", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.08em" }}>{f.k}</span>
+              <span className="mono" style={{ fontSize: "var(--fs-body)", color: "var(--fg-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.n}</span>
+              <span className="mono" style={{ textAlign: "right" }}><Em /></span>
             </div>
           ))}
         </div>
       </div>
-      <dl className="dl">
-        <dt>reproject</dt><dd className="mono">EPSG:4326 → EPSG:3857</dd>
-        <dt>resample</dt><dd className="mono">bilinear · 30m grid</dd>
-        <dt>clip to</dt><dd className="mono">city_boundary.geojson</dd>
-      </dl>
-    </VCard>
+      <EmptyDl keys={["reproject", "resample", "clip to"]} />
+    </Placeholder>
   );
 }
 
 /* ---------- 02 · CorrelogramVisual ---------- */
 
 export function CorrelogramVisual() {
-  // synthetic Moran's I curve: starts high, decays past ~1.4km
-  const pts = Array.from({ length: 24 }, (_, i) => {
-    const x = i / 23;
-    const y = Math.max(-0.05, 0.78 * Math.exp(-Math.pow(x * 3, 1.4)) - x * 0.1);
-    return { x, y };
-  });
-  const W = 360, H = 140;
-  const px = (x: number) => 28 + x * (W - 36);
-  const py = (y: number) => H - 14 - ((y + 0.1) / 0.95) * (H - 28);
-  const path = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${px(p.x).toFixed(1)} ${py(p.y).toFixed(1)}`).join(" ");
-  const band = pts.map((p) => ({ x: p.x, y0: p.y - 0.06, y1: p.y + 0.06 }));
-  const bandPath = [
-    ...band.map((p, i) => `${i === 0 ? "M" : "L"} ${px(p.x).toFixed(1)} ${py(p.y1).toFixed(1)}`),
-    ...band.slice().reverse().map((p) => `L ${px(p.x).toFixed(1)} ${py(p.y0).toFixed(1)}`),
-    "Z",
-  ].join(" ");
   return (
-    <VCard label="correlogram · spatial autocorrelation" meta="lag 0 → 5 km" accent="var(--magenta)">
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
-        <line x1="28" y1={py(0)} x2={W - 8} y2={py(0)} stroke="var(--line)" strokeDasharray="2 3" />
-        <path d={bandPath} fill="var(--magenta)" opacity="0.15" />
-        <path d={path} fill="none" stroke="var(--magenta)" strokeWidth="2" />
-        {pts.map((p, i) => (
-          <circle key={i} cx={px(p.x)} cy={py(p.y)} r="2.4" fill="var(--magenta)" />
-        ))}
-        <text x="6" y={py(0.7)} fontSize="9" fill="var(--muted)" fontFamily="var(--font-mono)">+0.7</text>
-        <text x="6" y={py(0)} fontSize="9" fill="var(--muted)" fontFamily="var(--font-mono)">0.0</text>
-        <text x={px(0)} y={H - 2} fontSize="9" fill="var(--muted)" fontFamily="var(--font-mono)">0 km</text>
-        <text x={px(1) - 24} y={H - 2} fontSize="9" fill="var(--muted)" fontFamily="var(--font-mono)">5 km</text>
-      </svg>
-      <dl className="dl" style={{ marginTop: 8 }}>
-        <dt>moran&apos;s I</dt><dd className="mono">0.74 · p &lt; 0.001</dd>
-        <dt>geary&apos;s C</dt><dd className="mono">0.31</dd>
-        <dt>range</dt><dd className="mono">≈ 1.4 km · isotropic</dd>
-      </dl>
-    </VCard>
+    <Placeholder
+      label="correlogram · spatial autocorrelation"
+      note="This is where a correlogram and its statistics appear. The plot area is empty because no correlogram has been computed for anything on this site."
+    >
+      <PlaceholderPlot
+        height={140}
+        ariaLabel="Empty plot area showing where a spatial autocorrelation curve would be drawn. No curve is shown because no correlogram has been computed."
+      />
+      <div style={{ marginTop: 8 }}>
+        <EmptyAxes rows={["lag", "autocorrelation"]} />
+      </div>
+      <EmptyDl keys={["moran's I", "geary's C", "range"]} />
+    </Placeholder>
   );
 }
 
 /* ---------- 03 · GwenVisual ---------- */
 
 export function GwenVisual() {
+  /* Variable names describe the heat domain's inputs. The originals carried a
+     percentile in one name and, more importantly, a signed coefficient and a
+     kept/dropped verdict per row -- a selection result, two decimal places,
+     from no run. The rows are uniform now: the panel shows that selection has
+     a table, not what the table said. */
   const vars = [
-    { n: "pct_canopy", b: -0.62, kept: true },
-    { n: "impervious_pct", b: 0.81, kept: true },
-    { n: "bldg_height_p90", b: -0.18, kept: true },
-    { n: "albedo_mean", b: -0.44, kept: true },
-    { n: "median_income", b: -0.21, kept: true },
-    { n: "road_density", b: 0.0, kept: false },
-    { n: "elev_std", b: 0.0, kept: false },
-    { n: "wind_z_mean", b: -0.27, kept: true },
+    "pct_canopy",
+    "impervious_pct",
+    "bldg_height_upper",
+    "albedo_mean",
+    "median_income",
+    "road_density",
+    "elev_std",
+    "wind_z_mean",
   ];
-  const max = 0.85;
   return (
-    <VCard label="gwen · elastic-net selection" meta="α 0.7 · 14 of 38 retained" accent="var(--pink)">
+    <Placeholder
+      label="gwen · variable selection"
+      note="This is the layout of the selection table: one row per candidate variable, with its coefficient and whether it was retained. No selection has been run."
+    >
       <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-        {vars.map((v, i) => {
-          const w = (Math.abs(v.b) / max) * 100;
-          const pos = v.b >= 0;
-          return (
-            <div key={i} style={{ display: "grid", gridTemplateColumns: "minmax(0,130px) minmax(0,1fr) 50px", gap: 10, alignItems: "center", fontSize: 12, opacity: v.kept ? 1 : 0.45 }}>
-              <span className="mono" style={{ fontSize: 11, textDecoration: v.kept ? "none" : "line-through" }}>{v.n}</span>
-              <div style={{ position: "relative", height: 10, background: "var(--paper)", borderRadius: 2 }}>
-                <div style={{ position: "absolute", left: "50%", top: 0, bottom: 0, width: 1, background: "var(--line)" }} />
-                {v.kept && (
-                  <div style={{ position: "absolute", top: 1, bottom: 1, [pos ? "left" : "right"]: "50%", width: `${w / 2}%`, background: pos ? "var(--crimson)" : "var(--purple)", borderRadius: 1 } as React.CSSProperties} />
-                )}
-              </div>
-              <span className="mono" style={{ fontSize: 10, color: "var(--muted)", textAlign: "right" }}>
-                {v.kept ? `${pos ? "+" : "−"}${Math.abs(v.b).toFixed(2)}` : "drop"}
-              </span>
-            </div>
-          );
-        })}
+        {vars.map((n) => (
+          <div key={n} style={{ display: "grid", gridTemplateColumns: "minmax(0,130px) minmax(0,1fr) 44px", gap: 10, alignItems: "center", fontSize: "var(--fs-body)" }}>
+            <span className="mono" style={{ fontSize: 11, color: "var(--fg-2)" }}>{n}</span>
+            <PlaceholderTrack />
+            <span className="mono" style={{ fontSize: "var(--fs-label)", textAlign: "right" }}><Em /></span>
+          </div>
+        ))}
       </div>
-      <dl className="dl" style={{ marginTop: 12 }}>
-        <dt>kernel</dt><dd className="mono">adaptive bisquare · bw 1.2 km</dd>
-        <dt>λ (cv)</dt><dd className="mono">0.038 · 5-fold</dd>
-      </dl>
-    </VCard>
+      <EmptyDl keys={["kernel", "bandwidth", "regularisation"]} />
+    </Placeholder>
   );
 }
 
 /* ---------- 04 · SparcVisual ---------- */
 
 export function SparcVisual() {
-  const W = 360, H = 130;
-  const epochs = 40;
-  const loss = Array.from({ length: epochs }, (_, i) => 1.0 * Math.exp(-i / 10) + 0.12 + Math.random() * 0.02);
-  const chi = Array.from({ length: epochs }, (_, i) => 1.6 * Math.exp(-i / 14) + 0.85 + Math.random() * 0.03);
-  const pathOf = (vals: number[], yMin: number, yMax: number) => {
-    const px = (i: number) => 28 + (i / (epochs - 1)) * (W - 36);
-    const py = (v: number) => H - 14 - ((v - yMin) / (yMax - yMin)) * (H - 28);
-    return vals.map((v, i) => `${i === 0 ? "M" : "L"} ${px(i).toFixed(1)} ${py(v).toFixed(1)}`).join(" ");
-  };
   return (
-    <VCard label="sparc · neural train" meta="GW3C · 8 chains · CUDA" accent="var(--crimson)">
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
-        <line x1="28" y1={H - 14} x2={W - 8} y2={H - 14} stroke="var(--line)" />
-        <path d={pathOf(loss, 0.1, 1.2)} fill="none" stroke="var(--crimson)" strokeWidth="1.6" />
-        <path d={pathOf(chi, 0.8, 2.5)} fill="none" stroke="var(--orange)" strokeWidth="1.6" strokeDasharray="3 2" />
-        <text x="6" y="14" fontSize="9" fill="var(--crimson)" fontFamily="var(--font-mono)">loss</text>
-        <text x="6" y="26" fontSize="9" fill="var(--orange)" fontFamily="var(--font-mono)">χ²</text>
-        <text x={px(W, 0)} y={H - 2} fontSize="9" fill="var(--muted)" fontFamily="var(--font-mono)">epoch 0</text>
-        <text x={W - 50} y={H - 2} fontSize="9" fill="var(--muted)" fontFamily="var(--font-mono)">40</text>
-      </svg>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 1, marginTop: 8 }}>
-        {Array.from({ length: 48 }).map((_, i) => {
-          const r = Math.floor(i / 12), c = i % 12;
-          const d = Math.hypot(r - 1.5, c - 5.5);
-          const v = Math.max(0, 1 - d / 6);
-          return <div key={i} style={{ aspectRatio: "1", background: `rgba(231,60,37,${v.toFixed(2)})`, borderRadius: 1 }} />;
-        })}
+    <Placeholder
+      label="sparc · training"
+      note="This is where training curves and validation diagnostics appear. Nothing has trained: the curves here were generated from a decay function and a random term, and the diagnostic beside them was a passing score from no run."
+    >
+      <PlaceholderPlot
+        height={130}
+        ariaLabel="Empty plot area showing where training loss and a validation diagnostic would be drawn against epoch. No curves are shown because no training run exists."
+      />
+      <div style={{ marginTop: 8 }}>
+        <EmptyAxes rows={["loss", "validation"]} />
       </div>
-      <dl className="dl" style={{ marginTop: 8 }}>
-        <dt>val χ²</dt><dd className="mono">0.93 · target &lt; 1.2 ✓</dd>
-        <dt>σ̄</dt><dd className="mono">0.154</dd>
-        <dt>physics</dt><dd className="mono" style={{ color: "var(--purple)" }}>monotone signs honored</dd>
-      </dl>
-    </VCard>
+      {/* The residual raster was a per-cell alpha ramp computed from distance
+          to the grid centre. A field of data colour is a result whether or not
+          it has a number on it, so it is hatched. */}
+      <div className="ph-plot" style={{ height: 44, marginTop: 10 }} role="img" aria-label="Empty raster area showing where a per-location residual map would be drawn." />
+      <EmptyDl keys={["validation", "mean sigma", "physics constraints"]} />
+    </Placeholder>
   );
 }
-function px(W: number, x: number) { return 28 + x * (W - 36); }
 
 /* ---------- 05 · CausalVisual ---------- */
 
 export function CausalVisual() {
-  // tiny DAG layout
+  /* The graph is kept because a DAG over named domain variables is structure
+     rather than a finding -- it shows what the stage operates on. The node
+     fills were brand hues, so they are outlined; the posterior trace below it
+     was a sine wave with noise and is hatched. */
   const nodes = [
-    { id: "canopy", x: 40, y: 30, c: "var(--purple)" },
-    { id: "imperv", x: 40, y: 90, c: "var(--magenta)" },
-    { id: "albedo", x: 150, y: 30, c: "var(--pink)" },
-    { id: "wind", x: 150, y: 90, c: "var(--orange)" },
-    { id: "AAT_z", x: 280, y: 60, c: "var(--crimson)" },
+    { id: "canopy", x: 40, y: 30 },
+    { id: "imperv", x: 40, y: 90 },
+    { id: "albedo", x: 150, y: 30 },
+    { id: "wind", x: 150, y: 90 },
+    { id: "temp", x: 280, y: 60 },
   ];
   const edges = [
-    ["canopy", "albedo"], ["canopy", "AAT_z"],
-    ["imperv", "albedo"], ["imperv", "AAT_z"],
-    ["albedo", "AAT_z"], ["wind", "AAT_z"],
+    ["canopy", "albedo"], ["canopy", "temp"],
+    ["imperv", "albedo"], ["imperv", "temp"],
+    ["albedo", "temp"], ["wind", "temp"],
   ] as const;
   const find = (id: string) => nodes.find((n) => n.id === id)!;
-  // posterior trace mock
-  const trace = Array.from({ length: 60 }, (_, i) => 0.5 + 0.08 * Math.sin(i * 0.6) + (Math.random() - 0.5) * 0.04);
-  const W = 340, H = 60;
-  const path = trace.map((v, i) => `${i === 0 ? "M" : "L"} ${(i / (trace.length - 1) * W).toFixed(1)} ${(H - v * H).toFixed(1)}`).join(" ");
   return (
-    <VCard label="causal · MC³ + NUTS" meta="412 sampled · R̂ 1.01" accent="var(--orange)">
-      <div className="kicker" style={{ marginBottom: 6 }}>DAG · model space (MC³)</div>
-      <svg viewBox="0 0 340 130" width="100%" style={{ display: "block", marginBottom: 10 }}>
+    <Placeholder
+      label="causal · model space"
+      note="The graph shows which variables this stage reasons over, drawn to illustrate the layout. No structure search has run, no edge here has been accepted or rejected, and the convergence statistics are empty for the same reason."
+    >
+      <div className="kicker" style={{ marginBottom: 6 }}>candidate structure</div>
+      <svg viewBox="0 0 340 130" width="100%" style={{ display: "block", marginBottom: 10 }} role="img" aria-label="A diagram of five named variables connected by arrows, drawn to show the shape of a causal graph. It is not a result of a structure search.">
         {edges.map(([a, b], i) => {
           const A = find(a), B = find(b);
-          return <line key={i} x1={A.x + 18} y1={A.y} x2={B.x - 18} y2={B.y} stroke="var(--ink-2)" strokeWidth="1" markerEnd="url(#arr)" opacity="0.5" />;
+          return <line key={i} x1={A.x + 18} y1={A.y} x2={B.x - 18} y2={B.y} stroke="var(--rule)" strokeWidth="1" markerEnd="url(#arr)" />;
         })}
         <defs>
           <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--ink-2)" />
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--rule)" />
           </marker>
         </defs>
         {nodes.map((n) => (
           <g key={n.id}>
-            <circle cx={n.x} cy={n.y} r="14" fill={n.c} />
-            <text x={n.x} y={n.y + 26} fontSize="9" textAnchor="middle" fill="var(--ink-2)" fontFamily="var(--font-mono)">{n.id}</text>
+            <circle cx={n.x} cy={n.y} r="14" fill="var(--bg-elevated)" stroke="var(--rule)" />
+            <text x={n.x} y={n.y + 26} fontSize="9" textAnchor="middle" fill="var(--fg-2)" fontFamily="var(--font-mono)">{n.id}</text>
           </g>
         ))}
       </svg>
-      <div className="kicker" style={{ marginBottom: 6 }}>posterior trace · NUTS</div>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block", border: "1px solid var(--line)", borderRadius: 4 }}>
-        <line x1="0" y1={H * 0.5} x2={W} y2={H * 0.5} stroke="var(--line)" strokeDasharray="2 3" />
-        <path d={path} fill="none" stroke="var(--orange)" strokeWidth="1.2" />
-      </svg>
-      <dl className="dl" style={{ marginTop: 10 }}>
-        <dt>edges accepted</dt><dd className="mono">41 of 56 · 3 in review</dd>
-        <dt>chains</dt><dd className="mono">8 · 2k samples · warmup 1k</dd>
-        <dt>R̂ max</dt><dd className="mono">1.01 ✓</dd>
-      </dl>
-    </VCard>
+      <div className="kicker" style={{ marginBottom: 6 }}>posterior trace</div>
+      <PlaceholderPlot
+        height={60}
+        ariaLabel="Empty plot area showing where a posterior trace would be drawn. No chain has been sampled."
+      />
+      <EmptyDl keys={["edges accepted", "chains", "convergence"]} />
+    </Placeholder>
   );
 }
 
 /* ---------- 06 · SimulationVisual ---------- */
 
 export function SimulationVisual() {
-  const [budget, setBudget] = React.useState(2.4);
-  const equity = [
-    { n: "heat vulnerability", on: true },
-    { n: "median income", on: true },
-    { n: "canopy access", on: true },
-    { n: "asthma rate", on: false },
-  ];
+  /* The scenario card named a city and a year, put a live dollar budget on a
+     slider, and recomputed a temperature delta and a tract count from the
+     slider position -- an interactive result from no model. The city and the
+     year are gone with the digits: a named place on a scenario card is a study
+     someone can believe we ran. */
+  const equity = ["heat vulnerability", "median income", "canopy access", "asthma rate"];
   return (
-    <VCard label="simulation · scenario" meta="philadelphia · 2026" accent="var(--amber)">
-      <div style={{ marginBottom: 12 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4 }}>
+    <Placeholder
+      label="simulation · scenario"
+      note="This is the layout of the scenario panel: a budget constraint, the equity layers an optimiser must honour, and the resulting change raster. No scenario has been run for any place."
+    >
+      <div style={{ marginBottom: 14 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
           <span className="kicker">budget constraint</span>
-          <span className="mono" style={{ fontSize: 12, fontWeight: 700 }}>${budget.toFixed(1)}M / $5.0M</span>
+          <span className="mono" style={{ fontSize: "var(--fs-body)", fontWeight: 700 }}><Em /></span>
         </div>
-        <input
-          type="range" min={0.5} max={5} step={0.1} value={budget}
-          onChange={(e) => setBudget(parseFloat(e.target.value))}
-          style={{ width: "100%", accentColor: "var(--amber)" }}
-          aria-label="budget"
-        />
+        <PlaceholderSlider />
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
-        {equity.map((e, i) => (
-          <span key={i} className="pill" style={{ background: e.on ? "var(--amber)" : "rgba(0,0,0,0.05)", color: e.on ? "#fff" : "var(--muted)" }}>
-            {e.on ? "✓" : "○"} {e.n}
-          </span>
+        {/* The tick and circle glyphs encoded which layers were switched on,
+            which is a configuration of a run that does not exist. */}
+        {equity.map((e) => (
+          <span key={e} className="pill" style={{ background: "transparent", border: "1px solid var(--rule)", color: "var(--fg-2)" }}>{e}</span>
         ))}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(20, 1fr)", gap: 1, marginBottom: 12 }}>
-        {Array.from({ length: 60 }).map((_, i) => {
-          const v = Math.sin(i * 0.4 + budget) * Math.cos(i * 0.21) * 0.5 + 0.5;
-          const stops = ["#602468", "#9e337d", "#e94d9b", "#e94461", "#e73c25", "#e76c25", "#e79024", "#f0b632", "#fbdd46"];
-          const idx = Math.floor(v * (stops.length - 1));
-          return <div key={i} style={{ aspectRatio: "1", background: stops[idx], opacity: 0.85 }} />;
-        })}
-      </div>
-      <dl className="dl">
-        <dt>Δ AAT_z mean</dt><dd className="mono">−{(0.12 + budget * 0.06).toFixed(2)} (σ 0.154)</dd>
-        <dt>tracts improved</dt><dd className="mono">{Math.round(120 + budget * 30)} of 287</dd>
-        <dt>budget check</dt><dd className="mono" style={{ color: "var(--purple)" }}>✓ within ${budget.toFixed(1)}M</dd>
-      </dl>
-    </VCard>
+      <div className="ph-plot" style={{ height: 64, marginBottom: 2 }} role="img" aria-label="Empty raster area showing where the per-location change under a scenario would be drawn." />
+      <EmptyDl keys={["mean change", "tracts improved", "budget check"]} />
+    </Placeholder>
   );
 }
 
 /* ---------- 07 · ReportVisual ---------- */
 
 export function ReportVisual() {
-  const [tab, setTab] = React.useState<"technical" | "planner" | "public">("planner");
-  const tabs: Array<{ k: typeof tab; label: string; c: string }> = [
-    { k: "technical", label: "Technical", c: "var(--crimson)" },
-    { k: "planner", label: "Planner", c: "var(--orange)" },
-    { k: "public", label: "Public", c: "var(--gold)" },
+  const [tab, setTab] = React.useState<"technical" | "planner" | "public">("technical");
+  const tabs: Array<{ k: typeof tab; label: string }> = [
+    { k: "technical", label: "Technical" },
+    { k: "planner", label: "Planner" },
+    { k: "public", label: "Public" },
   ];
-  // Sample report text showing the three output audiences. "District 7", the
-  // $2.4M figure and the diagnostics below are invented for the mock-up -- they
-  // are not from any run. The card is labelled illustrative for that reason.
-  const previews = {
-    technical: { title: "Methods & Posterior Diagnostics", body: "Geographically-weighted neural ensemble (GW3C). 8-chain NUTS, 2k samples post-warmup. R̂ ≤ 1.01. Validation χ² 0.93. Edge-level signs and physics constraints itemized in Appendix B. Reproducible from project.yml@a1b2c3d.", chips: ["χ² · σ · R̂", "DAG manifest", "code refs"] },
-    planner: { title: "Adaptation Brief — District 7", body: "$2.4M canopy expansion across 218 priority tracts is projected to reduce mean afternoon air-temperature by 0.26 °C (σ 0.15). Highest-vulnerability tracts gain the most. Trade-offs and sensitivity tables on p. 4.", chips: ["maps", "tradeoff table", "equity overlay"] },
-    public: { title: "What this means for your block", body: "Planting more trees on hot, paved blocks would cool them by about a quarter of a degree on summer afternoons. The neighborhoods that need it most would see the biggest change.", chips: ["plain language", "before/after", "FAQ"] },
+  /* The three preview bodies are gone, not em-dashed. Em-dashing the numerals
+     in the planner brief would have left "canopy expansion ... is projected to
+     reduce mean afternoon air-temperature by —", which still crops into a
+     claim -- and canopy cooling is the one intervention the validation
+     register records as not established. The acceptance test for this register
+     is that no crop reads as a result, so the body renders as the skeleton of
+     a document. What the three audiences actually get is already stated in the
+     copy beside this panel, which is where a feature description belongs.
+     Proposed replacement sentences are with the CFO; do not write prose in
+     here without them. */
+  const skeleton: Record<typeof tab, { title: string; chips: string[] }> = {
+    technical: { title: "Methods and diagnostics", chips: ["diagnostics", "DAG manifest", "code refs"] },
+    planner: { title: "Adaptation brief", chips: ["maps", "tradeoff table", "equity overlay"] },
+    public: { title: "What this means locally", chips: ["plain language", "before / after", "FAQ"] },
   };
-  const p = previews[tab];
+  const p = skeleton[tab];
   return (
-    <VCard label="report · audience" meta="sample output · illustrative" accent="var(--gold)">
-      <div style={{ display: "flex", gap: 4, marginBottom: 12, padding: 3, background: "var(--paper)", borderRadius: 5, border: "1px solid var(--line)" }}>
+    <Placeholder
+      label="report · audience"
+      note="This is the layout of the report view: one tab per audience, each with its own sections. The document bodies are empty because no run has produced a report."
+    >
+      {/* Active-tab fills were crimson, orange and gold under white text.
+          White on gold is 1.84:1, which is below every threshold there is. The
+          selected tab is ink now, and selection is also carried by
+          aria-selected rather than by colour alone. */}
+      <div role="tablist" aria-label="Report audience" data-ph-surface style={{ display: "flex", gap: 4, marginBottom: 12, padding: 3, borderStyle: "solid" }}>
         {tabs.map((t) => (
           <button
             key={t.k}
+            role="tab"
+            aria-selected={tab === t.k}
             onClick={() => setTab(t.k)}
             style={{
-              flex: 1, padding: "6px 10px", borderRadius: 3, border: "none", cursor: "pointer",
+              flex: 1, padding: "6px 10px", borderRadius: 3, cursor: "pointer",
               fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase",
-              background: tab === t.k ? t.c : "transparent",
-              color: tab === t.k ? "#fff" : "var(--ink-2)",
+              background: tab === t.k ? "var(--fg)" : "transparent",
+              color: tab === t.k ? "var(--paper)" : "var(--fg-2)",
+              border: tab === t.k ? "1px solid var(--fg)" : "1px solid transparent",
               transition: "background .15s, color .15s",
             }}
           >
@@ -440,19 +469,19 @@ export function ReportVisual() {
           </button>
         ))}
       </div>
-      <div style={{ border: "1px solid var(--line)", borderRadius: 6, padding: 14, background: "var(--paper)", marginBottom: 12 }}>
-        <div className="kicker" style={{ marginBottom: 6 }}>sample preview · {tab}</div>
-        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6, letterSpacing: "-0.01em" }}>{p.title}</div>
-        <div style={{ fontSize: 12, color: "var(--ink-2)", lineHeight: 1.55, marginBottom: 10 }}>{p.body}</div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-          {p.chips.map((c, i) => <span key={i} className="pill">{c}</span>)}
+      <div data-ph-surface style={{ padding: 14, marginBottom: 12 }}>
+        <div className="kicker" style={{ marginBottom: 6 }}>document body</div>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 8, letterSpacing: "-0.01em" }}>{p.title}</div>
+        <PlaceholderLines widths={["100%", "96%", "99%", "72%"]} />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12 }}>
+          {p.chips.map((c) => <span key={c} className="pill" style={{ background: "transparent", border: "1px solid var(--rule)", color: "var(--fg-2)" }}>{c}</span>)}
         </div>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-        {[".pdf", ".md", ".html", "manifest.json"].map((f, i) => (
-          <span key={i} className="pill" style={{ background: "var(--ink)", color: "var(--paper)" }}>↓ {f}</span>
+        {[".pdf", ".md", ".html", "manifest.json"].map((f) => (
+          <span key={f} className="pill" style={{ background: "transparent", border: "1px solid var(--rule)", color: "var(--fg-2)" }}>{f}</span>
         ))}
       </div>
-    </VCard>
+    </Placeholder>
   );
 }

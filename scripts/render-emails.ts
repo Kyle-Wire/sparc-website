@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 // Render every React Email template in src/emails/* to a static HTML file
 // under emails/dist/<name>.html. Variable props are passed as literal
 // `{{handlebars}}` placeholders so the output can be pasted directly into

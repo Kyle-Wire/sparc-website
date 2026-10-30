@@ -9,6 +9,10 @@ type Form = {
   name: string; email: string; org: string; domain: string; crs: string; reason: string;
 };
 
+// These are the template directory names in the engine repository. They are the
+// names of templates, not a claim that each one is validated: only urban heat
+// has a validation record, and that record covers one city. Do not present this
+// list as a menu of working products.
 const DOMAINS = ["uhi", "coastal", "drought", "geotech", "groundwater", "noise", "seismic", "stormwater", "water", "wildfire", "air", "forcesmip", "blank"];
 
 function ContactForm() {
@@ -40,18 +44,29 @@ function ContactForm() {
   }
 
   if (state === "ok") {
+    // This panel used to tell every submitter: "We'll send a build with the
+    // <DOMAIN> template pre-loaded for <CRS> within 5 business days." There is
+    // no build. Every desktop build in the estate reads "(not yet built)" and
+    // Studio installs from a clone of a private repository. That sentence was a
+    // commitment made automatically to each individual who filled in this form,
+    // which is a worse thing than a wrong line of marketing copy. Do not
+    // reinstate any delivery promise here until there is something to deliver
+    // and a channel to deliver it through.
     return (
       <div className="card" style={{ padding: 32, textAlign: "center" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 9999, background: "var(--purple)", color: "#fff", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 16 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} /> request received
         </div>
-        <h3 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 12px" }}>Welcome to the waitlist.</h3>
+        <h3 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 12px" }}>Thank you — we have it.</h3>
         <p style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.6, maxWidth: 480, margin: "0 auto" }}>
-          We&apos;ll send a build with the <strong className="mono">{form.domain.toUpperCase()}</strong> template pre-loaded for <strong className="mono">{form.crs}</strong> within 5 business days. Watch your inbox at <strong>{form.email}</strong>.
+          A person will read this and reply to <strong>{form.email}</strong>. To be
+          straight with you about where we are: there is no download to send you
+          yet. What we can do today is talk about your question and, if it fits,
+          run the work ourselves and hand you the results.
         </p>
         {ticket && (
           <div className="mono" style={{ marginTop: 18, fontSize: 11, color: "var(--muted)", letterSpacing: "0.1em" }}>
-            ▸ ticket · #{ticket} · queued
+            ▸ reference · #{ticket}
           </div>
         )}
       </div>
@@ -60,12 +75,12 @@ function ContactForm() {
 
   return (
     <form className="card" style={{ padding: 28 }} onSubmit={submit}>
-      <div className="kicker">request access · waitlist</div>
+      <div className="kicker">request access</div>
       <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.015em", margin: "8px 0 18px" }}>Tell us about your work.</h3>
       <div className="grid-2" style={{ gap: 14 }}>
-        <div><label className="label">Name</label><input className="input" required value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Dr. Naomi Schaal" /></div>
-        <div><label className="label">Email</label><input className="input" type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="naomi@berkeley.edu" /></div>
-        <div><label className="label">Organization</label><input className="input" value={form.org} onChange={(e) => update("org", e.target.value)} placeholder="UC Berkeley · Geography" /></div>
+        <div><label className="label">Name</label><input className="input" required value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Your name" /></div>
+        <div><label className="label">Email</label><input className="input" type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@org.org" /></div>
+        <div><label className="label">Organization</label><input className="input" value={form.org} onChange={(e) => update("org", e.target.value)} placeholder="Organization · team" /></div>
         <div><label className="label">Project CRS</label><input className="input mono" value={form.crs} onChange={(e) => update("crs", e.target.value)} placeholder="EPSG:32619" /></div>
         <div style={{ gridColumn: "1 / -1" }}>
           <label className="label">Domain template</label>
@@ -75,12 +90,12 @@ function ContactForm() {
         </div>
         <div style={{ gridColumn: "1 / -1" }}>
           <label className="label">What are you trying to figure out?</label>
-          <textarea className="input" style={{ minHeight: 100, resize: "vertical" }} value={form.reason} onChange={(e) => update("reason", e.target.value)} placeholder="Modeling canopy intervention scenarios across 287 Philadelphia census tracts. Need DAG validation + posterior σ rasters." />
+          <textarea className="input" style={{ minHeight: 100, resize: "vertical" }} value={form.reason} onChange={(e) => update("reason", e.target.value)} placeholder="The decision you are trying to make, the area it covers, and the data you already hold." />
         </div>
       </div>
       {state === "error" && <p style={{ color: "var(--crimson)", marginTop: 12, fontSize: 13 }}>{error}</p>}
       <div className="row" style={{ marginTop: 22, justifyContent: "space-between", alignItems: "center" }}>
-        <span className="mono" style={{ fontSize: 11, color: "var(--muted)" }}>▸ submit · build queue · ~5 business days</span>
+        <span className="mono" style={{ fontSize: 11, color: "var(--muted)" }}>▸ one inbox · read by a person</span>
         <button type="submit" className="btn btn-accent" disabled={state === "submitting"}>
           {state === "submitting" ? "Sending…" : "Request access"} <span className="arrow">→</span>
         </button>
@@ -96,7 +111,7 @@ export default function ContactPage() {
       <PageHero
         kicker="contact · we read everything"
         title="Get in touch."
-        lead="Waitlist requests, sales, support, research collaborations, press. We try to answer within two business days, and we read every line you write."
+        lead="Questions, research collaborations, press, or a study you would like us to run. One person reads this inbox."
         accent="var(--amber)"
       />
 
@@ -107,7 +122,8 @@ export default function ContactPage() {
             <div className="card" style={{ borderLeft: "2px solid var(--crimson)" }}>
               <div className="kicker">all enquiries · one inbox</div>
               <p style={{ fontSize: 13, color: "var(--ink-2)", margin: "8px 0 10px", lineHeight: 1.5 }}>
-                Sales, support, research collaborations, press — everything routes here while we set up role inboxes on the new domain.
+                Everything routes here. {COMPANY} is one person today, so there is
+                one address and no routing.
               </p>
               <a className="mono" href={`mailto:${EMAIL_PRIMARY}`} style={{ fontSize: 13, color: "var(--ink)", textDecorationColor: "var(--crimson)" }}>{EMAIL_PRIMARY}</a>
             </div>
@@ -126,19 +142,25 @@ export default function ContactPage() {
         </div>
       </Section>
 
-      <Section sunken kicker="response times · honest" title="What to expect.">
-        <div className="grid-4" style={{ gap: 14 }}>
-          {[
-            { k: "waitlist", v: "≤ 5 days", c: "var(--purple)" },
-            { k: "support · pursue", v: "≤ 48 hrs", c: "var(--crimson)" },
-            { k: "support · converge", v: "≤ 24 hrs", c: "var(--amber)" },
-            { k: "support · transcend", v: "Agreed per contract", c: "var(--gold)" },
-          ].map((r, i) => (
-            <div key={i} className="card" style={{ padding: 22, borderTop: `3px solid ${r.c}` }}>
-              <div className="kicker">{r.k}</div>
-              <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: "-0.02em", marginTop: 6, fontFeatureSettings: "'tnum'" }}>{r.v}</div>
-            </div>
-          ))}
+      {/* This section was headed "response times . honest" and published four
+          commitments: waitlist <= 5 days, support . pursue <= 48 hrs, support .
+          converge <= 24 hrs, support . transcend "Agreed per contract". There is
+          no support rota, there is nobody on call, and the three tier names were
+          retired on 29 Oct when the prices came down. /pricing simultaneously
+          said we "publish no response-time commitment", so the site contradicted
+          itself. Do not publish a response time until someone is accountable for
+          meeting it. */}
+      <Section sunken kicker="what to expect · plainly" title="No support commitment yet.">
+        <div className="card" style={{ padding: 22, maxWidth: 760 }}>
+          <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.65, margin: 0 }}>
+            We used to publish guaranteed response windows against subscription
+            tiers. There are no tiers and there is no support rota, so those
+            numbers were not commitments anybody could keep and they have been
+            withdrawn. In practice one person reads this inbox and usually replies
+            within a few business days. If you need a response time you can rely
+            on, it belongs in a written agreement for a specific piece of work,
+            and we will put it there.
+          </p>
         </div>
       </Section>
 

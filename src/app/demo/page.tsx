@@ -40,14 +40,18 @@ const PILOT_STRUCTURE = [
   {
     n: "04",
     t: "What you get.",
-    body: "Scenario outputs with location-level confidence intervals. A reproducible audit trail — every coefficient, every assumption, every step logged. A report formatted for your audience: planning committee, grant application, or capital plan.",
+    body: "Scenario outputs with location-level confidence intervals, and the limits stated alongside them — including where the model is not validated for what you are asking. A record of the run: the configuration, the assumptions and the steps. A report formatted for your audience: planning committee, grant application, or capital plan.",
   },
 ];
 
+// Step 03 used to read: "Build + template -- We send a build with the right
+// template pre-loaded for your domain and help you get rolling." There is no
+// build to send. The route we can actually offer is that we run the work and
+// hand over the results, so that is what this now says.
 const NEXT_STEPS = [
-  { n: "01", t: "We review", body: "We read every request personally \u2014 usually within a few business days." },
-  { n: "02", t: "30-min walkthrough", body: "If there's a fit, we schedule a short call to learn about your project and show the app." },
-  { n: "03", t: "Build + template", body: "We send a build with the right template pre-loaded for your domain and help you get rolling." },
+  { n: "01", t: "We review", body: "We read every request personally — usually within a few business days." },
+  { n: "02", t: "30-min walkthrough", body: "If there's a fit, we schedule a short call to learn about your project and show you what the model does and where it stops." },
+  { n: "03", t: "We scope the work", body: "There is nothing to download yet. If it fits, we agree a scope and run the study ourselves, and you get the results and the record behind them." },
 ];
 
 function DemoForm() {
@@ -117,7 +121,7 @@ function DemoForm() {
             required
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            placeholder="Naomi Schaal"
+            placeholder="Your name"
             autoComplete="name"
             maxLength={200}
           />
@@ -142,7 +146,7 @@ function DemoForm() {
             type="text"
             value={organization}
             onChange={(e) => setOrganization(e.target.value)}
-            placeholder="City of Boston · Planning"
+            placeholder="Organization · team"
             autoComplete="organization"
             maxLength={200}
           />
@@ -193,7 +197,7 @@ function DemoForm() {
         rows={4}
         value={useCase}
         onChange={(e) => setUseCase(e.target.value)}
-        placeholder="Modeling urban heat across Boston neighborhoods to prioritize canopy investment…"
+        placeholder="The decision you are trying to make, the area it covers, and the data you already hold…"
         maxLength={2000}
         style={{ resize: "vertical" }}
       />
@@ -224,10 +228,15 @@ export default function DemoPage() {
   return (
     <>
       <Nav active="demo" />
+      {/* The kicker said "pilot program . private beta" and the lead said we run
+          pilots "with a small cohort of planning teams, researchers, and
+          agencies". There is no cohort and there is no beta: there are three
+          letters of intent and no signed engagement. Do not describe a cohort
+          until one exists. */}
       <PageHero
-        kicker="pilot program · private beta"
+        kicker="pilot program"
         title="Request access."
-        lead="We run structured research pilots with a small cohort of planning teams, researchers, and agencies. Tell us about your spatial question and we'll be in touch."
+        lead="We are looking for a small number of planning teams, researchers and agencies to run structured pilots with. Tell us about your spatial question and we'll be in touch."
       />
       <Section>
         <div className="split-12-10" style={{ gap: 28, alignItems: "start" }}>
@@ -248,7 +257,8 @@ export default function DemoPage() {
               ))}
             </div>
             <p style={{ marginTop: 18, fontSize: 12, color: "var(--muted)", lineHeight: 1.6 }}>
-              We&apos;re still upgrading the application and making sure things run smoothly. Pilot partners help us shape what comes next.
+              We&apos;re still building the application. Pilot partners help us
+              shape what comes next, and get the work done by us in the meantime.
             </p>
           </div>
         </div>
@@ -266,8 +276,20 @@ export default function DemoPage() {
             </div>
           ))}
         </div>
+        {/* This closing line used to claim that "every project pins its
+            dependencies and records a run manifest, so a result can be
+            regenerated from the project file it came from". That is not true of
+            the figure of record: the Providence run directory is gone and the
+            company accepted that deliberately rather than regenerate it, and
+            neither the flood nor the wind benchmark results are pinned to the
+            commit that produced them. Retaining the run directory is now the
+            rule for any future run of record, which is a forward commitment and
+            must not be written as an existing property. */}
         <p style={{ marginTop: 24, fontSize: 13, color: "var(--muted)", lineHeight: 1.6, borderTop: "1px dashed var(--line)", paddingTop: 18 }}>
-          Outputs are built for reproducibility: every project pins its dependencies and records a run manifest, so a result can be regenerated from the project file it came from.
+          Every pilot keeps its run directory, its configuration and its software
+          versions, so the result can be traced to the run that produced it. Where
+          an earlier result cannot be regenerated, we say so rather than imply
+          otherwise — the methodology reports name those cases.
         </p>
       </Section>
       <Footer />

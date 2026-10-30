@@ -1,29 +1,70 @@
 /* SPARC Labs · design tokens. Source of truth for color/type/spacing.
-   Mirrors sparc-desktop tokens; do not modify hex values without a brand review. */
+   Mirrors sparc-desktop tokens; do not modify hex values without a brand review.
+
+   The file has three layers and the layers are the rule, not a convention:
+
+     1. --sparc-*      the brand ramp. DECORATION ONLY. Frozen pending brand
+                       review. Never a text colour, never the boundary of a
+                       control, never an encoding of data.
+     2. role tokens    --accent, --rule, --hairline, --fg-*, --status-*. These
+                       carry a contrast obligation, stated inline, and they are
+                       what components reference.
+     3. --seq-* --div-* the two data ramps. Data colour only; never decoration.
+
+   Why the layers exist: before this split, one token (--line) was both a
+   decorative hairline and the boundary of every input and button, so it could
+   not satisfy either job -- it sat at 1.61:1 where a meaning-carrying boundary
+   needs 3:1. And the brand ramp was simultaneously the brand and the severity
+   scale, which is how four of its nine steps came to be indistinguishable in
+   greyscale print. One token cannot hold two contracts. See
+   docs/design/color-roles.md. */
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
 :root {
-  /* Brand ramp */
-  --sparc-purple:  #602468;
-  --sparc-magenta: #9e337d;
-  --sparc-pink:    #e94d9b;
-  --sparc-red:     #e94461;
-  --sparc-crimson: #e73c25;
-  --sparc-orange:  #e76c25;
-  --sparc-amber:   #e79024;
-  --sparc-gold:    #f0b632;
-  --sparc-yellow:  #fbdd46;
+  /* ---------- 1 · Brand ramp · decoration only ----------
+     A stripe, a dot, a glow, a gradient behind a heading: yes, and no contrast
+     obligation applies, because nothing is lost if a reader cannot resolve it.
+     Text, control boundaries and data encodings: no. Ratios below are against
+     --paper and are the reason, measured, not an opinion. */
+  --sparc-purple:  #602468;  /* 9.81:1 */
+  --sparc-magenta: #9e337d;  /* 5.93:1 */
+  --sparc-pink:    #e94d9b;  /* 3.19:1 */
+  --sparc-red:     #e94461;  /* 3.50:1 */
+  --sparc-crimson: #e73c25;  /* 3.77:1 · 4.14:1 under white text -- misses AA */
+  --sparc-orange:  #e76c25;  /* 2.91:1 */
+  --sparc-amber:   #e79024;  /* 2.27:1 */
+  --sparc-gold:    #f0b632;  /* 1.67:1 */
+  --sparc-yellow:  #fbdd46;  /* 1.23:1 */
 
-  --purple:  var(--sparc-purple);
-  --magenta: var(--sparc-magenta);
-  --pink:    var(--sparc-pink);
-  --red:     var(--sparc-red);
-  --crimson: var(--sparc-crimson);
-  --orange:  var(--sparc-orange);
-  --amber:   var(--sparc-amber);
-  --gold:    var(--sparc-gold);
-  --yellow:  var(--sparc-yellow);
+  /* ---------- 2 · Working hues ----------
+     Aliases of the brand ramp for decorative use. Three of them are also
+     legible enough for a text or boundary role and are marked so; the rest are
+     decoration and the linter in scripts/check-contrast.mjs knows it. */
+  --purple:  var(--sparc-purple);   /* text ok · 9.81:1 */
+  --magenta: var(--sparc-magenta);  /* text ok · 5.93:1 */
+  --pink:    var(--sparc-pink);     /* decoration only */
+  --red:     var(--sparc-red);      /* decoration only */
+  --orange:  var(--sparc-orange);   /* decoration only */
+  --amber:   var(--sparc-amber);    /* decoration only */
+  --gold:    var(--sparc-gold);     /* decoration only */
+  --yellow:  var(--sparc-yellow);   /* decoration only */
+
+  /* --crimson is the one working hue that had to move. It is the site's accent
+     and therefore its only button, and white-on-#e73c25 is 4.14:1 at the 13px
+     of .btn-accent -- an AA miss on the single element the whole site funnels
+     to. Darkened within the hue family: 7.1° -> 6.9°, white-on 4.14 -> 5.17:1,
+     and on paper 3.77 -> 4.71:1, which also makes it legal as body-size text
+     for the first time. The brand ramp step itself is untouched above, so the
+     gradient is unchanged and no brand review is implied. */
+  --crimson: #cc331f;  /* 4.71:1 on paper · 5.17:1 under white text */
+
+  /* Darkened amber, for the two places a warm hue was carrying text or a
+     meaning-bearing boundary. 33.2° -> 33.0°, 2.27 -> 4.75:1 on paper.
+     There is deliberately no --gold-ink or --yellow-ink: at 1.67 and 1.23
+     those two cannot be rescued without leaving the hue, and nothing in the
+     system needs them to. They are decoration and that is all they are. */
+  --amber-ink: #9c5e12;  /* 4.75:1 on paper · 5.22:1 under white text */
 
   /* Warm neutrals */
   --ink:    #1a1416;
@@ -44,26 +85,100 @@
   --fg-2: var(--ink-2);
   --fg-muted: var(--muted);
 
-  --border: var(--line);
+  /* ---------- Rules: two tokens, two contracts ----------
+     --hairline is decorative: the faint division between two paragraphs of the
+     same thing. It has NO contrast obligation, and the right answer for most of
+     these rules is to stay faint, which is why darkening one shared token was
+     never the fix.
+
+     --rule is structural: the edge of an input, the frame of a data panel, the
+     division between a result and the caveat on it. It carries meaning, so
+     WCAG 2.1 1.4.11 applies and it clears 3:1 against every ground we put it
+     on -- white 4.68, --paper 4.26, --paper-2 3.83, --paper-3 3.13.
+
+     --line is kept as an alias of --hairline so the ~45 existing decorative
+     uses stay correct without being touched. If you are reaching for a border
+     and a reader needs to find it, you want --rule. */
+  --hairline: var(--line);
+  --rule: #7c7362;
+
+  --border: var(--rule);
   --accent: var(--crimson);
   --accent-2: var(--purple);
-  --accent-warning: var(--amber);
+  --accent-warning: var(--amber-ink);
 
+  /* Status colour is always the redundant channel. Every one of these appears
+     beside a word or a glyph that says the same thing, so a reader who cannot
+     resolve the hue loses nothing -- which is the pattern insar's deliverable
+     verdicts already get right, and the reason it degrades gracefully. */
   --status-live: var(--crimson);
-  --status-warn: var(--amber);
+  --status-warn: var(--amber-ink);
   --status-ai: var(--purple);
+
+  /* ---------- 3 · Data ramps ----------
+     Brand colour never encodes data; data colour never decorates. Both ramps
+     are generated by scripts/derive-ramps.mjs and verified by
+     scripts/check-ramps.mjs, because "the ramp is monotonic" is a property you
+     prove or do not have.
+
+     Sequential · for magnitude. Derived by holding each brand step's hue and
+     solving HSL lightness for an evenly spaced 8-bit greyscale target, so it
+     still reads as ours and survives greyscale print and red-green deficiency.
+     Adjacent steps differ by 25 grey levels; --grad-ramp's worst four differ
+     by a total of 19 across all four. */
+  --seq-1: #2a102d;  /* grey8  32 */
+  --seq-2: #5c1e49;  /* grey8  57 */
+  --seq-3: #9c1358;  /* grey8  82 */
+  --seq-4: #d21a3a;  /* grey8 107 */
+  --seq-5: #e7533f;  /* grey8 132 */
+  --seq-6: #e9844b;  /* grey8 157 */
+  --seq-7: #ebab5c;  /* grey8 182 */
+  --seq-8: #efcc7e;  /* grey8 207 */
+  --seq-9: #f5eab0;  /* grey8 232 */
+
+  /* Diverging · for signed change. ColorBrewer RdBu 9-class, verbatim. This is
+     adoption, not invention: FloodSim (app/map.html, rgb(33,102,172) ->
+     rgb(178,24,43)) and insar_pipeline (figures.py, cmap="RdBu" with
+     TwoSlopeNorm) independently arrived at it. Zero pins to --div-5 and a
+     diverging legend always carries numeric ends. Not monotonic end to end by
+     design -- monotonic outward from zero, one arm at a time. */
+  --div-1: #2166ac;
+  --div-2: #4393c3;
+  --div-3: #92c5de;
+  --div-4: #d1e5f0;
+  --div-5: #f7f7f7;  /* ZERO */
+  --div-6: #fddbc7;
+  --div-7: #f4a582;
+  --div-8: #d6604d;
+  --div-9: #b2182b;
 
   --font-sans: "Inter", "Neue Haas Grotesk", "Helvetica Neue", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
+  /* Brand furniture. Legal uses: the hero wordmark fill, the 4px strip under
+     the nav, a radial glow. Illegal uses, all of which it was doing: the stage
+     colour on the pipeline, the progress fill on the product rail, the accent
+     of a panel. Those encode an ordered quantity and this ramp is not ordered
+     -- see the --seq-* note above. It is built from --sparc-* rather than the
+     working hues so that darkening --crimson for AA left the gradient alone. */
   --grad-ramp: linear-gradient(90deg,
-    var(--purple) 0%, var(--magenta) 14%, var(--pink) 28%, var(--red) 42%,
-    var(--crimson) 56%, var(--orange) 70%, var(--amber) 82%, var(--gold) 92%, var(--yellow) 100%);
+    var(--sparc-purple) 0%, var(--sparc-magenta) 14%, var(--sparc-pink) 28%, var(--sparc-red) 42%,
+    var(--sparc-crimson) 56%, var(--sparc-orange) 70%, var(--sparc-amber) 82%, var(--sparc-gold) 92%, var(--sparc-yellow) 100%);
 
   --tex-grid:
     linear-gradient(rgba(0,0,0,0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,0,0,0.035) 1px, transparent 1px);
   --tex-grid-size: 24px 24px;
+
+  /* One texture, one meaning, site-wide: THERE IS NO NUMBER HERE. It is the
+     ground of a placeholder panel, and it is what an unvalidated regime or an
+     untested row renders as when those land. A texture is the right carrier
+     because it survives greyscale, print, PNG export and a photocopy, none of
+     which a tooltip or a colour does. Do not give it a second meaning. */
+  --tex-hatch: repeating-linear-gradient(45deg,
+    rgba(26,20,22,0.11) 0 2px, transparent 2px 8px);
+  --tex-hatch-dense: repeating-linear-gradient(45deg,
+    rgba(26,20,22,0.16) 0 1.5px, transparent 1.5px 4.5px);
 
   /* Spacing scale (px) */
   --space-1: 4px;
@@ -75,15 +190,26 @@
   --space-7: 48px;
   --space-8: 64px;
 
-  /* Type scale — values match the current desktop sizing.
-     Mobile overrides live in globals.css under @media (max-width: 640px). */
+  /* Type scale. These tokens are now the only place a heading size is
+     declared; globals.css reads them at every breakpoint and declares no
+     literal font-size for a scale step. Until this change the desktop scale
+     was a comment that happened to agree with the literals in globals.css --
+     the tokens only took effect below 640px, the tablet step had no token at
+     all, and with no utility layer in this codebase every drift would have
+     been a one-line inline style. Tablet and mobile overrides live in
+     globals.css under their @media blocks and override these values. */
   --fs-hero: 64px;        /* landing hero h1 */
   --fs-page-hero: 56px;   /* PageHero h1 */
   --fs-h1: 48px;
   --fs-h2: 28px;
   --fs-h2-section: 36px;  /* .section-head h2 */
   --fs-h3: 22px;
+  --fs-h4: 16px;
+  --fs-stage-title: 32px; /* .stage-block h2 on /product */
   --fs-display: 40px;     /* large inline numerics (pricing, about) */
+  --fs-body: 13px;        /* the base, and the floor for any honesty label */
+  --fs-lead: 18px;
+  --fs-label: 10px;       /* .kicker, .label, .pill */
 
   /* Container side padding */
   --wrap-pad: 32px;

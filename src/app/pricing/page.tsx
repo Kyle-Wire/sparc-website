@@ -108,7 +108,9 @@ export default function PricingPage() {
         <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 12, maxWidth: 760 }}>
           {BEFORE_WE_CHARGE.map((item, i) => (
             <li key={i} style={{ display: "flex", gap: 12, fontSize: 15, lineHeight: 1.6, color: "var(--ink-2)" }}>
-              <span className="mono" style={{ color: "var(--amber)", fontWeight: 700, marginTop: 2 }}>
+              {/* --amber as a text colour is 2.27:1 on paper, below every
+                  threshold. Darkened variant, same hue. */}
+              <span className="mono" style={{ color: "var(--amber-ink)", fontWeight: 700, marginTop: 2 }}>
                 {String(i + 1).padStart(2, "0")}
               </span>
               <span>{item}</span>

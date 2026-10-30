@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Kicker } from "@/components/marketing/page-shell";
+import { Em, Placeholder } from "@/components/system/placeholder";
 import { TAGLINE_SHORT, BRAND_LONG, VERSION } from "@/lib/brand";
 
 // This panel is an illustration of the interface. It previously opened
@@ -123,7 +124,10 @@ export function ProofStrip() {
     { kicker: "canopy cooling · providence", value: "not established", sub: "+10 pp canopy · not distinguishable from zero", color: "var(--muted)" },
     { kicker: "impervious · providence", value: "−0.40 °F", sub: "−10 pp impervious · model and causal estimate agree", color: "var(--crimson)" },
     { kicker: "model fit · unseen neighbourhoods", value: "R² 0.55", sub: "2 km blocks held out · the honest number", color: "var(--purple)" },
-    { kicker: "error vs. best baseline", value: "1.15 °F", sub: "RMSE · gradient boosting 1.37 °F", color: "var(--amber)" },
+    /* --amber-ink, not --amber: this 2px rule is the only thing framing the
+       tile, so it is a boundary that carries meaning, and --amber sits at
+       2.27:1 on paper. The darkened variant holds the hue at 4.75:1. */
+    { kicker: "error vs. best baseline", value: "1.15 °F", sub: "RMSE · gradient boosting 1.37 °F", color: "var(--amber-ink)" },
   ];
   return (
     <section className="compact" style={{ borderBottom: "1px solid var(--line)" }}>
@@ -148,14 +152,21 @@ export function PipelineFlow() {
     const iv = setInterval(() => setStage((s) => (s + 1) % 7), 2200);
     return () => clearInterval(iv);
   }, []);
+  /* The stage badges used to be seven steps of the brand ramp under white
+     text. Two of those pairs are unreadable -- white on --gold is 1.84:1 and
+     white on --amber 2.50:1 -- and the ramp was encoding stage index, which is
+     an ordered quantity on a ramp whose middle four steps sit inside a 19-level
+     band out of 256. Stage identity is the number and the row position, both of
+     which survive greyscale and neither of which needed a hue. Colour is left
+     with the one job it is good at here: marking which row is shown. */
   const stages = [
-    { n: "00", k: "Load Data", note: "maps · boundaries · data layers", c: "var(--purple)" },
-    { n: "01", k: "Explore", note: "how variables cluster in space", c: "var(--magenta)" },
-    { n: "02", k: "Learn", note: "local models · one per location", c: "var(--pink)" },
-    { n: "03", k: "Reason", note: "map causes and effects", c: "var(--crimson)" },
-    { n: "04", k: "Confidence", note: "repeated runs · uncertainty ranges", c: "var(--orange)" },
-    { n: "05", k: "Simulate", note: "what-if scenarios · tradeoffs", c: "var(--amber)" },
-    { n: "06", k: "Report", note: "audit trail · pdf · shareable", c: "var(--gold)" },
+    { n: "00", k: "Load Data", note: "maps · boundaries · data layers" },
+    { n: "01", k: "Explore", note: "how variables cluster in space" },
+    { n: "02", k: "Learn", note: "local models · one per location" },
+    { n: "03", k: "Reason", note: "map causes and effects" },
+    { n: "04", k: "Confidence", note: "repeated runs · uncertainty ranges" },
+    { n: "05", k: "Simulate", note: "what-if scenarios · tradeoffs" },
+    { n: "06", k: "Report", note: "audit trail · pdf · shareable" },
   ];
   return (
     <div className="card" style={{ padding: 0 }}>
@@ -179,7 +190,7 @@ export function PipelineFlow() {
               border: i === stage ? "1px dashed var(--line)" : "1px solid transparent",
               transition: "all .15s",
             }}>
-              <span className="mono" style={{ fontSize: 11, fontWeight: 700, padding: "3px 6px", borderRadius: 3, background: s.c, color: "#fff", textAlign: "center" }}>{s.n}</span>
+              <span className="mono" style={{ fontSize: 11, fontWeight: 700, padding: "3px 6px", borderRadius: 3, background: i === stage ? "var(--accent)" : "var(--fg)", color: "var(--paper)", textAlign: "center" }}>{s.n}</span>
               <span style={{ fontSize: 13, fontWeight: 600 }}>{s.k}</span>
               <span className="mono" style={{ fontSize: 11, color: "var(--muted)" }}>{s.note}</span>
               <span className="mono" style={{ fontSize: 10, color: status === "done" ? "var(--purple)" : status === "live" ? "var(--crimson)" : "var(--muted)", textAlign: "right" }}>
@@ -219,7 +230,11 @@ export function PosteriorTrace() {
     }
     return pts;
   });
-  const chainColors = ["var(--crimson)", "var(--purple)", "var(--amber)", "var(--magenta)"];
+  /* Four legend swatches, so these are meaning-carrying non-text and owe 3:1.
+     --amber was 2.27 and is replaced by its darkened variant; the other three
+     already cleared. The curves are categorical, not ordered, so this is not a
+     ramp and must not become one. */
+  const chainColors = ["var(--crimson)", "var(--purple)", "var(--amber-ink)", "var(--magenta)"];
   const chainStrokes = [1.6, 1.1, 1.8, 1.3];
   const chainOpacities = [0.95, 0.7, 0.85, 0.6];
   return (
@@ -248,42 +263,41 @@ export function PosteriorTrace() {
   );
 }
 
+/* Brought into the shared placeholder register. The interim treatment on this
+   panel was right about the rule -- every numeral is an em dash at the same
+   metrics, and the header label is at label weight rather than 10px muted
+   mono -- and it was a second treatment, which is the one thing a register
+   cannot have. It now renders through <Placeholder>, so it carries the same
+   hatch and the same data-placeholder marker as the seven /product panels and
+   it is covered by the same CI check. The word in the header is PLACEHOLDER
+   because there is one vocabulary for this, not two.
+
+   For the record, since the comment is worth keeping with the panel: this
+   previously rendered +10.6 degC, +8.9 degC, sigma 0.38, -1.7 degC and
+   0.71 -> 0.18 at 24px bold while its disclaimer rendered at 10px in muted
+   mono. There is no Boston run and no scenario run of any city on this site.
+   Do not put digits back in this panel. */
 export function ScenarioCompare() {
   return (
-    <div className="card" style={{ padding: 0 }}>
-      {/* Interface mock-up. It is labelled illustrative and it used to render
-          invented figures anyway -- +10.6 degC, +8.9 degC, sigma 0.38, -1.7 degC,
-          0.71 -> 0.18 -- at 24px bold, while the disclaimer rendered at 10px in
-          muted mono. A reader cannot tell a disclaimer from a timestamp at that
-          weight, so the design was what made the invented numbers read as real.
-          A placeholder shows layout, not digits: every numeral here is an em
-          dash at the same metrics. Do not put digits back in this panel. There
-          is no Boston run and no scenario run of any city on this site. */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--line)" }}>
-        <div className="kicker">adaptation scenario</div>
-        <span className="mono" style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-2)" }}>LAYOUT ONLY · NO RESULT</span>
-      </div>
-      <div style={{ padding: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        {[
-          { label: "Baseline", color: "var(--ink-2)" },
-          { label: "+ canopy scenario", color: "var(--ink-2)" },
-        ].map((s, i) => (
-          <div key={i} style={{ border: "1px dashed var(--line)", borderRadius: 6, padding: "10px 12px" }}>
-            <div className="kicker" style={{ fontSize: 9 }}>{s.label}</div>
-            <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", color: s.color, margin: "4px 0 2px", fontFeatureSettings: "'tnum'" }}>—</div>
-            <div className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>± —</div>
+    <Placeholder
+      label="adaptation scenario"
+      note="This panel shows where a baseline, a scenario and the difference between them go. It has never held a result."
+    >
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        {["Baseline", "+ canopy scenario"].map((label) => (
+          <div key={label} data-ph-surface style={{ padding: "10px 12px" }}>
+            <div className="kicker" style={{ fontSize: 9 }}>{label}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", color: "var(--fg-2)", margin: "4px 0 2px" }}>
+              <Em />
+            </div>
+            <div className="mono" style={{ fontSize: "var(--fs-label)", color: "var(--fg-2)" }}><Em prefix="± " /></div>
           </div>
         ))}
-        <div style={{ gridColumn: "1 / -1", padding: "8px 0 2px", borderTop: "1px dotted var(--line)", display: "flex", justifyContent: "space-between" }}>
+        <div style={{ gridColumn: "1 / -1", padding: "8px 0 2px", borderTop: "1px dotted var(--rule)", display: "flex", justifyContent: "space-between" }}>
           <span className="kicker">Δ predicted mean</span>
-          <span className="mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-2)" }}>—</span>
-        </div>
-        <div style={{ gridColumn: "1 / -1", paddingTop: 4 }}>
-          <span className="mono" style={{ fontSize: 11, color: "var(--ink-2)" }}>
-            This panel shows where the numbers go. It has never held a result.
-          </span>
+          <span className="mono" style={{ fontSize: 12, fontWeight: 700 }}><Em /></span>
         </div>
       </div>
-    </div>
+    </Placeholder>
   );
 }

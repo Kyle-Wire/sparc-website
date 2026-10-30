@@ -28,7 +28,6 @@ export default function ProductPage() {
           index={0}
           num="01"
           anchor="ingest"
-          accent="var(--purple)"
           kicker="01 · ingestion"
           title="Bring your own data. Or build it in app."
           lead="Drop in rasters, shapefiles, GeoJSON boundaries, parquet tables, or a project.yml — SPARC reprojects, resamples, and clips them to your study area without ever phoning home. Pull in canopy, impervious, parcels, permits, and equity layers, then pin the whole thing to a single manifest."
@@ -45,7 +44,6 @@ export default function ProductPage() {
           index={1}
           num="02"
           anchor="correlogram"
-          accent="var(--magenta)"
           kicker="02 · spatial structure"
           title="See how far your variables travel."
           lead="Before fitting any model, SPARC maps how tightly each variable clusters in space — measuring the distance at which two locations stop influencing each other. That range shapes every downstream step."
@@ -62,7 +60,6 @@ export default function ProductPage() {
           index={2}
           num="03"
           anchor="gwen"
-          accent="var(--pink)"
           kicker="03 · variable selection"
           title="Find what actually matters, where."
           lead="This stage sweeps a local statistical model across every location — stripping noise and identifying which variables carry a real signal in each neighborhood. Only the meaningful ones move forward, with their direction of effect preserved."
@@ -79,7 +76,6 @@ export default function ProductPage() {
           index={3}
           num="04"
           anchor="sparc"
-          accent="var(--crimson)"
           kicker="04 · local learning"
           title="A model that fits your city, not the average city."
           lead="The core SPARC stage: a neural model trained at every location simultaneously, with effect directions locked to what the previous stage found and physics enforced at every checkpoint. If a result violates either, it doesn't advance."
@@ -96,7 +92,6 @@ export default function ProductPage() {
           index={4}
           num="05"
           anchor="causal"
-          accent="var(--orange)"
           kicker="05 · causal analysis"
           title="Find what actually causes what — then test it."
           lead="Causal structure is explored, not assumed. SPARC searches the space of valid cause-and-effect maps that fit your data, then builds a probability distribution over which connections are most credible. Every link is auditable."
@@ -113,7 +108,6 @@ export default function ProductPage() {
           index={5}
           num="06"
           anchor="simulation"
-          accent="var(--amber)"
           kicker="06 · simulation"
           title="Scenarios with budgets and equity, not just sliders."
           lead="Push the model with real constraints. Set a dollar budget. Toggle equity layers — heat vulnerability, income, canopy access — as inputs the optimizer must honor. Get back a posterior raster, not a single number."
@@ -130,7 +124,6 @@ export default function ProductPage() {
           index={6}
           num="07"
           anchor="report"
-          accent="var(--gold)"
           kicker="07 · report"
           title="One pipeline. Three audiences."
           lead="The same run produces three reports: Technical (methods, posterior diagnostics, code refs), Planner (briefs, tradeoffs, equity overlays), and Public (plain-language, before/after, FAQ). Each one ships with a signed manifest so anyone can re-run it."

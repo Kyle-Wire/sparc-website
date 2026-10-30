@@ -7,17 +7,20 @@ html, body {
   font-family: var(--font-sans);
   color: var(--fg);
   background: var(--bg);
-  font-size: 13px;
+  font-size: var(--fs-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 body { overflow-x: hidden; }
 
+/* Every scale step reads from a token. No literal font-size for a scale step
+   below this line, at any breakpoint -- that is the whole point of the change.
+   Add a step by adding a token, not by typing a number here. */
 h1, h2, h3, h4, h5, h6 { margin: 0; letter-spacing: -0.01em; color: var(--fg); }
-h1 { font-size: 48px; font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; }
-h2 { font-size: 28px; font-weight: 700; line-height: 1.25; }
-h3 { font-size: 22px; font-weight: 700; line-height: 1.25; }
-h4 { font-size: 16px; font-weight: 600; line-height: 1.25; }
+h1 { font-size: var(--fs-h1); font-weight: 800; line-height: 1.05; letter-spacing: -0.02em; }
+h2 { font-size: var(--fs-h2); font-weight: 700; line-height: 1.25; }
+h3 { font-size: var(--fs-h3); font-weight: 700; line-height: 1.25; }
+h4 { font-size: var(--fs-h4); font-weight: 600; line-height: 1.25; }
 h6 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-muted); font-family: var(--font-mono); }
 p { margin: 0 0 12px; }
 a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line); transition: text-decoration-color .12s; }
@@ -32,15 +35,22 @@ code, pre, kbd, samp { font-family: var(--font-mono); font-size: 12px; color: va
 .nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; padding: 0 32px; max-width: 1240px; margin: 0 auto; }
 .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
 .nav-links { display: flex; gap: 24px; flex: 1; }
-.nav-links a { font-size: 13px; font-weight: 500; color: var(--ink-2); text-decoration: none; padding: 6px 2px; border-bottom: 1px solid transparent; transition: color .15s, border-color .15s; }
+.nav-links a { font-size: var(--fs-body); font-weight: 500; color: var(--ink-2); text-decoration: none; padding: 6px 2px; border-bottom: 1px solid transparent; transition: color .15s, border-color .15s; }
 .nav-links a:hover, .nav-links a.active { color: var(--ink); border-bottom-color: var(--accent); }
 .nav-cta { display: flex; align-items: center; gap: 12px; }
 
-/* Buttons */
-.btn { display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: 13px; font-weight: 600; padding: 9px 14px; border-radius: 5px; cursor: pointer; border: 1px solid var(--line); background: #fff; color: var(--ink); text-decoration: none; transition: background .12s, transform .12s, border-color .12s; }
+/* Buttons. The border is --rule, not --hairline: the edge of a control is a
+   meaning-carrying boundary under WCAG 1.4.11, and at 1.61:1 the old shared
+   token did not let a reader find the edge of a button on paper. */
+.btn { display: inline-flex; align-items: center; gap: 8px; font-family: inherit; font-size: var(--fs-body); font-weight: 600; padding: 9px 14px; border-radius: 5px; cursor: pointer; border: 1px solid var(--rule); background: #fff; color: var(--ink); text-decoration: none; transition: background .12s, transform .12s, border-color .12s; }
 .btn:hover { background: rgba(0,0,0,0.04); }
 .btn-primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .btn-primary:hover { background: var(--ink-2); }
+/* The only button that matters. Under a one-conversion-path site this is the
+   single element the whole page funnels to, and white-on-crimson was 4.14:1 at
+   13px -- an AA miss on the conversion path itself. --accent now resolves to
+   the darkened crimson (5.17:1 under white text), so this clears AA without a
+   markup change anywhere. Do not point --accent back at --sparc-crimson. */
 .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
 .btn-accent:hover { filter: brightness(1.05); }
 .btn-ghost { background: transparent; border-color: transparent; }
@@ -49,7 +59,7 @@ code, pre, kbd, samp { font-family: var(--font-mono); font-size: 12px; color: va
 .btn:hover .arrow { transform: translateX(2px); }
 
 /* Kickers / mono / dots */
-.kicker { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.kicker { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
 .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; vertical-align: middle; }
 .mono { font-family: var(--font-mono); }
 
@@ -57,7 +67,7 @@ code, pre, kbd, samp { font-family: var(--font-mono); font-size: 12px; color: va
 section { padding: 80px 0; position: relative; }
 section.compact { padding: 56px 0; }
 .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 32px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
-.section-head h2 { font-size: 36px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin: 0; }
+.section-head h2 { font-size: var(--fs-h2-section); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin: 0; }
 .section-head .lead { color: var(--muted); font-size: 14px; max-width: 420px; }
 
 .grid-bg { background-image: var(--tex-grid); background-size: var(--tex-grid-size); }
@@ -67,7 +77,7 @@ section.compact { padding: 56px 0; }
 .card.dashed { border-style: dashed; background: var(--paper); }
 
 /* Pills */
-.pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; padding: 3px 9px; border-radius: 9999px; background: rgba(0,0,0,0.05); color: var(--ink-2); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: var(--fs-label); text-transform: uppercase; letter-spacing: 0.1em; padding: 3px 9px; border-radius: 9999px; background: rgba(0,0,0,0.05); color: var(--ink-2); }
 
 /* Ramp strip */
 .ramp-strip { height: 4px; width: 100%; background: var(--grad-ramp); background-size: 200% 100%; animation: rampShift 18s ease-in-out infinite; }
@@ -76,7 +86,7 @@ section.compact { padding: 56px 0; }
 footer { border-top: 1px solid var(--line); padding: 60px 0 40px; background: var(--paper-2); }
 .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
 .foot-grid h6 { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; font-family: var(--font-mono); }
-.foot-grid a { display: block; color: var(--ink-2); text-decoration: none; font-size: 13px; padding: 4px 0; }
+.foot-grid a { display: block; color: var(--ink-2); text-decoration: none; font-size: var(--fs-body); padding: 4px 0; }
 .foot-grid a:hover { color: var(--accent); }
 .foot-tag { color: var(--muted); font-size: 12px; line-height: 1.6; max-width: 320px; }
 .foot-bottom { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
@@ -166,7 +176,7 @@ body.no-scroll { overflow: hidden; }
 .account-shell { display: grid; grid-template-columns: 220px 1fr; gap: 32px; align-items: start; }
 .account-nav { display: flex; flex-direction: column; gap: 4px; position: sticky; top: 80px; }
 .account-nav a {
-  display: block; padding: 8px 12px; font-size: 13px; color: var(--ink-2);
+  display: block; padding: 8px 12px; font-size: var(--fs-body); color: var(--ink-2);
   text-decoration: none; border-left: 2px solid transparent; border-radius: 0 4px 4px 0;
 }
 .account-nav a:hover { background: rgba(0,0,0,0.04); color: var(--ink); }
@@ -174,57 +184,209 @@ body.no-scroll { overflow: hidden; }
 
 /* Definition lists */
 .dl { display: grid; grid-template-columns: 1fr 2fr; gap: 0; border-top: 1px solid var(--line); }
-.dl > * { padding: 12px 0; border-bottom: 1px dotted var(--line); font-size: 13px; }
+.dl > * { padding: 12px 0; border-bottom: 1px dotted var(--line); font-size: var(--fs-body); }
 .dl dt { color: var(--muted); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
 .dl dd { margin: 0; color: var(--ink-2); }
 
 /* Animations */
 @keyframes blink { 50% { opacity: 0; } }
-@keyframes pulse-dot { 0%,100% { box-shadow: 0 0 0 0 rgba(231,60,37,0.5); } 50% { box-shadow: 0 0 0 6px rgba(231,60,37,0); } }
-.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: pulse-dot 1.6s ease-out infinite; display: inline-block; }
+/* .live-dot and its pulse-dot keyframes are deliberately gone. They were the
+   mechanism by which three synthetic panels asserted a running computation --
+   a pulsing dot over a setInterval. Both call sites were removed in the claim
+   sweep; removing the class is what stops it coming back, because an unused
+   affordance in the stylesheet is an invitation. If something on this site is
+   ever genuinely live, it gets a new class and a reason. */
 @keyframes rampShift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .fadeup { animation: fadeUp .4s ease-out both; }
 
 /* Page hero */
 .page-hero { padding: 72px 0 40px; border-bottom: 1px solid var(--line); position: relative; }
-.page-hero h1 { font-size: 56px; font-weight: 800; letter-spacing: -0.025em; line-height: 1; margin: 14px 0 18px; max-width: 900px; }
-.page-hero p.lead { font-size: 18px; color: var(--ink-2); max-width: 640px; line-height: 1.55; }
+.page-hero h1 { font-size: var(--fs-page-hero); font-weight: 800; letter-spacing: -0.025em; line-height: 1; margin: 14px 0 18px; max-width: 900px; }
+.page-hero p.lead { font-size: var(--fs-lead); color: var(--ink-2); max-width: 640px; line-height: 1.55; }
 
-/* Form inputs */
-.input { font-family: inherit; font-size: 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 5px; background: var(--bg-elevated); color: var(--ink); outline: none; width: 100%; }
+/* Form inputs. Border is --rule for the same reason as .btn. */
+.input { font-family: inherit; font-size: 14px; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 5px; background: var(--bg-elevated); color: var(--ink); outline: none; width: 100%; }
 .input:focus { border-color: var(--accent); }
-.label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px; }
+.label { font-family: var(--font-mono); font-size: var(--fs-label); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px; }
 
-/* Stage stack (Product page) */
+/* Stage stack (Product page).
+
+   The rail fill and the stage badges used to be the brand ramp, which made
+   stage index an ordered quantity encoded on a ramp that is not ordered --
+   stages 02 through 05 were one colour in greyscale and for a red-green
+   deficient reader. The fix is not a better ramp here. Stage identity already
+   has two non-colour channels that are stronger than hue: the number itself
+   and the position in the stack. So the badge carries ink, the open stage
+   carries the accent, and progress on the rail is carried by length, which is
+   what a progress bar is for. One hue, two states, nothing lost in print. */
 .stage-stack { position: relative; }
 .stage-stack .stage-rail { position: absolute; left: 32px; top: 0; bottom: 0; width: 2px; background: var(--line); }
-.stage-stack .stage-rail-fill { position: absolute; left: 0; top: 0; width: 100%; background: linear-gradient(to bottom, var(--purple), var(--magenta), var(--pink), var(--crimson), var(--orange), var(--amber), var(--gold)); transition: height .5s ease; }
+.stage-stack .stage-rail-fill { position: absolute; left: 0; top: 0; width: 100%; background: var(--accent); transition: height .5s ease; }
 .stage-block { position: relative; border-bottom: 1px solid var(--line); padding: 56px 0; transition: background .4s ease; }
-.stage-block .stage-num { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: #fff; }
+.stage-block .stage-num { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--paper); background: var(--fg); transition: background .2s ease; }
+.stage-block.open .stage-num { background: var(--accent); }
 .stage-block .stage-head { display: grid; grid-template-columns: 50px 1fr auto; gap: 18px; align-items: center; width: 100%; background: transparent; border: 0; padding: 0; margin: 0; text-align: left; color: inherit; font: inherit; cursor: pointer; }
 .stage-block .stage-head:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
-.stage-block .stage-title { font-size: 32px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin: 6px 0 0; }
+.stage-block .stage-title { font-size: var(--fs-stage-title); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin: 6px 0 0; }
 .stage-block .stage-body { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-top: 32px; padding-left: 68px; max-height: 0; opacity: 0; overflow: hidden; transition: max-height .55s ease, opacity .35s ease, margin-top .35s ease; }
 .stage-block.open .stage-body { max-height: 1200px; opacity: 1; }
 .stage-block .stage-chevron { font-family: var(--font-mono); font-size: 11px; color: var(--muted); transition: transform .35s ease, color .35s ease; }
 .stage-block.open .stage-chevron { transform: rotate(180deg); color: var(--ink); }
-.stage-block .stage-lead { font-size: 16px; color: var(--ink-2); line-height: 1.6; margin: 0 0 18px; }
+.stage-block .stage-lead { font-size: var(--fs-h4); color: var(--ink-2); line-height: 1.6; margin: 0 0 18px; }
 
 @media (prefers-reduced-motion: reduce) {
   .stage-block .stage-body { transition: none; max-height: none; opacity: 1; }
   .stage-stack .stage-rail-fill { transition: none; height: 100% !important; }
   .fadeup { animation: none; }
+  /* The two loops this block used to miss. rampShift drives the hero wordmark
+     and the nav strip; both ran continuously regardless of the preference. */
+  .ramp-strip { animation: none; }
+  [style*="rampShift"] { animation: none !important; }
+}
+
+/* ============================================================
+   The placeholder register
+
+   One rule: A PLACEHOLDER PANEL SHOWS LAYOUT. IT NEVER SHOWS DIGITS.
+
+   This exists because the previous mechanism was a comment. stage-parts.tsx
+   carried an honest source comment for months saying its figures were
+   invented, the panel labelled itself "sample output · illustrative", and it
+   still read as a result -- because the label rendered at 10px muted mono,
+   the weakest register in the system and visually identical to decorative
+   metadata like "philadelphia · 2026" on the same page, while the invented
+   dollar figure rendered in body copy at full strength. A reader could not
+   tell a disclaimer from a timestamp. The design was what made the false
+   claim read as true, so the fix has to be in the design.
+
+   The marker is the load-bearing part, not the hatch. [data-placeholder]
+   makes "no numeral inside this subtree" a mechanical check --
+   scripts/check-placeholders.mjs owns it, and it is a guarantee rather than
+   an intention. Apply the attribute with the <Placeholder> primitive in
+   src/components/system/placeholder.tsx; do not hand-roll the attribute, or
+   the visual and the gate can drift apart.
+
+   Acceptance test, and it is the real one: crop the panel anywhere. No crop
+   may read as a result.
+   ============================================================ */
+
+[data-placeholder] {
+  position: relative;
+  background-color: var(--bg-elevated);
+  background-image: var(--tex-hatch);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+
+/* Inner surfaces go transparent so the hatch is continuous through the whole
+   panel. A placeholder with an opaque white body reads as a finished card
+   with the numbers removed; a placeholder with the ground showing through
+   reads as a template, which is what it is. */
+[data-placeholder] [data-ph-surface] {
+  background: transparent;
+  border: 1px dashed var(--rule);
+  border-radius: 6px;
+}
+
+/* The header flag. Deliberately NOT the .kicker/meta register: this is set at
+   --fs-body, which is the floor for any honesty label in this system, bold,
+   in full-strength ink, boxed. It is the strongest thing in the panel header.
+   An honesty label smaller than the body text it qualifies is a disclaimer,
+   and we have measured evidence that disclaimers do not read. */
+[data-placeholder] .ph-flag {
+  font-family: var(--font-mono);
+  font-size: var(--fs-body);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg);
+  background: var(--bg-elevated);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
+
+[data-placeholder] .ph-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rule);
+}
+
+[data-placeholder] .ph-body { padding: 16px; }
+
+/* Every numeral slot. Tabular-lining and inheriting its surroundings' metrics,
+   so the layout reads exactly as it would with a number in it -- that is what
+   makes this a placeholder rather than a deletion. */
+[data-placeholder] .ph-em {
+  font-feature-settings: 'tnum';
+  color: var(--fg-2);
+}
+
+/* The mandatory note. Not optional, not a tooltip, not collapsed on mobile:
+   the panel has to say in words what it is, because a hatch is a convention
+   and a sentence is not. */
+[data-placeholder] .ph-note {
+  font-family: var(--font-mono);
+  font-size: var(--fs-body);
+  color: var(--fg-2);
+  line-height: 1.5;
+  margin: 0;
+  padding: 10px 16px 14px;
+  border-top: 1px dotted var(--rule);
+}
+
+/* A plot area with no data in it. The §4.2 rule generalised from a cell to a
+   whole chart: a region with no number behind it is never rendered in the data
+   colour. Axes and legend rows survive, because those are layout; the curve
+   does not, because a drawn curve crops into a result. */
+[data-placeholder] .ph-plot {
+  background-image: var(--tex-hatch-dense);
+  border: 1px dashed var(--rule);
+  border-radius: 4px;
+  display: block;
+  width: 100%;
+}
+
+/* A bar track with no bar in it. Same reasoning, one dimension down. */
+[data-placeholder] .ph-track {
+  background-image: var(--tex-hatch-dense);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+}
+
+@media print {
+  /* The hatch is the one thing that must survive a board packet. */
+  [data-placeholder] { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 
 /* ============ Tablet ============ */
 @media (max-width: 900px) {
+  /* The missing step. Before this block existed the tablet scale was two
+     literals buried in the rules below -- 40px for the page hero and 24px for
+     a stage title -- with no token anywhere, so the documented scale had a
+     hole exactly where the viewport is most common. The cascade is now
+     desktop -> tablet -> mobile through one set of names. */
+  :root {
+    --fs-hero: 48px;
+    --fs-page-hero: 40px;
+    --fs-h1: 40px;
+    --fs-h2: 26px;
+    --fs-h2-section: 30px;
+    --fs-h3: 20px;
+    --fs-display: 34px;
+    --fs-stage-title: 24px;
+    --fs-lead: 17px;
+  }
+
   .nav-links { display: none; }
   .foot-grid { grid-template-columns: 1fr 1fr; }
-  .page-hero h1 { font-size: 40px; }
   .section-head { flex-direction: column; align-items: flex-start; }
   .stage-block .stage-body { grid-template-columns: 1fr; gap: 24px; padding-left: 0; }
-  .stage-block .stage-title { font-size: 24px; }
   .stage-stack .stage-rail { left: 16px; }
 
   /* Visibility */
@@ -284,13 +446,9 @@ body.no-scroll { overflow: hidden; }
     --fs-h2-section: 24px;
     --fs-h3: 18px;
     --fs-display: 30px;
+    --fs-stage-title: 22px;
+    --fs-lead: 16px;
   }
-
-  h1 { font-size: var(--fs-h1); }
-  h2 { font-size: var(--fs-h2); }
-  h3 { font-size: var(--fs-h3); }
-
-  body { font-size: 13px; }
 
   section { padding: 48px 0; }
   section.compact { padding: 36px 0; }
@@ -299,11 +457,8 @@ body.no-scroll { overflow: hidden; }
   .nav-cta { gap: 6px; }
 
   .page-hero { padding: 48px 0 28px; }
-  .page-hero h1 { font-size: var(--fs-page-hero); }
-  .page-hero p.lead { font-size: 16px; }
 
   .section-head { gap: 16px; margin-bottom: 24px; }
-  .section-head h2 { font-size: var(--fs-h2-section); }
 
   .foot-grid { grid-template-columns: 1fr; gap: 28px; }
   .foot-bottom { flex-direction: column; align-items: flex-start; gap: 8px; text-align: left; }
@@ -324,7 +479,6 @@ body.no-scroll { overflow: hidden; }
 
   /* Stage stack typography */
   .stage-block { padding: 40px 0; }
-  .stage-block .stage-title { font-size: 22px; }
   .stage-block .stage-head { grid-template-columns: 40px 1fr auto; gap: 12px; }
   .stage-block .stage-body { gap: 18px; }
 

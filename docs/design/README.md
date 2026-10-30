@@ -9,6 +9,7 @@ it. Where there is no gate yet, the page says so.
 
 | | |
 |---|---|
+| [`field-report.md`](field-report.md) | Register B's ground: the reading measure, the printed-page rhythm, and captions that cannot be made small. |
 | [`measurement-unit.md`](measurement-unit.md) | Four slots, never fewer. The primitive every trust surface sits on, its four required props, and why it has no colour axis. |
 | [`placeholder-register.md`](placeholder-register.md) | A placeholder panel shows layout. It never shows digits. The register, the acceptance test, and the two CI gates. |
 | [`color-roles.md`](color-roles.md) | Three token layers, the decorative-vs-structural rule split finished at the use sites, the AA failures and what each fix was worth. |

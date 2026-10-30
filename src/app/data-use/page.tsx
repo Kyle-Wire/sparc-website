@@ -36,7 +36,7 @@ export default function DataUsePage() {
       <Nav />
       <PageHero kicker="data use · explicit" title="What happens to your data." accent="var(--amber)" />
       <Section>
-        <article style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 18, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
+        <article className="prose">
           <p>
             {COMPANY} is not selling or distributing software today, so there is no
             installed application sending us anything. This page says what is
@@ -45,7 +45,7 @@ export default function DataUsePage() {
             mode, before anyone receives software or commissions a study.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>This website</h2>
+          <h2>This website</h2>
           <p>
             If you contact us through this site, we receive what you type and your
             email address, and we use it to reply. The site sets a session cookie
@@ -53,7 +53,7 @@ export default function DataUsePage() {
             tracking. Hosting is Vercel; transactional email is Resend.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>If we run a study for you</h2>
+          <h2>If we run a study for you</h2>
           <p>
             This is the route we can actually offer today, and it is important to
             be plain about it: <strong>your inputs leave your machine.</strong> You
@@ -64,7 +64,7 @@ export default function DataUsePage() {
             answer in writing as part of the agreement rather than by website copy.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Local compute, when there is software to install</h2>
+          <h2>Local compute, when there is software to install</h2>
           <p>
             Our models are built to run on the machine of whoever is using them —
             that is a deliberate design choice and the reason municipal data never
@@ -73,7 +73,7 @@ export default function DataUsePage() {
             quoted interchangeably.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Questions</h2>
+          <h2>Questions</h2>
           <p>
             Email <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a>. If a
             procurement process needs a data-handling schedule, say so and we will

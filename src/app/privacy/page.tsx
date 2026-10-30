@@ -21,20 +21,20 @@ export default function PrivacyPage() {
       <Nav />
       <PageHero kicker="privacy · plain english" title="What we collect, what we don't." lead={`${COMPANY} does not currently distribute software, so this covers this website and anything you send us directly.`} accent="var(--purple)" />
       <Section>
-        <article className="prose" style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 18, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>What we collect</h2>
+        <article className="prose">
+          <h2>What we collect</h2>
           <p>Account information you give us, if you create an account: email, and optionally a name and organization. Whatever you write in a contact or access request, so that we can reply to it. Nothing else.</p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>What we don&apos;t</h2>
+          <h2>What we don&apos;t</h2>
           <p>We do not run advertising, analytics or third-party trackers on this site. We do not sell anything through it, so there is no payment or subscription data. We do not receive project files, rasters, model outputs or LLM prompts from any installed application, because there is no installed application sending them. We do not train on anything you send us.</p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>If we run a study for you</h2>
+          <h2>If we run a study for you</h2>
           <p>A commissioned study is different and we will not describe it here in general terms: your inputs would leave your machine and come to ours. The handling terms belong in the engagement agreement, in writing, for that specific piece of work. See <a href="/data-use">data use</a>.</p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Your rights</h2>
+          <h2>Your rights</h2>
           <p>You can ask us to export, correct or delete anything we hold about you by emailing <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a>. We will respond within 30 days.</p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Subprocessors</h2>
+          <h2>Subprocessors</h2>
           <ul><li>Supabase — authentication and database for this site (US/EU)</li><li>Vercel — website hosting (US)</li><li>Resend — transactional email (US)</li></ul>
 
           <h2 id="cookies" style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0, scrollMarginTop: 96 }}>Cookies</h2>

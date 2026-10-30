@@ -21,10 +21,13 @@ export function MobileNav({
 
   const close = React.useCallback(() => setOpen(false), []);
 
+  // The drawer portals into document.body, which does not exist during SSR; render it only after mount.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   React.useEffect(() => { setMounted(true); }, []);
 
   React.useEffect(() => {
     if (!open) return;
+    const openBtn = openBtnRef.current;
     document.body.classList.add("no-scroll");
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
@@ -34,7 +37,7 @@ export function MobileNav({
     return () => {
       document.body.classList.remove("no-scroll");
       document.removeEventListener("keydown", onKey);
-      openBtnRef.current?.focus();
+      openBtn?.focus();
     };
   }, [open]);
 

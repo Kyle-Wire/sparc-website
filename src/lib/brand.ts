@@ -25,6 +25,15 @@ export const FOUNDED_YEAR = 2024;
 export const COPYRIGHT_YEAR = 2026;
 
 export const TAGLINE_SHORT = `${BRAND_LONG} · ${VERSION}`;
+
+// TAGLINE_LONG feeds page metadata, so whatever it says appears on every page of
+// the site and in every link preview. It previously read "A neural model with
+// built-in causal inference". Do not reinstate that, or any description of the
+// pipeline as a neural or meta-learned model: the SharedTrunk + CityHead stacker
+// never ran. It raised an UnboundLocalError before its first epoch and the
+// pipeline silently fell back to a weighted average of the base models, which is
+// what produced every figure of record. See sparc-resilience
+// docs/results/reconciliation.md and the README's retraction notice.
 export const TAGLINE_LONG =
-  `${BRAND_LONG}. A neural model with built-in causal inference — for spatial scientists ` +
-  `who need a pipeline that can simulate adaptation, not just describe the world.`;
+  `${BRAND_LONG}. Spatial models of environmental hazards, built to be checked — ` +
+  `every figure we publish traces to a named run, including the ones that failed.`;

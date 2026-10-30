@@ -12,6 +12,8 @@ export function CookieNotice() {
   React.useEffect(() => {
     try {
       const dismissed = window.localStorage.getItem(STORAGE_KEY) === "dismissed";
+      // localStorage does not exist during SSR; reading it in render would hydrate differently.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible(!dismissed);
     } catch {
       // localStorage blocked (private mode, etc.) — show the notice this session.

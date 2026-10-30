@@ -69,7 +69,12 @@ URL is `https://sparclabs.co/api/lemonsqueezy/webhook`.
 ## Verify
 
 ```bash
-pnpm typecheck
-pnpm lint
-pnpm build
+npm run typecheck
+npm run lint            # eslint, warnings fail it too
+npm run check:design    # placeholder source scan + colour tokens
+npm run build
+npm run check:placeholders:rendered   # after the build: reads .next/server/app
+npm run security:audit  # high/critical advisories in production dependencies
 ```
+
+CI (`.github/workflows/ci.yml`) runs exactly these on every push and pull request, against `package-lock.json` via `npm ci`; the audit also runs weekly. Merging deploys the live site, so a red check means do not merge.

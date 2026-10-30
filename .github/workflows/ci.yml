@@ -1,0 +1,110 @@
+name: ci
+
+# Merging to main deploys the live site, so these are the checks that stand between a branch and production.
+# They are the same commands the README lists, run against package-lock.json.
+#
+# Every job is independent so one red check does not hide another. None of them has continue-on-error, and
+# the only condition anywhere is that the weekly run does just the audit. A check that can go quiet is not a
+# gate. To make them block a merge, require the five job names below in the branch-protection rule for main
+# (a repo setting; a workflow file cannot set it).
+#
+# design and the "rendered placeholders" step are the gates from docs/design/placeholder-register.md and
+# data-ramps.md. The rendered check reads .next/server/app/**/*.html, so it must run after the build, in the
+# same job. It fails if it finds no build or no placeholder panels: a gate that finds nothing has not passed.
+#
+# security-audit is the one that can turn red with no change in this repo: a new advisory against a pinned
+# dependency fails it on the next push or on the weekly run. That is the point of it.
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC: advisories land without a commit
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  typecheck:
+    name: typecheck
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+
+  lint:
+    name: lint
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # eslint . --max-warnings 0: a warning fails the build, otherwise warnings accumulate until nobody reads them.
+      - run: npm run lint
+
+  build:
+    name: build
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # No secrets and no .env: the build must succeed without them. If it needs one, that is a bug to fix
+      # here, not a secret to add to CI.
+      - run: npm run build
+      - run: npm run check:placeholders:rendered
+
+  design:
+    name: design gates
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Placeholder panels never show digits; token contrast and data-ramp monotonicity hold.
+      - run: npm run check:design
+
+  security-audit:
+    name: security audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # npm audit --omit=dev --audit-level=high: production dependencies only, high and critical advisories.
+      - run: npm run security:audit

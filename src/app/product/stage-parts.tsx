@@ -97,6 +97,8 @@ export function StageBlock({
   React.useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.location.hash === `#${anchor}`) {
+      // Reads window.location, which does not exist during SSR; doing this in render would hydrate differently.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setOpen(true);
       ctx?.register(index, true);
     }

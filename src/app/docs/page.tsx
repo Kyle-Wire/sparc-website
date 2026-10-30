@@ -1,29 +1,71 @@
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
+import { EMAIL_PRIMARY } from "@/lib/brand";
 
 export const metadata = { title: "Documentation" };
 
-const DOCS = [
-  { t: "Manual", b: "End-to-end overview of the SPARC desktop client.", href: "https://github.com/sparclabs/sparc/blob/main/docs/MANUAL.md" },
-  { t: "Pipeline guide", b: "How the neural-causal pipeline assembles a project.", href: "https://github.com/sparclabs/sparc/blob/main/docs/PIPELINE_GUIDE.md" },
-  { t: "Interpretation guide", b: "Reading posteriors, intervention rasters, and audit reports.", href: "https://github.com/sparclabs/sparc/blob/main/docs/INTERPRETATION_GUIDE.md" },
-  { t: "Contributing", b: "How to submit a community template or plugin.", href: "https://github.com/sparclabs/sparc/blob/main/docs/CONTRIBUTING.md" },
-];
+// Rewritten 2026-10-30. Everything on this page was broken:
+//
+//   1. All four links pointed at https://github.com/sparclabs/sparc, which
+//      returns 404. The repository does not exist and never has. The engine
+//      lives at Kyle-Wire/sparc-resilience and it is private.
+//   2. Worse than dead: the GitHub organisation `sparclabs` DOES exist and is
+//      NOT ours. It was created on 2026-03-04 and its public repositories are
+//      `AgenticPay` and `nilgiri`. So this page sent every visitor into a
+//      stranger's namespace, and if that org ever creates a repository called
+//      `sparc`, these links would have delivered our readers into it.
+//   3. "All technical documentation lives in the open-source repository" — the
+//      code is proprietary. This is the same contradiction as the AGPL claim
+//      removed from /about, /product and the Terms of Service on 29 Oct, in a
+//      phrasing that sweep did not match.
+//   4. "Contributing — How to submit a community template or plugin" invited
+//      outside contributions to proprietary code, which would leave the
+//      copyright in a contributor's hands rather than the company's. The same
+//      invitation was removed from SPARC_Labs_GEV's README for that reason.
+//
+// Do not add a link to a documentation URL until that URL resolves, and do not
+// link to the `sparclabs` org under any circumstances.
 
 export default function DocsPage() {
   return (
     <>
       <Nav />
-      <PageHero kicker="documentation" title="The manual, the methods, the pipelines." lead="All technical documentation lives in the open-source repository. Here are the most useful entry points." accent="var(--purple)" />
+      <PageHero kicker="documentation" title="The manual, the methods, the pipelines." lead="Our technical documentation is not published yet. The methodology reports are the substantive write-ups and they are being prepared for release." accent="var(--purple)" />
       <Section>
-        <div className="grid-2" style={{ gap: 14 }}>
-          {DOCS.map((d) => (
-            <a key={d.href} href={d.href} target="_blank" rel="noopener noreferrer" className="card" style={{ padding: 24, textDecoration: "none", color: "inherit" }}>
-              <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.015em", margin: "0 0 8px" }}>{d.t} →</h3>
-              <p style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.55, margin: 0 }}>{d.b}</p>
-            </a>
-          ))}
-        </div>
+        <article style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 18, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
+          <p>
+            This page used to link to a public repository. There isn&apos;t one:
+            the code is proprietary and the repositories are private, so the links
+            went nowhere. Rather than leave four broken links up, here is what
+            actually exists and where it stands.
+          </p>
+
+          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Methodology reports</h2>
+          <p>
+            One per hazard program — heat, flooding, wind and ground motion. Each
+            one walks through the science, states the weaknesses and the prohibited
+            uses <em>before</em> the results, and gives every figure a named run and
+            a file it came from. They include the results that failed.
+            They are written and are being prepared for publication; they are not
+            public yet.
+          </p>
+
+          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>User documentation</h2>
+          <p>
+            There is a manual, a pipeline guide and an interpretation guide inside
+            the engine repository. They ship with the software rather than being
+            hosted here, and since there is nothing to download yet, there is
+            nothing for them to accompany.
+          </p>
+
+          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Want a copy before then?</h2>
+          <p>
+            If you are evaluating us and need the technical detail now — a
+            procurement review, a research collaboration, a peer read — email{" "}
+            <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a> and say which
+            program you care about. That is a real offer; the documents exist.
+          </p>
+        </article>
       </Section>
       <Footer />
     </>

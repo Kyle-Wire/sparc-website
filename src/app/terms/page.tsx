@@ -26,8 +26,14 @@ export default function TermsPage() {
           <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Acceptable use</h2>
           <p>Don&apos;t use SPARC to harm people. Don&apos;t use it to misrepresent uncertainty in ways a court would call fraud. Don&apos;t scrape our marketing site.</p>
 
+          {/* This clause said "the neural-causal pipeline produces statistical
+              estimates". The neural stacker never ran — it raised an
+              UnboundLocalError before its first epoch and the pipeline fell back
+              to a weighted average of the base models. A warranty disclaimer is a
+              contract term, so it should not describe a component that does not
+              exist. Wording changed; the disclaimer itself is unchanged. */}
           <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>No warranty</h2>
-          <p>SPARC is provided &quot;as is&quot;. The neural-causal pipeline produces statistical estimates, not engineering certifications. You are responsible for the decisions you make from its outputs.</p>
+          <p>SPARC is provided &quot;as is&quot;. Its outputs are statistical estimates, not engineering certifications, and they are screening-level: they are not a substitute for a licensed engineer&apos;s analysis, a regulatory flood determination, or a ground survey. You are responsible for the decisions you make from its outputs.</p>
 
           <p style={{ fontSize: 13, color: "var(--muted)" }}>© {COPYRIGHT_YEAR} {COMPANY_LEGAL} · {OFFICE_FULL}</p>
         </article>

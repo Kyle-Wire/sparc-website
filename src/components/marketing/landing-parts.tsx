@@ -5,8 +5,13 @@ import Link from "next/link";
 import { Kicker } from "@/components/marketing/page-shell";
 import { TAGLINE_SHORT, BRAND_LONG, VERSION } from "@/lib/brand";
 
+// This panel is an illustration of the interface. It previously opened
+// "boston-heat.project" and ticked seven successful stages. There is no Boston
+// run and there never was: the heat model is validated for Providence only. Do
+// not name a city here, and do not name a project file that implies a completed
+// study. The header says "illustration" for the same reason.
 const BOOT_LINES = [
-  { t: 80, text: "▸ sparc open boston-heat.project", kind: "cmd" },
+  { t: 80, text: "▸ sparc open <your-project>", kind: "cmd" },
   { t: 220, text: "  loading your data ·················· ok", kind: "ok" },
   { t: 360, text: "  reading spatial patterns ··········· ok", kind: "ok" },
   { t: 480, text: "  learning local relationships ······· ok", kind: "ok" },
@@ -35,7 +40,7 @@ function TerminalSplash() {
     }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingBottom: 10, borderBottom: "1px solid #2a2227", marginBottom: 12 }}>
         <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 10, letterSpacing: "0.12em", color: "#8a7d72", textTransform: "uppercase" }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--crimson)" }} /> sparc · boot
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--crimson)" }} /> sparc · interface illustration
         </span>
         <span style={{ fontSize: 10, color: "#8a7d72", letterSpacing: "0.1em" }}>{VERSION} · {String(Math.floor(progress)).padStart(3, "0")}%</span>
       </div>
@@ -103,16 +108,22 @@ export function Hero() {
   );
 }
 
+// Not imported by any page, so this has never been public. It is kept only
+// because the comment below is worth keeping with it. Every figure must match
+// sparc-resilience/docs/results/reconciliation.md, which is the register and is
+// enforced in that repo's CI. It previously carried R2 0.56 and a canopy effect
+// of -0.24 degF; the register moved to 0.55 and -0.19 on 29 Oct and this was
+// left stale. Do not reinstate the earlier 0.90-0.94 R2 values, the "z-unit"
+// effects, or any city we have not run. Providence is the validated site, and
+// the canopy effect is registered not_established: the model's figure is the
+// same size as what the pipeline reports when no canopy effect is simulated at
+// all, so it must not be quoted as a result.
 export function ProofStrip() {
-  // Every figure here comes from the Providence core run and is reconciled in
-  // sparc-resilience/docs/results/reconciliation.md. Do not reinstate the earlier
-  // 0.90-0.94 R2 values, the "z-unit" effects, or any city we have not run:
-  // that note retracts them. Providence is the validated site.
   const items = [
-    { kicker: "canopy cooling · providence", value: "−0.24 °F", sub: "+10 pp canopy · city mean, fold-averaged", color: "var(--crimson)" },
-    { kicker: "model fit · unseen neighbourhoods", value: "R² 0.56", sub: "2 km blocks held out · the honest number", color: "var(--purple)" },
-    { kicker: "error vs. best baseline", value: "1.14 °F", sub: "RMSE · gradient boosting 1.37 °F", color: "var(--amber)" },
-    { kicker: "causes mapped · validated", value: "24 → 41", sub: "causal factors · connections found", color: "var(--gold)" },
+    { kicker: "canopy cooling · providence", value: "not established", sub: "+10 pp canopy · not distinguishable from zero", color: "var(--muted)" },
+    { kicker: "impervious · providence", value: "−0.40 °F", sub: "−10 pp impervious · model and causal estimate agree", color: "var(--crimson)" },
+    { kicker: "model fit · unseen neighbourhoods", value: "R² 0.55", sub: "2 km blocks held out · the honest number", color: "var(--purple)" },
+    { kicker: "error vs. best baseline", value: "1.15 °F", sub: "RMSE · gradient boosting 1.37 °F", color: "var(--amber)" },
   ];
   return (
     <section className="compact" style={{ borderBottom: "1px solid var(--line)" }}>
@@ -142,15 +153,19 @@ export function PipelineFlow() {
     { n: "01", k: "Explore", note: "how variables cluster in space", c: "var(--magenta)" },
     { n: "02", k: "Learn", note: "local models · one per location", c: "var(--pink)" },
     { n: "03", k: "Reason", note: "map causes and effects", c: "var(--crimson)" },
-    { n: "04", k: "Confidence", note: "8 runs · uncertainty ranges", c: "var(--orange)" },
+    { n: "04", k: "Confidence", note: "repeated runs · uncertainty ranges", c: "var(--orange)" },
     { n: "05", k: "Simulate", note: "what-if scenarios · tradeoffs", c: "var(--amber)" },
     { n: "06", k: "Report", note: "audit trail · pdf · shareable", c: "var(--gold)" },
   ];
   return (
     <div className="card" style={{ padding: 0 }}>
+      {/* The stage cycles on a setInterval. Nothing is running. The pill said
+          "running . stage 0X" next to a pulsing live dot, which asserted a
+          computation in progress; it now says "illustration" and the dot is
+          gone. Do not reinstate a live indicator over a timer. */}
       <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div className="kicker">pipeline · 7 stages</div>
-        <span className="pill"><span className="live-dot" /> running · stage {String(stage).padStart(2, "0")}</span>
+        <span className="pill">illustration · stage {String(stage).padStart(2, "0")}</span>
       </div>
       <div style={{ padding: 14, display: "flex", flexDirection: "column", gap: 6 }}>
         {stages.map((s, i) => {
@@ -168,7 +183,7 @@ export function PipelineFlow() {
               <span style={{ fontSize: 13, fontWeight: 600 }}>{s.k}</span>
               <span className="mono" style={{ fontSize: 11, color: "var(--muted)" }}>{s.note}</span>
               <span className="mono" style={{ fontSize: 10, color: status === "done" ? "var(--purple)" : status === "live" ? "var(--crimson)" : "var(--muted)", textAlign: "right" }}>
-                {status === "done" ? "✓ done" : status === "live" ? "▸ live" : "queued"}
+                {status === "done" ? "✓ step" : status === "live" ? "▸ shown" : "later"}
               </span>
             </button>
           );
@@ -184,6 +199,10 @@ export function PosteriorTrace() {
     const iv = setInterval(() => setT((v) => v + 1), 80);
     return () => clearInterval(iv);
   }, []);
+  // Four procedurally generated sine curves. These are not samples from any
+  // posterior and no chain is running. The header said "live . 8 chains", which
+  // contradicted this code and its own four-entry legend below. Do not put a
+  // count or a live indicator on a drawing.
   const chains = [0, 1, 2, 3].map((c) => {
     const seed = c * 13 + 7;
     const amp = 0.18 + c * 0.07;
@@ -207,10 +226,10 @@ export function PosteriorTrace() {
     <div className="card" style={{ padding: 0 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--line)" }}>
         <div className="kicker">posterior trace</div>
-        <span className="pill"><span className="live-dot" /> live · 8 chains</span>
+        <span className="pill">illustration · not sampled data</span>
       </div>
       <div style={{ padding: 16 }}>
-        <svg width="100%" height="160" viewBox="0 0 400 160" preserveAspectRatio="none">
+        <svg width="100%" height="160" viewBox="0 0 400 160" preserveAspectRatio="none" role="img" aria-label="Illustration of what a posterior trace plot looks like. The curves are drawn, not sampled.">
           {chains.map((pts, c) => (
             <polyline key={c}
               points={pts.map(([x, y]) => `${x * 400},${80 + y * 60}`).join(" ")}
@@ -220,7 +239,7 @@ export function PosteriorTrace() {
         <div className="row" style={{ gap: 16, marginTop: 8, fontSize: 10, color: "var(--muted)" }}>
           {chainColors.map((c, i) => (
             <span key={i} className="row mono" style={{ gap: 5 }}>
-              <span style={{ width: 8, height: 2, background: c }} /> chain {i + 1}
+              <span style={{ width: 8, height: 2, background: c }} /> trace {i + 1}
             </span>
           ))}
         </div>
@@ -232,30 +251,37 @@ export function PosteriorTrace() {
 export function ScenarioCompare() {
   return (
     <div className="card" style={{ padding: 0 }}>
-      {/* Interface mock-up. The numbers below are made up to show the layout --
-          there is no Boston run. Keep the "illustrative" label if you edit this. */}
+      {/* Interface mock-up. It is labelled illustrative and it used to render
+          invented figures anyway -- +10.6 degC, +8.9 degC, sigma 0.38, -1.7 degC,
+          0.71 -> 0.18 -- at 24px bold, while the disclaimer rendered at 10px in
+          muted mono. A reader cannot tell a disclaimer from a timestamp at that
+          weight, so the design was what made the invented numbers read as real.
+          A placeholder shows layout, not digits: every numeral here is an em
+          dash at the same metrics. Do not put digits back in this panel. There
+          is no Boston run and no scenario run of any city on this site. */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--line)" }}>
         <div className="kicker">adaptation scenario</div>
-        <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>illustrative · 1 km grid</span>
+        <span className="mono" style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-2)" }}>LAYOUT ONLY · NO RESULT</span>
       </div>
       <div style={{ padding: 16, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
         {[
-          { label: "Baseline", value: "+10.6 °C", color: "var(--crimson)", sigma: "σ 0.38" },
-          { label: "+12% canopy", value: "+8.9 °C", color: "var(--amber)", sigma: "σ 0.44" },
+          { label: "Baseline", color: "var(--ink-2)" },
+          { label: "+ canopy scenario", color: "var(--ink-2)" },
         ].map((s, i) => (
           <div key={i} style={{ border: "1px dashed var(--line)", borderRadius: 6, padding: "10px 12px" }}>
             <div className="kicker" style={{ fontSize: 9 }}>{s.label}</div>
-            <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", color: s.color, margin: "4px 0 2px", fontFeatureSettings: "'tnum'" }}>{s.value}</div>
-            <div className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>{s.sigma}</div>
+            <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", color: s.color, margin: "4px 0 2px", fontFeatureSettings: "'tnum'" }}>—</div>
+            <div className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>± —</div>
           </div>
         ))}
         <div style={{ gridColumn: "1 / -1", padding: "8px 0 2px", borderTop: "1px dotted var(--line)", display: "flex", justifyContent: "space-between" }}>
           <span className="kicker">Δ predicted mean</span>
-          <span className="mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--purple)" }}>−1.7 °C</span>
+          <span className="mono" style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-2)" }}>—</span>
         </div>
-        <div style={{ gridColumn: "1 / -1", paddingTop: 4, display: "flex", justifyContent: "space-between" }}>
-          <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>example figures · not a validated result</span>
-          <span className="mono" style={{ fontSize: 10, color: "var(--muted)" }}>spatial clustering 0.71 → 0.18</span>
+        <div style={{ gridColumn: "1 / -1", paddingTop: 4 }}>
+          <span className="mono" style={{ fontSize: 11, color: "var(--ink-2)" }}>
+            This panel shows where the numbers go. It has never held a result.
+          </span>
         </div>
       </div>
     </div>

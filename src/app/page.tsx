@@ -24,15 +24,19 @@ const PILLARS = [
   },
 ];
 
+// The n= counts below are not traceable to anything in the engine repository and
+// three of these names may not be templates at all. They are flagged for the
+// per-program evidence pages that replace this section; do not cite them as a
+// count of anything until someone has checked them against sparc/templates/.
 const TEMPLATES_PEEK = [
-  { name: "UHI", sub: "Urban Heat Island", n: 24, c: "var(--crimson)" },
-  { name: "Coastal", sub: "Erosion + sea level", n: 18, c: "var(--purple)" },
-  { name: "Drought", sub: "Soil moisture · evapotranspiration", n: 21, c: "var(--amber)" },
-  { name: "Geotechnical", sub: "Bearing capacity", n: 16, c: "var(--gold)" },
-  { name: "Groundwater", sub: "Aquifer drawdown", n: 19, c: "var(--magenta)" },
-  { name: "Wildfire", sub: "Fuel · weather · spread rate", n: 27, c: "var(--orange)" },
-  { name: "Air Quality", sub: "PM₂.₅ + dispersion", n: 22, c: "var(--pink)" },
-  { name: "Stormwater", sub: "Runoff · flooding", n: 17, c: "var(--red)" },
+  { name: "UHI", sub: "Urban Heat Island", c: "var(--crimson)" },
+  { name: "Coastal", sub: "Erosion + sea level", c: "var(--purple)" },
+  { name: "Drought", sub: "Soil moisture · evapotranspiration", c: "var(--amber)" },
+  { name: "Geotechnical", sub: "Bearing capacity", c: "var(--gold)" },
+  { name: "Groundwater", sub: "Aquifer drawdown", c: "var(--magenta)" },
+  { name: "Wildfire", sub: "Fuel · weather · spread rate", c: "var(--orange)" },
+  { name: "Air Quality", sub: "PM₂.₅ + dispersion", c: "var(--pink)" },
+  { name: "Stormwater", sub: "Runoff · flooding", c: "var(--red)" },
 ];
 
 const STEPS = [
@@ -63,14 +67,20 @@ export default function HomePage() {
         </div>
       </Section>
 
+      {/* This section used to be headed "live . interactive" and led with "A
+          simplified urban-heat study on Boston, MA. Every step is tracked and can
+          be reproduced exactly." There is no Boston run. The heat model is
+          validated for Providence only, and the three panels below are drawings
+          of the interface rather than output from any run. Do not attach a city
+          or a reproducibility claim to them. */}
       <section style={{ background: "var(--paper-2)", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
         <div className="wrap">
           <div className="section-head">
             <div>
-              <Kicker dot dotColor="var(--purple)">live · interactive</Kicker>
+              <Kicker>illustration · not a run</Kicker>
               <h2 style={{ marginTop: 8 }}>The Pipeline.</h2>
             </div>
-            <p className="lead">A simplified urban-heat study on Boston, MA. Every step is tracked and can be reproduced exactly.</p>
+            <p className="lead">What the four stages look like in the application. These panels are drawn to show the interface, not produced by a model run — our validated results and their failure modes live in the methodology reports.</p>
           </div>
           <div className="split-14-10" style={{ gap: 18, alignItems: "stretch" }}>
             <PipelineFlow />
@@ -83,7 +93,7 @@ export default function HomePage() {
       </section>
 
       <Section
-        kicker="private beta · 2 active domains · more on the roadmap"
+        kicker="in development"
         title="Domain-agnostic, not domain-naive."
         action={<Link href="/domains" className="btn">All domains <span className="arrow">→</span></Link>}
       >
@@ -92,7 +102,6 @@ export default function HomePage() {
             <div key={it.name} className="card" style={{ padding: 16, borderLeft: `2px solid ${it.c}` }}>
               <div className="row" style={{ justifyContent: "space-between", alignItems: "baseline" }}>
                 <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>{it.name}</h4>
-                <span className="mono" style={{ fontSize: 10, color: "var(--muted)", letterSpacing: "0.1em" }}>n={it.n}</span>
               </div>
               <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 4 }}>{it.sub}</div>
             </div>
@@ -115,17 +124,21 @@ export default function HomePage() {
         </div>
       </Section>
 
+      {/* "private beta" was removed here on 2026-10-30. There are no beta
+          partners. The same claim was taken off /domains on 29 Oct and this page
+          was missed. Do not describe a beta cohort until there is one. */}
       <section style={{ borderTop: "1px solid var(--line)" }} className="grid-bg">
         <div className="wrap" style={{ textAlign: "center", padding: "48px 0" }}>
-          <Kicker dot dotColor="var(--accent)">pilot program · private beta</Kicker>
+          <Kicker dot dotColor="var(--accent)">pilot program</Kicker>
           <h2 style={{ fontSize: "var(--fs-h1)", fontWeight: 800, letterSpacing: "-0.025em", lineHeight: 1.05, margin: "16px auto 18px", maxWidth: 800, textWrap: "balance" }}>
-            We&apos;re still polishing the app.<br />Pilot with us.
+            We&apos;re still building the app.<br />Pilot with us.
           </h2>
           <p style={{ color: "var(--ink-2)", maxWidth: 580, margin: "0 auto 24px", fontSize: 16 }}>
-            SPARC is in private beta. We&apos;re upgrading the application,
-            smoothing rough edges, and partnering with planners and researchers
-            on real projects. Tell us about your area of interest and we&apos;ll
-            see if there&apos;s a fit.
+            There is nothing to download yet. We&apos;re building the
+            application, and we&apos;d rather work with a small number of
+            planners and researchers on real projects than ship something
+            half-finished. Tell us about your area of interest and we&apos;ll see
+            if there&apos;s a fit.
           </p>
           <div className="row" style={{ justifyContent: "center", gap: 10 }}>
             <Link href="/demo" className="btn btn-accent">Request access <span className="arrow">→</span></Link>

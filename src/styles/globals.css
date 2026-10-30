@@ -171,11 +171,17 @@ footer { border-top: 1px solid var(--hairline); padding: 60px 0 40px; background
 .hide-tablet  { display: initial; }
 
 /* Mobile nav drawer */
+/* The two controls in the nav. --rule for the same reason .btn and .input are
+   --rule: the edge of a control is a meaning-carrying boundary under WCAG
+   1.4.11, and these two are the whole of the navigation on a phone. The nav's
+   REGISTER is held for the direction answer; which token a 1px border points at
+   is not part of that answer, and holding a surface is not the same as the
+   surface being correct. */
 .mobile-menu-btn {
   display: none;
   align-items: center; justify-content: center;
   width: 40px; height: 40px;
-  border: 1px solid var(--hairline);
+  border: 1px solid var(--rule);
   background: transparent; color: var(--ink);
   border-radius: 6px; cursor: pointer; padding: 0;
 }
@@ -206,7 +212,7 @@ footer { border-top: 1px solid var(--hairline); padding: 60px 0 40px; background
 .drawer-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .drawer-close {
   width: 36px; height: 36px; border-radius: 6px;
-  border: 1px solid var(--hairline); background: transparent; color: var(--ink);
+  border: 1px solid var(--rule); background: transparent; color: var(--ink);
   cursor: pointer; padding: 0; display: inline-flex; align-items: center; justify-content: center;
 }
 .drawer-close:hover { background: rgba(0,0,0,0.04); }

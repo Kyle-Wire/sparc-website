@@ -95,7 +95,11 @@ export function NavUserStatus() {
             right: 0,
             minWidth: 200,
             background: "var(--bg-elevated)",
-            border: "1px solid var(--hairline)",
+            /* --rule: the edge of a floating menu laid over page content is the
+               only thing telling a reader where the menu stops and the page
+               starts. The nav's register is held for the direction answer; a
+               1px border token is not part of that answer. */
+            border: "1px solid var(--rule)",
             borderRadius: 8,
             boxShadow: "0 12px 32px -12px rgba(26,20,22,0.18)",
             padding: 6,

@@ -124,6 +124,16 @@ Everything else — section bands, footer rules, card-internal dividers, the
 dotted row separators, the `.pill` outline, the stage dividers — is
 `--hairline`, and should stay faint. That is the whole reason there are two.
 
+**Three of the ten are inside the nav, which is otherwise held for the direction
+answer**, and they are a separate commit so they can be reverted on their own:
+`.mobile-menu-btn`, `.drawer-close` and the account dropdown's frame. The first
+two are the whole of the navigation on a phone. What is held on the nav is its
+*register* — the type, the ground, the voice, the elevation — and which token a
+1px border points at is not part of that question. Holding a surface is also not
+the same as the surface being correct, and a known 1.61:1 control edge on every
+page is not a defensible thing to hold. If that reads as overreach, revert the
+commit and the rest of this change is unaffected.
+
 If you are reaching for a border and a reader needs to be able to find it, you
 want `--rule`.
 

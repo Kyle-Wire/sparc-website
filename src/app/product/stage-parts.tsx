@@ -56,7 +56,7 @@ export function StageStack({ children }: { children: React.ReactNode }) {
 
   return (
     <StageStackCtx.Provider value={{ register, total }}>
-      <section className="stage-stack" style={{ padding: 0, borderBottom: "1px solid var(--line)" }}>
+      <section className="stage-stack" style={{ padding: 0, borderBottom: "1px solid var(--hairline)" }}>
         <div className="wrap" style={{ position: "relative" }}>
           <div className="stage-rail" aria-hidden>
             <div className="stage-rail-fill" style={{ height: `${fillPct}%` }} />

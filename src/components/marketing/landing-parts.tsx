@@ -75,7 +75,7 @@ function TerminalSplash() {
 
 export function Hero() {
   return (
-    <section style={{ padding: "60px 0 80px", borderBottom: "1px solid var(--line)", position: "relative", overflow: "hidden" }} className="grid-bg">
+    <section style={{ padding: "60px 0 80px", borderBottom: "1px solid var(--hairline)", position: "relative", overflow: "hidden" }} className="grid-bg">
       <div aria-hidden style={{
         position: "absolute", right: -200, top: -200, width: 700, height: 700,
         background: "radial-gradient(circle, rgba(231,60,37,0.08), transparent 60%)",
@@ -137,7 +137,7 @@ export function Hero() {
    words and colour is only ever redundant to it. */
 export function ProofStrip() {
   return (
-    <section className="compact" style={{ borderBottom: "1px solid var(--line)" }}>
+    <section className="compact" style={{ borderBottom: "1px solid var(--hairline)" }}>
       <div className="wrap">
         <MeasurementRow cols={4}>
           <Measurement
@@ -202,7 +202,7 @@ export function PipelineFlow() {
           "running . stage 0X" next to a pulsing live dot, which asserted a
           computation in progress; it now says "illustration" and the dot is
           gone. Do not reinstate a live indicator over a timer. */}
-      <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--line)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--hairline)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div className="kicker">pipeline · 7 stages</div>
         <span className="pill">illustration · stage {String(stage).padStart(2, "0")}</span>
       </div>
@@ -215,7 +215,12 @@ export function PipelineFlow() {
               padding: "10px 12px", borderRadius: 5, cursor: "pointer", textAlign: "left",
               fontFamily: "inherit",
               background: i === stage ? "var(--paper)" : "transparent",
-              border: i === stage ? "1px dashed var(--line)" : "1px solid transparent",
+              /* --rule: this border is how a reader sees WHICH ROW IS SHOWN, so
+                 it is non-text content identifying the state of a control and
+                 WCAG 1.4.11 applies. At 1.61:1 the only two channels carrying
+                 the selected state were a 1.61:1 dashed edge and a paper-on-
+                 white ground change, neither of which is findable. */
+              border: i === stage ? "1px dashed var(--rule)" : "1px solid transparent",
               transition: "all .15s",
             }}>
               <span className="mono" style={{ fontSize: 11, fontWeight: 700, padding: "3px 6px", borderRadius: 3, background: i === stage ? "var(--accent)" : "var(--fg)", color: "var(--paper)", textAlign: "center" }}>{s.n}</span>
@@ -267,7 +272,7 @@ export function PosteriorTrace() {
   const chainOpacities = [0.95, 0.7, 0.85, 0.6];
   return (
     <div className="card" style={{ padding: 0 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--line)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--hairline)" }}>
         <div className="kicker">posterior trace</div>
         <span className="pill">illustration · not sampled data</span>
       </div>

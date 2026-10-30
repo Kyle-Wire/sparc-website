@@ -59,8 +59,8 @@ export default function HomePage() {
               <div className="kicker">{it.kicker}</div>
               <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.015em", margin: "10px 0 12px", textWrap: "pretty" }}>{it.title}</h3>
               <p style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.55, margin: 0 }}>{it.body}</p>
-              <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px dashed var(--line)" }}>
-                <span className="pill" style={{ background: "transparent", border: "1px solid var(--line)" }}>{it.tag}</span>
+              <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px dashed var(--hairline)" }}>
+                <span className="pill" style={{ background: "transparent", border: "1px solid var(--hairline)" }}>{it.tag}</span>
               </div>
             </div>
           ))}
@@ -73,7 +73,7 @@ export default function HomePage() {
           validated for Providence only, and the three panels below are drawings
           of the interface rather than output from any run. Do not attach a city
           or a reproducibility claim to them. */}
-      <section style={{ background: "var(--paper-2)", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
+      <section style={{ background: "var(--paper-2)", borderTop: "1px solid var(--hairline)", borderBottom: "1px solid var(--hairline)" }}>
         <div className="wrap">
           <div className="section-head">
             <div>
@@ -99,7 +99,7 @@ export default function HomePage() {
       >
         <div className="grid-4" style={{ gap: 14 }}>
           {TEMPLATES_PEEK.map((it) => (
-            <div key={it.name} className="card" style={{ padding: 16, borderLeft: `2px solid ${it.c}` }}>
+            <div key={it.name} className="card" style={{ padding: 16, boxShadow: `inset 2px 0 0 ${it.c}` }}>
               <div className="row" style={{ justifyContent: "space-between", alignItems: "baseline" }}>
                 <h4 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>{it.name}</h4>
               </div>
@@ -110,9 +110,9 @@ export default function HomePage() {
       </Section>
 
       <Section kicker="how it works" title="Explore → Learn → Reason → Adapt." lead="Four steps, in plain language. The same flow whether you're studying heat in a city or moisture in a watershed.">
-        <div className="steps-row" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0, borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
+        <div className="steps-row" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0, borderTop: "1px solid var(--hairline)", borderBottom: "1px solid var(--hairline)" }}>
           {STEPS.map((s, i) => (
-            <div key={i} className="steps-cell" data-last={i === 3 ? "true" : undefined} style={{ padding: "26px 22px", borderRight: i < 3 ? "1px solid var(--line)" : "none", position: "relative" }}>
+            <div key={i} className="steps-cell" data-last={i === 3 ? "true" : undefined} style={{ padding: "26px 22px", borderRight: i < 3 ? "1px solid var(--hairline)" : "none", position: "relative" }}>
               <div className="row" style={{ alignItems: "baseline", gap: 10, marginBottom: 12 }}>
                 <span className="mono" style={{ fontSize: 11, fontWeight: 700, padding: "2px 6px", borderRadius: 3, background: "var(--ink)", color: "#fff" }}>{s.no}</span>
                 <span className="kicker">{s.k}</span>
@@ -127,7 +127,7 @@ export default function HomePage() {
       {/* "private beta" was removed here on 2026-10-30. There are no beta
           partners. The same claim was taken off /domains on 29 Oct and this page
           was missed. Do not describe a beta cohort until there is one. */}
-      <section style={{ borderTop: "1px solid var(--line)" }} className="grid-bg">
+      <section style={{ borderTop: "1px solid var(--hairline)" }} className="grid-bg">
         <div className="wrap" style={{ textAlign: "center", padding: "48px 0" }}>
           <Kicker dot dotColor="var(--accent)">pilot program</Kicker>
           <h2 style={{ fontSize: "var(--fs-h1)", fontWeight: 800, letterSpacing: "-0.025em", lineHeight: 1.05, margin: "16px auto 18px", maxWidth: 800, textWrap: "balance" }}>
@@ -145,7 +145,7 @@ export default function HomePage() {
             <Link href="/product" className="btn">Tour the pipeline</Link>
           </div>
         </div>
-        <div style={{ borderTop: "1px dashed var(--line)" }}>
+        <div style={{ borderTop: "1px dashed var(--hairline)" }}>
           <div className="wrap" style={{ padding: "18px 0", display: "flex", justifyContent: "center", alignItems: "center", gap: 12, flexWrap: "wrap", color: "var(--muted)", fontSize: 13 }}>
             <span>Building tools for places? <strong style={{ color: "var(--ink-2)" }}>We&apos;re talking to a small group of mission-aligned investors.</strong></span>
             <Link href={{ pathname: "/demo", query: { role: "investor" } }} className="mono" style={{ fontSize: 12, color: "var(--accent)", textDecoration: "none", letterSpacing: "0.04em" }}>get in touch →</Link>

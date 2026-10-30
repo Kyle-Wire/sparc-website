@@ -66,7 +66,7 @@ export default function PricingPage() {
               key={s.k}
               style={{
                 padding: "20px 22px",
-                borderTop: i === 0 ? "none" : "1px solid var(--line)",
+                borderTop: i === 0 ? "none" : "1px solid var(--hairline)",
                 display: "grid",
                 gap: 6,
               }}

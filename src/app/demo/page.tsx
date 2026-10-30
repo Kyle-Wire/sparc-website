@@ -285,7 +285,7 @@ export default function DemoPage() {
             commit that produced them. Retaining the run directory is now the
             rule for any future run of record, which is a forward commitment and
             must not be written as an existing property. */}
-        <p style={{ marginTop: 24, fontSize: 13, color: "var(--muted)", lineHeight: 1.6, borderTop: "1px dashed var(--line)", paddingTop: 18 }}>
+        <p style={{ marginTop: 24, fontSize: 13, color: "var(--muted)", lineHeight: 1.6, borderTop: "1px dashed var(--rule)", paddingTop: 18 }}>
           Every pilot keeps its run directory, its configuration and its software
           versions, so the result can be traced to the run that produced it. Where
           an earlier result cannot be regenerated, we say so rather than imply

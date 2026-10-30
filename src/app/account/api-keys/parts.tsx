@@ -63,7 +63,7 @@ export function ApiKeysClient({ initial }: { initial: ApiKeyRow[] }) {
 
       <div className="card table-scroll" style={{ padding: 0, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-          <thead><tr style={{ background: "var(--paper-2)", borderBottom: "1px solid var(--line)" }}>
+          <thead><tr style={{ background: "var(--paper-2)", borderBottom: "1px solid var(--rule)" }}>
             {["provider", "label", "key", "added", ""].map((h) => (
               <th key={h} style={{ textAlign: "left", padding: "12px 18px", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--muted)" }}>{h}</th>
             ))}
@@ -72,7 +72,7 @@ export function ApiKeysClient({ initial }: { initial: ApiKeyRow[] }) {
             {keys.length === 0 ? (
               <tr><td colSpan={5} style={{ padding: 22, textAlign: "center", color: "var(--muted)" }}>No keys yet.</td></tr>
             ) : keys.map((k) => (
-              <tr key={k.id} style={{ borderBottom: "1px dotted var(--line)" }}>
+              <tr key={k.id} style={{ borderBottom: "1px dotted var(--hairline)" }}>
                 <td style={{ padding: "12px 18px" }}><span className="pill mono">{k.provider}</span></td>
                 <td style={{ padding: "12px 18px" }}>{k.label}</td>
                 <td style={{ padding: "12px 18px" }} className="mono">••••{k.key_last4}</td>

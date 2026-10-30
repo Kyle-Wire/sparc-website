@@ -96,9 +96,14 @@
      WCAG 2.1 1.4.11 applies and it clears 3:1 against every ground we put it
      on -- white 4.68, --paper 4.26, --paper-2 3.83, --paper-3 3.13.
 
-     --line is kept as an alias of --hairline so the ~45 existing decorative
-     uses stay correct without being touched. If you are reaching for a border
-     and a reader needs to find it, you want --rule. */
+     --line is now the raw hex and nothing else. Every one of the 47 use sites
+     has been moved to --hairline or --rule, one decision at a time, and
+     scripts/check-color-usage.mjs fails the build if var(--line) appears
+     outside this file. Leaving it referenceable was the compromise that let the
+     split land in one change; keeping it referenceable would have meant the
+     ambiguous token survived the fix, and the next border would have reached
+     for it. If you are reaching for a border and a reader needs to find it,
+     you want --rule. */
   --hairline: var(--line);
   --rule: #7c7362;
 

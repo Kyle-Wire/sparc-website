@@ -35,7 +35,7 @@ export default async function DownloadsPage() {
         </p>
         <div style={{ display: "grid", gap: 8 }}>
           {BUILDS.map((b) => (
-            <div key={b.file} className="row" style={{ justifyContent: "space-between", alignItems: "center", padding: "12px 16px", border: "1px solid var(--line)", borderRadius: 6 }}>
+            <div key={b.file} className="row" style={{ justifyContent: "space-between", alignItems: "center", padding: "12px 16px", border: "1px solid var(--rule)", borderRadius: 6 }}>
               <div>
                 <div style={{ fontWeight: 600 }}>{b.os}</div>
                 <div className="mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 2 }}>{b.file} · sha256 {b.sha}</div>
@@ -54,7 +54,7 @@ export default async function DownloadsPage() {
         ) : (
           <div style={{ display: "grid", gap: 8 }}>
             {keys.map((k) => (
-              <div key={k.id} className="row" style={{ justifyContent: "space-between", padding: "10px 14px", border: "1px solid var(--line)", borderRadius: 6 }}>
+              <div key={k.id} className="row" style={{ justifyContent: "space-between", padding: "10px 14px", border: "1px solid var(--rule)", borderRadius: 6 }}>
                 <div className="mono" style={{ fontSize: 13 }}>{k.key_prefix}••••••••• <span className="pill" style={{ marginLeft: 8 }}>{k.tier}</span></div>
                 <span className="mono" style={{ fontSize: 11, color: "var(--muted)" }}>{k.activated_at ? `activated ${new Date(k.activated_at).toLocaleDateString()}` : "unused"}</span>
               </div>

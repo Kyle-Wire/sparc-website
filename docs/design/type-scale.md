@@ -1,6 +1,7 @@
 # The type scale
 
-Internal design specification. Owner: Head of Design.
+Internal design specification. Owner: Head of Design. The numeral rule in §4 is
+enforced by `npm run check:numerals`.
 
 ---
 
@@ -61,7 +62,47 @@ claim in full-strength body copy. The inversion is a rule:
 maturity chips, when their vocabulary lands
 ([SPA-37](/SPA/issues/SPA-37)), inherit the same floor.
 
-## 4. Still open: the ~45 inline literals
+## 4. Tabular-lining numerals, declared once
+
+> **Tabular-lining numerals everywhere a number can change.**
+
+First item in the common design layer, and it holds in every direction still
+open, so it is worth a gate rather than a convention.
+
+Inter's default figures are **proportional**. That means a column of readings
+does not line up, and a value that updates shifts the glyphs around it — so a
+reader comparing two figures is comparing two rhythms, and a number that changes
+appears to move. On a surface whose entire argument is *check this figure*, that
+is a defect rather than a refinement.
+
+**One declaration, on `html, body`.** Not on the components that happen to hold
+numbers today: the failure mode is the number that arrives tomorrow in a
+component nobody thought to tag. Opting a surface out is now a visible,
+deliberate line of CSS instead of the default.
+
+Three things the gate asserts beyond the root declaration:
+
+1. **Form controls are covered explicitly.** The UA stylesheet applies the
+   `font` shorthand to `input`, `button`, `select` and `textarea`, and that
+   shorthand resets `font-variant-numeric` — so without a rule of its own, a
+   quantity typed into a field is the one place on the site with proportional
+   figures. `font-family: inherit` on `.input` does not reach it.
+2. **`font-feature-settings` is forbidden.** It is the low-level property: it
+   overrides `font-variant-numeric` and takes an opaque OpenType tag list, so a
+   component reaching for one unrelated feature silently drops tabular figures
+   and nothing reports it. Two of these existed before the gate — including one
+   on `.ph-em`, the placeholder register's own numeral slot, which is the single
+   place the property could have done the most damage.
+3. **No silent opt-out.** `proportional-nums` and `oldstyle-nums` fail the
+   build. A surface that genuinely needs them needs a reviewed exception with a
+   reason in `scripts/check-numerals.mjs`.
+
+**Not covered**, and said out loud rather than skipped silently: the email
+templates, which render in somebody else's engine and where most clients ignore
+`font-variant-numeric` entirely; and a figure drawn into a `canvas` or an SVG
+`<text>` with its own font stack.
+
+## 5. Still open: the ~45 inline literals
 
 Roughly forty-five `fontSize:` literals remain in page components — ten `22`s
 that are `--fs-h3`, a run of `24`s on the legal pages that is a section-head

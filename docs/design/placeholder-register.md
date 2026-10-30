@@ -154,7 +154,29 @@ digits. Either that is a legitimate second, weaker register with its own
 marker, or those labels should go. It is a real question and it is not urgent;
 flagged here so the inconsistency is on the record rather than discovered later.
 
+**Update: the labels now at least read.** All three carried their one
+load-bearing sentence in a `.pill` — 10px uppercase mono, which is the same
+register §1 of this page is about. `PipelineFlow` and `PosteriorTrace` are now
+wrapped in `<Figure>`, so the sentence renders at `--fs-body` under the panel;
+see [`field-report.md`](field-report.md) §3. `TerminalSplash` keeps its
+`interface illustration` label inside the dark terminal chrome and is untouched,
+because it sits in the hero and the hero is held for the direction answer.
+
+**And one of the three is a harder case than I first wrote.**
+`PosteriorTrace` does not just render ordinal labels — **it draws four
+curves**, and rule 5 above says a drawn curve crops into a result, which is why
+the seven `/product` panels render a hatched `<PlaceholderPlot/>` with no curve
+at all. By this register's own rule, `PosteriorTrace` should too. Its caption is
+honest and at full weight now, which is a strict improvement, but *a caption
+does not survive a crop and the rule is about crops.*
+
+What stops me taking it: removing those curves removes the landing page's main
+visual, so it is a register decision with a visible consequence rather than a
+typographic one, and the surrounding hero is held. It is the first thing to
+settle once the direction answer lands. Recorded, not fixed.
+
 ---
 
-**Related:** [`color-roles.md`](color-roles.md) ·
+**Related:** [`measurement-unit.md`](measurement-unit.md) ·
+[`field-report.md`](field-report.md) · [`color-roles.md`](color-roles.md) ·
 [`data-ramps.md`](data-ramps.md) · [`type-scale.md`](type-scale.md)

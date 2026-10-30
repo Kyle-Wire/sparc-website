@@ -32,7 +32,7 @@ export default function DocsPage() {
       <Nav />
       <PageHero kicker="documentation" title="The manual, the methods, the pipelines." lead="Our technical documentation is not published yet. The methodology reports are the substantive write-ups and they are being prepared for release." accent="var(--purple)" />
       <Section>
-        <article style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 18, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
+        <article className="prose">
           <p>
             This page used to link to a public repository. There isn&apos;t one:
             the code is proprietary and the repositories are private, so the links
@@ -40,7 +40,7 @@ export default function DocsPage() {
             actually exists and where it stands.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Methodology reports</h2>
+          <h2>Methodology reports</h2>
           <p>
             One per hazard program — heat, flooding, wind and ground motion. Each
             one walks through the science, states the weaknesses and the prohibited
@@ -50,7 +50,7 @@ export default function DocsPage() {
             public yet.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>User documentation</h2>
+          <h2>User documentation</h2>
           <p>
             There is a manual, a pipeline guide and an interpretation guide inside
             the engine repository. They ship with the software rather than being
@@ -58,7 +58,7 @@ export default function DocsPage() {
             nothing for them to accompany.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Want a copy before then?</h2>
+          <h2>Want a copy before then?</h2>
           <p>
             If you are evaluating us and need the technical detail now — a
             procurement review, a research collaboration, a peer read — email{" "}

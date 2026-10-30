@@ -246,6 +246,135 @@ body.no-scroll { overflow: hidden; }
 }
 
 /* ============================================================
+   The measurement unit
+
+   Four slots, never fewer. A slot with no value renders an em dash.
+
+   The component is src/components/system/measurement.tsx and it is the only
+   thing that writes [data-measurement]; scripts/check-measurements.mjs holds
+   both ends of that. Everything below is Register B -- the field report -- and
+   the restraint is the specification rather than a taste:
+
+     Personality may touch anything that is not a measurement. The moment a
+     number appears, the measurement unit governs and the personality stops at
+     the panel border.
+
+   So: no display face, no stepped elevation, no brand hue carrying meaning, no
+   elevation at all. Rules and whitespace instead, which is what a methods
+   appendix is made of. The crop test is the acceptance test -- crop any panel
+   with a number in it, and the crop must contain none of those three things.
+
+   What carries weight here is the order of the slots and the fact that the
+   verdict and the support cannot be dropped, not the styling.
+   ============================================================ */
+
+.mu {
+  display: flex;
+  flex-direction: column;
+  /* The unit is a block of text at a readable measure, not a card. A frame
+     would make it a card and cards invite accents. */
+  min-width: 0;
+}
+
+/* Slot 1's name. Small caps is the field-report label register: it sits under
+   the value without competing with it, and unlike the 10px muted mono it
+   replaces, it is not visually identical to decorative metadata. */
+.mu-of {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-caps: all-small-caps;
+  color: var(--fg-muted);
+  margin-bottom: 6px;
+}
+.mu-link { color: inherit; text-decoration-color: var(--rule); }
+.mu-link:hover { text-decoration-color: var(--accent); }
+
+/* Slot 1. The largest thing in the unit, and tabular-lining so that a column
+   of them lines up and a value that changes does not re-flow its neighbours. */
+.mu-value {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Slot 2. The spread and the name of the spread at the same size and the same
+   ink: `± 0.38` with no subject is not a measurement, so the second half is not
+   allowed to render as a qualifier on the first. */
+.mu-interval {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-2);
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.mu-interval .mu-pm,
+.mu-interval .mu-of-what { font-size: inherit; color: inherit; font-weight: inherit; }
+
+/* Slot 3. Body size, full-strength ink, no colour. This is the slot nobody
+   else does and the one that survives greyscale, a screen reader and a
+   photocopy, so it is not allowed to be the quiet one. */
+.mu-verdict {
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--fg);
+  line-height: 1.45;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+
+/* Slot 4. Quieter than the verdict, and still at --fg-2 rather than --muted:
+   the ground a value draws on is content, not chrome. */
+.mu-support {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-2);
+  line-height: 1.5;
+  margin-top: 5px;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* An empty slot. Same metrics as the slot it sits in -- it inherits
+   everything and changes only the ink, so the layout reads exactly as it would
+   with a value in it. That is what makes it a declared absence rather than a
+   gap. */
+.mu-em { color: var(--fg-2); }
+
+/* A row of units that reads as one table.
+
+   The alignment is the reason this exists. Units in a row stretch to a common
+   height and the caveat block is pushed to the bottom of each, so every verdict
+   rule lands on one line across the row and a reader runs down the verdict
+   column instead of hunting for each verdict inside its own box. Four units of
+   unequal slot lengths laid out independently are four cards; with the rules on
+   one line they are a field report.
+
+   Bottom-aligned rather than top-aligned on purpose: the three slots above the
+   rule are one line each, so the values already share a baseline, and it is the
+   caveats -- the part a reader is looking for, and the part a card would have
+   buried -- that needs the shared line.
+
+   The column count is explicit rather than auto-fit so the wrap points are the
+   site's breakpoints and not the content's. More readings than fit one band is
+   a table rather than a row; the table form shares the same four slots and is
+   specified in docs/design/measurement-unit.md. */
+.mu-row {
+  display: grid;
+  grid-template-columns: repeat(var(--mu-cols, 4), minmax(0, 1fr));
+  column-gap: 32px;
+  row-gap: 32px;
+  align-items: stretch;
+}
+.mu-row > .mu > .mu-verdict { margin-top: auto; }
+
+@media (max-width: 900px) { .mu-row { --mu-cols: 2; } }
+@media (max-width: 640px) { .mu-row { --mu-cols: 1; row-gap: 28px; } }
+
+/* ============================================================
    The placeholder register
 
    One rule: A PLACEHOLDER PANEL SHOWS LAYOUT. IT NEVER SHOWS DIGITS.

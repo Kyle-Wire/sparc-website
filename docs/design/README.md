@@ -9,6 +9,7 @@ it. Where there is no gate yet, the page says so.
 
 | | |
 |---|---|
+| [`measurement-unit.md`](measurement-unit.md) | Four slots, never fewer. The primitive every trust surface sits on, its four required props, and why it has no colour axis. |
 | [`placeholder-register.md`](placeholder-register.md) | A placeholder panel shows layout. It never shows digits. The register, the acceptance test, and the two CI gates. |
 | [`color-roles.md`](color-roles.md) | Three token layers, the decorative-vs-structural rule split, the AA failures and what each fix was worth. |
 | [`data-ramps.md`](data-ramps.md) | Why the brand ramp cannot encode severity, the two data ramps, and the greyscale legend test specified for Gate. |
@@ -17,8 +18,9 @@ it. Where there is no gate yet, the page says so.
 ## The gates
 
 ```
-npm run check:design                  # placeholders + colours, fast
+npm run check:design                  # placeholders + measurements + colours, fast
 npm run check:placeholders            # no numeral in a placeholder subtree
+npm run check:measurements            # four slots per unit, no colour axis
 npm run check:colors                  # token contrast + ramp monotonicity
 npm run build && npm run check:placeholders:rendered
                                       # no digit a visitor could see

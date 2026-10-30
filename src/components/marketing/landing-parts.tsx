@@ -3,7 +3,8 @@
 import * as React from "react";
 import Link from "next/link";
 import { Kicker } from "@/components/marketing/page-shell";
-import { Em, Placeholder } from "@/components/system/placeholder";
+import { Placeholder } from "@/components/system/placeholder";
+import { Measurement, MeasurementRow } from "@/components/system/measurement";
 import { TAGLINE_SHORT, BRAND_LONG, VERSION } from "@/lib/brand";
 
 // This panel is an illustration of the interface. It previously opened
@@ -119,28 +120,55 @@ export function Hero() {
 // the canopy effect is registered not_established: the model's figure is the
 // same size as what the pipeline reports when no canopy effect is simulated at
 // all, so it must not be quoted as a result.
+/* Now built from the measurement unit, which is what this strip was reaching
+   for and getting three-quarters right: it had a subject, a value and one line
+   of mixed caveat, with the verdict and the support competing for the same 12px
+   of muted mono and the interval nowhere at all.
+
+   Splitting the old `sub` into slots 3 and 4 made one thing visible that the
+   single line had hidden: THE REGISTER CARRIES NO INTERVAL FOR ANY OF THESE
+   FOUR READINGS. Four `± —`s in a row is an uncomfortable render and it is the
+   correct one -- a spread that is not on record is not a spread of zero, and
+   the previous layout could not say so because it had no slot to say it in.
+   Do not fill them from anywhere but the register.
+
+   The per-tile hue is gone with the rewrite. It was decoration standing in for
+   a boundary, and a reading has no colour axis: slot 3 carries the verdict in
+   words and colour is only ever redundant to it. */
 export function ProofStrip() {
-  const items = [
-    { kicker: "canopy cooling · providence", value: "not established", sub: "+10 pp canopy · not distinguishable from zero", color: "var(--muted)" },
-    { kicker: "impervious · providence", value: "−0.40 °F", sub: "−10 pp impervious · model and causal estimate agree", color: "var(--crimson)" },
-    { kicker: "model fit · unseen neighbourhoods", value: "R² 0.55", sub: "2 km blocks held out · the honest number", color: "var(--purple)" },
-    /* --amber-ink, not --amber: this 2px rule is the only thing framing the
-       tile, so it is a boundary that carries meaning, and --amber sits at
-       2.27:1 on paper. The darkened variant holds the hue at 4.75:1. */
-    { kicker: "error vs. best baseline", value: "1.15 °F", sub: "RMSE · gradient boosting 1.37 °F", color: "var(--amber-ink)" },
-  ];
   return (
     <section className="compact" style={{ borderBottom: "1px solid var(--line)" }}>
       <div className="wrap">
-        <div className="grid-4">
-          {items.map((it, i) => (
-            <div key={i} style={{ borderLeft: `2px solid ${it.color}`, paddingLeft: 16 }}>
-              <div className="kicker">{it.kicker}</div>
-              <div style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-0.02em", margin: "4px 0 2px", fontFeatureSettings: "'tnum'" }}>{it.value}</div>
-              <div style={{ fontSize: 12, color: "var(--muted)" }} className="mono">{it.sub}</div>
-            </div>
-          ))}
-        </div>
+        <MeasurementRow cols={4}>
+          <Measurement
+            of="canopy cooling · providence"
+            value={null}
+            interval={null}
+            verdict="Not established — not distinguishable from zero"
+            support="+10 pp canopy · Providence"
+          />
+          <Measurement
+            of="impervious · providence"
+            value="−0.40 °F"
+            interval={null}
+            verdict="Model and causal estimate agree"
+            support="−10 pp impervious · Providence"
+          />
+          <Measurement
+            of="model fit · unseen neighbourhoods"
+            value="R² 0.55"
+            interval={null}
+            verdict="Held out, not fitted"
+            support="2 km blocks held out"
+          />
+          <Measurement
+            of="error vs. best baseline"
+            value="1.15 °F"
+            interval={null}
+            verdict="Below the best baseline"
+            support="RMSE · gradient boosting 1.37 °F"
+          />
+        </MeasurementRow>
       </div>
     </section>
   );
@@ -281,22 +309,20 @@ export function ScenarioCompare() {
   return (
     <Placeholder
       label="adaptation scenario"
-      note="This panel shows where a baseline, a scenario and the difference between them go. It has never held a result."
+      note="This panel shows where a baseline, a scenario and the difference between them go, and what each one would have to carry: a value, a named interval, a verdict in words, and the ground the value draws on. It has never held any of the four."
     >
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-        {["Baseline", "+ canopy scenario"].map((label) => (
-          <div key={label} data-ph-surface style={{ padding: "10px 12px" }}>
-            <div className="kicker" style={{ fontSize: 9 }}>{label}</div>
-            <div style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", color: "var(--fg-2)", margin: "4px 0 2px" }}>
-              <Em />
-            </div>
-            <div className="mono" style={{ fontSize: "var(--fs-label)", color: "var(--fg-2)" }}><Em prefix="± " /></div>
-          </div>
-        ))}
-        <div style={{ gridColumn: "1 / -1", padding: "8px 0 2px", borderTop: "1px dotted var(--rule)", display: "flex", justifyContent: "space-between" }}>
-          <span className="kicker">Δ predicted mean</span>
-          <span className="mono" style={{ fontSize: 12, fontWeight: 700 }}><Em /></span>
-        </div>
+      <MeasurementRow cols={2}>
+        {/* Four nulls each, which is the whole composition: a measurement with
+            nothing behind it is not a different component and not a mode on
+            this one, it is the same unit with every slot declared empty. The
+            reader sees the shape of the reading we do not have, including the
+            two slots -- interval and support -- that the panel this replaced
+            did not even have room for. */}
+        <Measurement of="Baseline" value={null} interval={null} verdict={null} support={null} />
+        <Measurement of="+ canopy scenario" value={null} interval={null} verdict={null} support={null} />
+      </MeasurementRow>
+      <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px dotted var(--rule)" }}>
+        <Measurement of="Δ predicted mean" value={null} interval={null} verdict={null} support={null} />
       </div>
     </Placeholder>
   );

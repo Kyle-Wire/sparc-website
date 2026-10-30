@@ -20,7 +20,7 @@ export default function ProductPage() {
       <PageHero
         kicker="product · sparc desktop"
         title="Seven stages. Scroll the pipeline."
-        lead="SPARC is a Tauri/React desktop app wrapped around one thing: a seven-stage neural pipeline with built-in causal inference. Bring your own data, watch each stage open as you scroll, and finish with a report shaped for who's reading it."
+        lead="SPARC is a Tauri/React desktop app wrapped around one thing: a seven-stage spatial modelling pipeline with causal analysis built in. Bring your own data, watch each stage open as you scroll, and finish with a report shaped for who's reading it."
       />
 
       <StageStack>
@@ -78,9 +78,13 @@ export default function ProductPage() {
           anchor="sparc"
           kicker="04 · local learning"
           title="A model that fits your city, not the average city."
-          lead="The core SPARC stage: a neural model trained at every location simultaneously, with effect directions locked to what the previous stage found and physics enforced at every checkpoint. If a result violates either, it doesn't advance."
+          lead="The core SPARC stage: a blend of geographically weighted models fitted across your study area, with effect directions locked to what the previous stage found and physics enforced at every checkpoint. If a result violates either, it doesn't advance."
           items={[
-            { k: "structure", v: "8 independent model runs · per-location predictions" },
+            // Was "8 independent model runs". No default in sparc-resilience produces
+            // eight runs, and the published core result is a non-negative blend of
+            // five models (sparc-resilience README, "Current Providence result").
+            // Do not reinstate a run count without a figure in the register.
+            { k: "structure", v: "several models blended · per-location predictions" },
             { k: "training", v: "guided sampling · stops when fit is good enough" },
             { k: "guardrails", v: "effect directions locked · physical laws enforced" },
             { k: "runs on", v: "GPU · Apple Silicon · standard CPU" },
@@ -97,7 +101,10 @@ export default function ProductPage() {
           lead="Causal structure is explored, not assumed. SPARC searches the space of valid cause-and-effect maps that fit your data, then builds a probability distribution over which connections are most credible. Every link is auditable."
           items={[
             { k: "search", v: "explores all plausible cause-and-effect structures" },
-            { k: "confidence", v: "8 runs · 2,000 samples each · convergence reported" },
+            // Was "8 runs · 2,000 samples each". The MC3 and NUTS chain counts in
+            // sparc-resilience default to 7, 3 and 2 depending on the stage; nothing
+            // defaults to eight, and no sample count is fixed at 2,000 across them.
+            { k: "confidence", v: "multiple chains · convergence reported" },
             { k: "review", v: "accept · reject · flip · constrain · annotate" },
             { k: "exports", v: "connection log · confidence charts · what-if API" },
           ]}
@@ -126,7 +133,10 @@ export default function ProductPage() {
           anchor="report"
           kicker="07 · report"
           title="One pipeline. Three audiences."
-          lead="The same run produces three reports: Technical (methods, posterior diagnostics, code refs), Planner (briefs, tradeoffs, equity overlays), and Public (plain-language, before/after, FAQ). Each one ships with a signed manifest so anyone can re-run it."
+          // Dropped: "Each one ships with a signed manifest so anyone can re-run it."
+          // Nothing in sparc/report signs anything, and the re-run claim is the one
+          // corrected in philosophy 03 below and on /about.
+          lead="The same run produces three reports: Technical (methods, posterior diagnostics, code refs), Planner (briefs, tradeoffs, equity overlays), and Public (plain-language, before/after, FAQ)."
           items={[
             { k: "audiences", v: "Technical · Planner · Public" },
             { k: "formats", v: ".pdf · .md · .html · figures · manifest.json" },
@@ -142,7 +152,13 @@ export default function ProductPage() {
           {[
             { k: "philosophy · 01", t: "No black boxes.", b: "Every number has a source. Every effect has a direction. Every prediction comes with a confidence range." },
             { k: "philosophy · 02", t: "Physics, not vibes.", b: "The model must respect how heat, water, and air actually behave — or it doesn't run." },
-            { k: "philosophy · 03", t: "Reproducible by default.", b: "Every project saves as a single file. Any result can be regenerated exactly, years from now, on any machine." },
+            // Was: "Any result can be regenerated exactly, years from now, on any
+            // machine." The Providence run of record cannot be regenerated — the run
+            // directory was not kept and the company accepted that on 2026-10-29 —
+            // and the flood and wind benchmarks are not pinned to their commits. The
+            // same claim was corrected on /about on 2026-10-30; this wording matches
+            // principle 02 there deliberately, so the two pages cannot drift again.
+            { k: "philosophy · 03", t: "A result names the run behind it.", b: "Every project saves as a single file, and every figure we publish names the run and the configuration it came from. Where an earlier result cannot be regenerated, we say so instead of implying otherwise." },
             { k: "philosophy · 04", t: "Your data stays yours.", b: "Everything runs on your machine. Nothing is uploaded or shared without your explicit say-so." },
           ].map((p, i) => (
             <div key={i} style={{ borderTop: "1px solid rgba(245,239,228,0.3)", paddingTop: 24 }}>
@@ -158,13 +174,20 @@ export default function ProductPage() {
         <div className="grid-4" style={{ gap: 14 }}>
           {[
             { k: "frontend", v: "Tauri 2.0 · React 18 · TypeScript", c: "var(--crimson)" },
-            { k: "backend", v: "Python 3.12 · local background process", c: "var(--purple)" },
-            { k: "model", v: "geographically-weighted neural · 8-run sampling", c: "var(--amber)" },
+            // "Python 3.12" was wrong: sparc-resilience supports 3.10-3.11.
+            { k: "backend", v: "Python 3.10–3.11 · local background process", c: "var(--purple)" },
+            // Was "geographically-weighted neural · 8-run sampling". The neural
+            // meta-learner has no out-of-fold score on record and the published
+            // result comes from a model blend; the run count was unsupported.
+            { k: "model", v: "geographically weighted model blend", c: "var(--amber)" },
             { k: "geo stack", v: "GDAL · rasterio · GeoPandas", c: "var(--gold)" },
             { k: "compute", v: "CUDA 11.8 · MPS · CPU fallback", c: "var(--magenta)" },
             { k: "storage", v: "DuckDB · parquet · GeoTIFF", c: "var(--orange)" },
-            { k: "ai assist", v: "Claude Sonnet 4.6 · bring your own key", c: "var(--pink)" },
-            { k: "license", v: "proprietary · subscription", c: "var(--red)" },
+            // The "ai assist · Claude Sonnet 4.6 · bring your own key" row is removed.
+            // That model id has never existed, so the chat path has never worked for
+            // anyone. Re-add it only once BYOK ships against a current model id.
+            // "subscription" is removed with it: nothing is sold on this site today.
+            { k: "license", v: "proprietary", c: "var(--red)" },
           ].map((r, i) => (
             <div key={i} className="card" style={{ borderLeft: `2px solid ${r.c}` }}>
               <div className="kicker">{r.k}</div>

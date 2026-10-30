@@ -10,6 +10,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "check:placeholders": "node scripts/check-placeholders.mjs",
+    "check:placeholders:rendered": "node scripts/check-placeholders-rendered.mjs",
     "check:colors": "node scripts/check-colors.mjs",
     "check:design": "npm run check:placeholders && npm run check:colors",
     "security:audit": "npm audit --omit=dev --audit-level=high",

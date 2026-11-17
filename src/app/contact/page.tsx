@@ -9,14 +9,19 @@ type Form = {
   name: string; email: string; org: string; domain: string; crs: string; reason: string;
 };
 
-// These are the template directory names in the engine repository. They are the
-// names of templates, not a claim that each one is validated: only urban heat
-// has a validation record, and that record covers one city. Do not present this
-// list as a menu of working products.
-const DOMAINS = ["uhi", "coastal", "drought", "geotech", "groundwater", "noise", "seismic", "stormwater", "water", "wildfire", "air", "forcesmip", "blank"];
+// What the message is about. Stored in the `domain` column the form has always
+// written to; `crs` is no longer asked for and is sent empty. The list is a
+// way to sort the inbox, not a menu of products: a report is run by hand on
+// request and nothing here is on sale.
+const TOPICS: { value: string; label: string }[] = [
+  { value: "report", label: "A flood and heat report for a place" },
+  { value: "question", label: "A question about the site or the data" },
+  { value: "research-press", label: "Research or press" },
+  { value: "other", label: "Something else" },
+];
 
 function ContactForm() {
-  const [form, setForm] = React.useState<Form>({ name: "", email: "", org: "", domain: "uhi", crs: "EPSG:32619", reason: "" });
+  const [form, setForm] = React.useState<Form>({ name: "", email: "", org: "", domain: "report", crs: "", reason: "" });
   const [state, setState] = React.useState<"idle" | "submitting" | "ok" | "error">("idle");
   const [ticket, setTicket] = React.useState<string>("");
   const [error, setError] = React.useState<string>("");
@@ -75,29 +80,28 @@ function ContactForm() {
 
   return (
     <form className="card" style={{ padding: 28 }} onSubmit={submit}>
-      <div className="kicker">request access</div>
-      <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.015em", margin: "8px 0 18px" }}>Tell us about your work.</h3>
+      <div className="kicker">ask for a report · or anything else</div>
+      <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.015em", margin: "8px 0 18px" }}>Tell us the place and the question.</h3>
       <div className="grid-2" style={{ gap: 14 }}>
         <div><label className="label">Name</label><input className="input" required value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Your name" /></div>
         <div><label className="label">Email</label><input className="input" type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@org.org" /></div>
-        <div><label className="label">Organization</label><input className="input" value={form.org} onChange={(e) => update("org", e.target.value)} placeholder="Organization · team" /></div>
-        <div><label className="label">Project CRS</label><input className="input mono" value={form.crs} onChange={(e) => update("crs", e.target.value)} placeholder="EPSG:32619" /></div>
+        <div style={{ gridColumn: "1 / -1" }}><label className="label">Organization (optional)</label><input className="input" value={form.org} onChange={(e) => update("org", e.target.value)} placeholder="If you are writing for one" /></div>
         <div style={{ gridColumn: "1 / -1" }}>
-          <label className="label">Domain template</label>
+          <label className="label">What is this about?</label>
           <select className="input" value={form.domain} onChange={(e) => update("domain", e.target.value)}>
-            {DOMAINS.map((o) => <option key={o}>{o}</option>)}
+            {TOPICS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
         <div style={{ gridColumn: "1 / -1" }}>
-          <label className="label">What are you trying to figure out?</label>
-          <textarea className="input" style={{ minHeight: 100, resize: "vertical" }} value={form.reason} onChange={(e) => update("reason", e.target.value)} placeholder="The decision you are trying to make, the area it covers, and the data you already hold." />
+          <label className="label">The place, and what you are trying to decide</label>
+          <textarea className="input" style={{ minHeight: 100, resize: "vertical" }} value={form.reason} onChange={(e) => update("reason", e.target.value)} placeholder="City and state is enough for now. If we go ahead with a report we will ask for the address by email." />
         </div>
       </div>
       {state === "error" && <p style={{ color: "var(--crimson)", marginTop: 12, fontSize: 13 }}>{error}</p>}
       <div className="row" style={{ marginTop: 22, justifyContent: "space-between", alignItems: "center" }}>
         <span className="mono" style={{ fontSize: 11, color: "var(--muted)" }}>▸ one inbox · read by a person</span>
         <button type="submit" className="btn btn-accent" disabled={state === "submitting"}>
-          {state === "submitting" ? "Sending…" : "Request access"} <span className="arrow">→</span>
+          {state === "submitting" ? "Sending…" : "Send"} <span className="arrow">→</span>
         </button>
       </div>
     </form>
@@ -111,7 +115,7 @@ export default function ContactPage() {
       <PageHero
         kicker="contact · we read everything"
         title="Get in touch."
-        lead="Questions, research collaborations, press, or a study you would like us to run. One person reads this inbox."
+        lead="Ask for a flood and heat report for a place, or ask anything else. The models are not on the site yet, so for now a report is run by hand. One person reads this inbox."
         accent="var(--amber)"
       />
 

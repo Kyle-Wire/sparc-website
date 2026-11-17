@@ -1,0 +1,460 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Nav, Footer } from "@/components/shell/Shell";
+import { Kicker } from "@/components/marketing/page-shell";
+import { PlaceMap, type TrackLine } from "@/components/place/PlaceMap";
+import { LockedShelf, MissingCard, RecordCard, ShelfHead } from "@/components/place/cards";
+import { areasAt } from "@/lib/place/census";
+import { KM_PER_MILE, parsePlaceSlug } from "@/lib/place/coords";
+import { floodZonesAt } from "@/lib/place/fema";
+import { stormsNear, type NearbyStorm } from "@/lib/place/hurricanes";
+import type { Lookup } from "@/lib/place/lookup";
+import { claimsInTract, declarationsInCounty, type CountyDeclarations, type TractClaims } from "@/lib/place/openfema";
+
+// A place page: everything on the public record about the neighbourhood
+// around a block, and the layout of what paying would add.
+//
+// What may appear in a record card: a value read from a public register, the
+// register's own words for it, and its source and date. No card interprets a
+// record as safe or unsafe, and nothing here is SPARC Labs model output. The
+// sentences around each value are templates in this file; the values come
+// from src/lib/place. See docs/design/site-redesign-brief.md.
+//
+// The page address is a block, never a house (src/lib/place/coords.ts).
+
+type Props = { params: Promise<{ slug: string }> };
+
+const FEMA_SOURCE = "FEMA, National Flood Hazard Layer";
+const CLAIMS_SOURCE = "FEMA, National Flood Insurance Program claims (OpenFEMA)";
+const DECLARATIONS_SOURCE = "FEMA, Disaster Declarations Summaries (OpenFEMA)";
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const place = parsePlaceSlug(slug);
+  return {
+    title: place ? "A place on the public record" : "Place not found",
+    // One page per block of the country is not something to put in a search index.
+    robots: { index: false, follow: false },
+  };
+}
+
+function longDate(iso: string): string {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+function miles(km: number): number {
+  return Math.round(km / KM_PER_MILE);
+}
+
+function list(items: string[]): string {
+  if (items.length <= 1) return items.join("");
+  return `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+}
+
+function stormLine(s: NearbyStorm): string {
+  const who = s.name ? `${s.name}, ${s.year}` : `Unnamed storm, ${s.year}`;
+  const what = s.categoryNearby > 0 ? `category ${s.categoryNearby} hurricane` : s.statusNearby;
+  const where = s.closestKm < 2 ? "over this place" : `${miles(s.closestKm)} mi away`;
+  return `${who}: ${what} at its nearest point, ${where}`;
+}
+
+function ClaimsCard({ res, tractName }: { res: Lookup<TractClaims>; tractName: string }) {
+  if (!res.ok) return <MissingCard hazard="flood" about="Flood insurance claims nearby" reason={res.reason} source={CLAIMS_SOURCE} />;
+  const c = res.data;
+  const caveat = (
+    <p className="record-aside">
+      Only homes insured through the National Flood Insurance Program can make a claim, so a low count does not
+      mean no flooding. Claims are published by census area, never by address.
+    </p>
+  );
+  if (c.total === 0) {
+    return (
+      <RecordCard hazard="flood" about="Flood insurance claims nearby" figure="0" figureNote={`claims on record in ${tractName}`} source={CLAIMS_SOURCE}>
+        <p>No flood insurance claim is on record in the census tract around this place.</p>
+        {caveat}
+      </RecordCard>
+    );
+  }
+  const busiest = c.busiestYears.map((y) => `${y.year} (${y.claims})`);
+  return (
+    <RecordCard
+      hazard="flood"
+      about="Flood insurance claims nearby"
+      figure={`${c.atLeast ? "over " : ""}${c.total.toLocaleString("en-US")}`}
+      figureNote={`${c.total === 1 ? "claim" : "claims"} on record in ${tractName}`}
+      source={CLAIMS_SOURCE}
+      asOf={c.firstYear && c.lastYear ? `${c.firstYear} to ${c.lastYear}` : undefined}
+    >
+      <p>
+        Flood insurance claims were made in this census tract in {c.yearsWithClaims}{" "}
+        {c.yearsWithClaims === 1 ? "year" : "different years"}
+        {c.firstYear && c.lastYear && c.firstYear !== c.lastYear ? `, from ${c.firstYear} to ${c.lastYear}` : c.lastYear ? `, ${c.lastYear}` : ""}.
+        {busiest.length > 1 ? ` The years with the most were ${list(busiest)}.` : ""}
+      </p>
+      {caveat}
+    </RecordCard>
+  );
+}
+
+function DeclarationsCard({ res, countyName }: { res: Lookup<CountyDeclarations>; countyName: string }) {
+  if (!res.ok) return <MissingCard hazard="storm" about="Federal disaster declarations" reason={res.reason} source={DECLARATIONS_SOURCE} />;
+  const d = res.data;
+  const shown = d.byType.slice(0, 4).map((t) => `${t.type.toLowerCase()} ${t.count}`);
+  const types = d.byType.length > 4 ? `${shown.join(", ")}, and other types` : list(shown);
+  return (
+    <RecordCard
+      hazard="storm"
+      about="Federal disaster declarations"
+      figure={d.total.toLocaleString("en-US")}
+      figureNote={`for ${countyName}${d.firstYear ? ` since ${d.firstYear}` : ""}`}
+      source={DECLARATIONS_SOURCE}
+    >
+      {d.total > 0 ? (
+        <>
+          <p>By FEMA&apos;s own type: {types}.</p>
+          <p>Most recent, with FEMA&apos;s type and the date declared:</p>
+          <ul>
+            {d.recent.map((r) => (
+              <li key={`${r.date}-${r.title}`}>
+                {r.title} ({r.type.toLowerCase()}), {longDate(r.date)}
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <p>FEMA lists no disaster declaration for this county.</p>
+      )}
+      <p className="record-aside">
+        A declaration covers the whole county, not this block. Public-health declarations are left out.
+      </p>
+    </RecordCard>
+  );
+}
+
+export default async function PlacePage({ params }: Props) {
+  const { slug: rawSlug } = await params;
+  const place = parsePlaceSlug(rawSlug);
+  if (!place) notFound();
+  const slug = decodeURIComponent(rawSlug);
+
+  const areas = await areasAt(place);
+  const noArea = { ok: false as const, reason: areas.ok ? "" : areas.reason };
+  const [zones, claims, declarations] = await Promise.all([
+    floodZonesAt(place),
+    areas.ok ? claimsInTract(areas.data.tractGeoid) : noArea,
+    areas.ok ? declarationsInCounty(areas.data.stateFips, areas.data.countyFips) : noArea,
+  ]);
+  const storms = stormsNear(place);
+
+  const where = areas.ok
+    ? `${areas.data.localName ?? areas.data.countyName}, ${areas.data.stateAbbr}`
+    : "the United States";
+  const tractName = areas.ok ? areas.data.tractName : "this census tract";
+  const countyName = areas.ok ? areas.data.countyName : "this county";
+
+  const tracks: TrackLine[] = storms.storms.map((s) => ({
+    id: s.id,
+    label: s.name ? `${s.name} ${s.year}` : `Unnamed ${s.year}`,
+    lines: s.lines,
+  }));
+
+  const sfha = zones.ok ? zones.data.zones.filter((z) => z.inSfha) : [];
+
+  return (
+    <>
+      <Nav active="home" />
+
+      <section className="place-head">
+        <div className="wrap">
+          <Kicker dot dotColor="var(--flood)">
+            on the public record{areas.ok ? ` · ${tractName}, ${countyName}` : ""}
+          </Kicker>
+          <h1>A block in {where}</h1>
+          <p className="lead">
+            What public registers hold about flood, storms, sea level and land cover around this place. The
+            page shows the neighbourhood, not a house, and its address carries the block only.
+          </p>
+          <div className="place-jump">
+            <a className="btn btn-sm" href="#flood">Flood</a>
+            <a className="btn btn-sm" href="#heat">Heat</a>
+            <a className="btn btn-sm" href="#coming">Ground and wind</a>
+            <a className="btn btn-sm" href="#sources">Sources</a>
+            <Link className="btn btn-sm btn-ghost" href="/">Look up another address</Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="compact">
+        <div className="wrap">
+          <PlaceMap slug={slug} place={place} tracks={tracks} />
+        </div>
+      </section>
+
+      <section id="flood" className="hazard-row">
+        <div className="wrap">
+          <Kicker>hazard</Kicker>
+          <h2>
+            <span className="hazard-mark" data-hazard="flood" aria-hidden />
+            Flood and storms
+          </h2>
+          <p className="lead">FEMA&apos;s flood map, what has been claimed and declared nearby, and the storms that have passed.</p>
+
+          <div className="shelf">
+            <ShelfHead name="On record" state="free" />
+            <div className="shelf-cards">
+              {zones.ok ? (
+                zones.data.zones.length === 0 ? (
+                  <RecordCard hazard="flood" about="FEMA flood zone" figure="Not mapped" source={FEMA_SOURCE}>
+                    <p>FEMA&apos;s digital flood map has no zone for this block. Not every part of the country is in it.</p>
+                  </RecordCard>
+                ) : (
+                  <RecordCard
+                    hazard="flood"
+                    about="FEMA flood zone"
+                    figure={`Zone ${zones.data.zones[0].code}`}
+                    figureNote={
+                      zones.data.zones.length > 1
+                        ? `and ${zones.data.zones.length - 1} more on this block`
+                        : (zones.data.zones[0].subtype ?? undefined)
+                    }
+                    source={FEMA_SOURCE}
+                    asOf={zones.data.panelDate ? `map panel effective ${longDate(zones.data.panelDate)}` : undefined}
+                  >
+                    {zones.data.zones.length === 1 ? (
+                      <p>
+                        FEMA&apos;s flood map puts this block in Zone {zones.data.zones[0].code}
+                        {zones.data.zones[0].subtype ? ` (${zones.data.zones[0].subtype.toLowerCase()})` : ""}.{" "}
+                        {sfha.length
+                          ? "FEMA classes it as a Special Flood Hazard Area."
+                          : "FEMA does not class it as a Special Flood Hazard Area."}
+                      </p>
+                    ) : (
+                      <>
+                        <p>FEMA&apos;s flood map shows more than one zone on this block:</p>
+                        <ul>
+                          {zones.data.zones.map((z) => (
+                            <li key={`${z.code}-${z.subtype ?? ""}`}>
+                              Zone {z.code}
+                              {z.subtype ? `, ${z.subtype.toLowerCase()}` : ""}
+                              {z.inSfha ? " (Special Flood Hazard Area)" : ""}
+                            </li>
+                          ))}
+                        </ul>
+                        <p>
+                          {sfha.length
+                            ? "Part of the block is in FEMA's Special Flood Hazard Area. "
+                            : "None of them is a Special Flood Hazard Area. "}
+                          The map above shows where the lines fall.
+                        </p>
+                      </>
+                    )}
+                    <p className="record-aside">
+                      A flood zone is FEMA&apos;s map of flood hazard for insurance and building rules. It is
+                      context, not a forecast for one house.
+                    </p>
+                  </RecordCard>
+                )
+              ) : (
+                <MissingCard hazard="flood" about="FEMA flood zone" reason={zones.reason} source={FEMA_SOURCE} />
+              )}
+
+              <ClaimsCard res={claims} tractName={tractName} />
+              <DeclarationsCard res={declarations} countyName={countyName} />
+
+              <RecordCard
+                hazard="storm"
+                about="Tropical storms and hurricanes"
+                figure={storms.total.toLocaleString("en-US")}
+                figureNote={`tracked within ${storms.radiusKm} km (${miles(storms.radiusKm)} miles)`}
+                source="NOAA National Hurricane Center, HURDAT2 best tracks"
+                asOf={storms.record}
+              >
+                {storms.total > 0 ? (
+                  <>
+                    <p>
+                      {storms.hurricanesNearby === 0
+                        ? "None was at hurricane strength at its nearest point."
+                        : `${storms.hurricanesNearby} ${storms.hurricanesNearby === 1 ? "was" : "were"} at hurricane strength at the nearest point.`}{" "}
+                      The count includes depressions and the remnants of storms. Most recent:
+                    </p>
+                    <ul>
+                      {storms.storms.slice(0, 6).map((s) => (
+                        <li key={s.id}>{stormLine(s)}</li>
+                      ))}
+                    </ul>
+                  </>
+                ) : (
+                  <p>NOAA&apos;s record has no tropical storm or hurricane track this close to the place.</p>
+                )}
+                <p className="record-aside">
+                  A track is the path of the storm&apos;s centre. Rain and wind reach far from it, so distance from
+                  a track is not a measure of what this block got.
+                </p>
+              </RecordCard>
+
+              <RecordCard hazard="flood" about="Sea level rise" source="NOAA Office for Coastal Management, Sea Level Rise Viewer data">
+                <p>
+                  NOAA maps where the sea would reach at the highest tides if it stood 1, 3 or 6 feet above
+                  today&apos;s high-tide line. Switch the layer on in the map above to see whether that water
+                  reaches this neighbourhood. Inland, the layer is empty.
+                </p>
+                <p className="record-aside">
+                  NOAA describes its map as a screening-level tool. It does not account for erosion, sinking
+                  ground or future construction. This card is a map layer only; the site makes no statement
+                  about this block from it.
+                </p>
+              </RecordCard>
+            </div>
+          </div>
+
+          <div className="shelf shelf-pair">
+            <div>
+              <ShelfHead name="Modelled" state="paid" />
+              <LockedShelf kind="flood-model" />
+            </div>
+            <div>
+              <ShelfHead name="What if" state="paid" />
+              <LockedShelf kind="flood-whatif" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="heat" className="hazard-row">
+        <div className="wrap">
+          <Kicker>hazard</Kicker>
+          <h2>
+            <span className="hazard-mark" data-hazard="heat" aria-hidden />
+            Heat
+          </h2>
+          <p className="lead">How much of the neighbourhood is trees and how much is paving, and what a model would add.</p>
+
+          <div className="shelf">
+            <ShelfHead name="On record" state="free" />
+            <div className="shelf-cards">
+              <RecordCard hazard="heat" about="Tree canopy and paving" source="National Land Cover Database 2021, USGS and partners (MRLC)" asOf="2021">
+                <p>
+                  The national land cover survey maps tree canopy and the share of ground covered by paving
+                  and buildings. Switch either layer on in the map above.
+                </p>
+                <p className="record-aside">
+                  These are map layers only for now, and they cover the lower 48 states. Figures for this
+                  block against its neighbourhood are not on the site yet.
+                </p>
+              </RecordCard>
+            </div>
+          </div>
+
+          <div className="shelf shelf-pair">
+            <div>
+              <ShelfHead name="Modelled" state="paid" />
+              <LockedShelf kind="heat-model" />
+            </div>
+            <div>
+              <ShelfHead name="What if" state="paid" />
+              <LockedShelf kind="heat-whatif" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="coming" className="hazard-row">
+        <div className="wrap">
+          <Kicker>coming</Kicker>
+          <h2>Ground and wind</h2>
+          <p className="lead">Two more hazards are planned. Neither is on the site yet.</p>
+          <div className="shelf-cards" style={{ marginTop: 24 }}>
+            <div className="card dashed">
+              <ShelfHead name="Ground movement" state="coming" />
+              <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6, margin: 0 }}>
+                Whether the ground is sinking or shifting, measured from satellite radar, with the measured
+                rate carried forward to show how it is likely to continue.
+              </p>
+            </div>
+            <div className="card dashed">
+              <ShelfHead name="Wind" state="coming" />
+              <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6, margin: 0 }}>
+                How wind moves through the neighbourhood across the seasons, as a map. The storm tracks above
+                are the part of this that is on record today.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="sources" className="compact">
+        <div className="wrap">
+          <Kicker>reading this page</Kicker>
+          <h2 style={{ margin: "8px 0 18px" }}>What this is, and where it comes from</h2>
+          <p className="screening-note">
+            <strong>A screening tool.</strong> This page gathers public records so a buyer or resident can see
+            them in one place. The records are shown as their publishers give them and can be out of date or
+            incomplete. It is not an engineering study, an appraisal, an insurance quote or a home inspection,
+            and it is not for engineering decisions.
+          </p>
+          <div className="table-scroll" style={{ marginTop: 24 }}>
+            <table className="plain-table">
+              <thead>
+                <tr>
+                  <th>Record</th>
+                  <th>Publisher</th>
+                  <th>What area it describes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Flood zones</td>
+                  <td>FEMA, National Flood Hazard Layer</td>
+                  <td>The block: a box about 180 m across around the middle of this place</td>
+                </tr>
+                <tr>
+                  <td>Flood insurance claims</td>
+                  <td>FEMA, OpenFEMA NFIP claims</td>
+                  <td>The census tract ({tractName})</td>
+                </tr>
+                <tr>
+                  <td>Disaster declarations</td>
+                  <td>FEMA, OpenFEMA declarations summaries</td>
+                  <td>The county ({countyName})</td>
+                </tr>
+                <tr>
+                  <td>Storm tracks</td>
+                  <td>NOAA National Hurricane Center, HURDAT2</td>
+                  <td>Within {storms.radiusKm} km of the place</td>
+                </tr>
+                <tr>
+                  <td>Sea level rise</td>
+                  <td>NOAA Office for Coastal Management</td>
+                  <td>Map layer</td>
+                </tr>
+                <tr>
+                  <td>Tree canopy, paving</td>
+                  <td>National Land Cover Database 2021 (MRLC)</td>
+                  <td>Map layer</td>
+                </tr>
+                <tr>
+                  <td>Census areas, base map</td>
+                  <td>US Census Bureau; USGS The National Map</td>
+                  <td>Names of the tract and county; the map underneath</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="record-aside" style={{ marginTop: 16, maxWidth: 820 }}>
+            Your address: if you searched for one, it was sent to the Census Bureau&apos;s geocoder to find this
+            block and was not stored. The link to this page holds the block, so sharing it does not share a
+            house. Map tiles load in your browser straight from the agencies above.
+          </p>
+        </div>
+      </section>
+
+      <Footer />
+    </>
+  );
+}

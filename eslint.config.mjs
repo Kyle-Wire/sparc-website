@@ -11,6 +11,8 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      // The map library's worker, copied from node_modules by scripts/copy-map-worker.mjs.
+      "public/vendor/**",
     ],
   },
 ];

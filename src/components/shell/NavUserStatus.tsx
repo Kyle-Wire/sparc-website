@@ -65,8 +65,8 @@ export function NavUserStatus() {
         <Link href="/login" className="btn btn-ghost btn-sm" style={{ fontWeight: 500, fontSize: 12 }}>
           Sign in
         </Link>
-        <Link href="/signup" className="btn btn-primary btn-sm">
-          Request access <span className="arrow">→</span>
+        <Link href="/contact" className="btn btn-primary btn-sm">
+          Ask for a report <span className="arrow">→</span>
         </Link>
       </>
     );

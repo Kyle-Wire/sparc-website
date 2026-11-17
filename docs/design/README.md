@@ -9,6 +9,7 @@ it. Where there is no gate yet, the page says so.
 
 | | |
 |---|---|
+| [`site-redesign-brief.md`](site-redesign-brief.md) | The site's direction from 17 November 2026: public records free for any US address, flood and heat models paid. What is built, what is not, and whose decision each point was. |
 | [`placeholder-register.md`](placeholder-register.md) | A placeholder panel shows layout. It never shows digits. The register, the acceptance test, and the two CI gates. |
 | [`color-roles.md`](color-roles.md) | Three token layers, the decorative-vs-structural rule split, the AA failures and what each fix was worth. |
 | [`data-ramps.md`](data-ramps.md) | Why the brand ramp cannot encode severity, the two data ramps, and the greyscale legend test specified for Gate. |
@@ -37,6 +38,13 @@ workflow*).
 
 Before this work, "including in mockups" rested on a source comment. It now
 fails a build.
+
+Since the redesign of 17 November 2026 there is a third thing a displayed
+number may trace to: a public register, fetched live and named with its
+publisher on the card that shows it (`src/lib/place/`, and the source table in
+[`site-redesign-brief.md`](site-redesign-brief.md)). The rule is otherwise
+unchanged. A model result with no run behind it is still a placeholder panel,
+and the paid shelves on a place page are drawn that way.
 
 ## Not settled here
 

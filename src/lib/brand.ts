@@ -34,6 +34,13 @@ export const TAGLINE_SHORT = `${BRAND_LONG} · ${VERSION}`;
 // pipeline silently fell back to a weighted average of the base models, which is
 // what produced every figure of record. See sparc-resilience
 // docs/results/reconciliation.md and the README's retraction notice.
+//
+// Changed 2026-11-17 with the site's new direction (docs/design/
+// site-redesign-brief.md). The line states only what the site does today: it
+// looks up public records for a US address, free. The flood and heat models
+// are not on the site yet, so the line does not mention them as available.
+export const SITE_TITLE = "Environmental screening for home buyers";
+
 export const TAGLINE_LONG =
-  `${BRAND_LONG}. Spatial models of environmental hazards, built to be checked — ` +
-  `every figure we publish traces to a named run, including the ones that failed.`;
+  `Environmental screening for home buyers. Public flood, storm and sea level ` +
+  `records for the neighbourhood around any US address, free.`;

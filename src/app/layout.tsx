@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../styles/globals.css";
-import { COMPANY, BRAND_LONG, TAGLINE_LONG, SITE_URL } from "@/lib/brand";
+import { COMPANY, SITE_TITLE, TAGLINE_LONG, SITE_URL } from "@/lib/brand";
 import { CookieNotice } from "@/components/shell/CookieNotice";
 
 export const viewport: Viewport = {
@@ -14,12 +14,12 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${COMPANY} · ${BRAND_LONG}`,
+    default: `${COMPANY} · ${SITE_TITLE}`,
     template: `%s · ${COMPANY}`,
   },
   description: TAGLINE_LONG,
   openGraph: {
-    title: `${COMPANY} · ${BRAND_LONG}`,
+    title: `${COMPANY} · ${SITE_TITLE}`,
     description: TAGLINE_LONG,
     url: SITE_URL,
     siteName: COMPANY,
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${COMPANY} · ${BRAND_LONG}`,
+    title: `${COMPANY} · ${SITE_TITLE}`,
     description: TAGLINE_LONG,
   },
 };

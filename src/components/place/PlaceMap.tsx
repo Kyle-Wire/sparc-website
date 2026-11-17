@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
-import type { Map as MlMap, GeoJSONSource, StyleSpecification } from "maplibre-gl";
+import type { Map as MlMap, Marker, GeoJSONSource, StyleSpecification } from "maplibre-gl";
 import type { LatLon } from "@/lib/place/coords";
 import { recallPoint, type PlacePoint } from "./place-point";
 
 /**
- * The neighbourhood map: the place at the centre, public layers on top.
+ * The neighbourhood map: the place at the centre, public layers on top, and
+ * a click anywhere to read what is on record at that spot.
  *
  * Every layer here is a published public map drawn as its publisher draws it.
- * Nothing on this map is SPARC Labs model output, and the caption under the
- * map says so. Tiles are fetched by the visitor's browser straight from the
- * agencies (USGS, FEMA, NOAA, MRLC); the hosts are listed in next.config.ts.
+ * Nothing on this map is SPARC Labs model output, and the panel says so.
+ * Tiles are fetched by the visitor's browser straight from the agencies
+ * (USGS, FEMA, NOAA, MRLC); the hosts are listed in next.config.ts.
  *
  * The exact point a visitor searched for is read from this browser tab's own
  * storage and marked for them alone. A visitor who opens a shared link sees
  * the block ring and no mark.
+ *
+ * A click is sent to /api/inspect, which asks FEMA, USGS and the land cover
+ * server about that spot. The click is not stored.
  */
 
 const NFHL = "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer";
@@ -29,10 +33,10 @@ function wms(layer: string): string {
   );
 }
 
-type LayerId = "fema" | "slr1" | "slr3" | "slr6" | "canopy" | "paving" | "tracks";
+type RasterId = "fema" | "slr1" | "slr3" | "slr6" | "canopy" | "paving";
 
 interface RasterDef {
-  id: Exclude<LayerId, "tracks">;
+  id: RasterId;
   tiles: string;
   tileSize: number;
   minzoom?: number;
@@ -119,25 +123,148 @@ export interface TrackLine {
   lines: [number, number][][];
 }
 
-const SLR_OPTIONS: { value: "off" | "slr1" | "slr3" | "slr6"; label: string }[] = [
+type Slr = "off" | "slr1" | "slr3" | "slr6";
+
+const SLR_OPTIONS: { value: Slr; label: string }[] = [
   { value: "off", label: "Off" },
   { value: "slr1", label: "1 ft" },
   { value: "slr3", label: "3 ft" },
   { value: "slr6", label: "6 ft" },
 ];
 
+/* ---- what /api/inspect returns ---- */
+type Item<T> = { value: T } | { error: string };
+interface Spot {
+  zone: Item<{ code: string; subtype: string | null; inSfha: boolean } | null>;
+  elevation: Item<{ feet: number; metres: number; resolutionM: number | null; surveyYear: number | null }>;
+  canopy: Item<number | null>;
+  paving: Item<number | null>;
+}
+type SpotState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "failed"; reason: string }
+  | { status: "done"; spot: Spot };
+
+function SpotRow({ label, children, source }: { label: string; children: React.ReactNode; source: string }) {
+  return (
+    <div className="spot-row">
+      <dt>{label}</dt>
+      <dd>
+        <span className="spot-value">{children}</span>
+        <small>{source}</small>
+      </dd>
+    </div>
+  );
+}
+
+function missing(reason: string) {
+  return <span className="spot-missing">No answer. {reason}</span>;
+}
+
+function SpotPanel({ state, onCentre }: { state: SpotState; onCentre: () => void }) {
+  return (
+    <section className="spot-panel" aria-live="polite">
+      <div className="kicker">at this spot</div>
+      {state.status === "idle" && (
+        <p className="spot-hint">
+          <strong>Click anywhere on the map</strong> to read the flood zone, the ground&apos;s height, the tree
+          canopy and the paving at that spot.
+        </p>
+      )}
+      {state.status === "loading" && <p className="spot-hint">Asking FEMA, USGS and the land cover survey…</p>}
+      {state.status === "failed" && <p className="spot-hint">{state.reason}</p>}
+      {state.status === "done" && (
+        <dl className="spot-list">
+          <SpotRow label="FEMA flood zone" source="FEMA National Flood Hazard Layer">
+            {"error" in state.spot.zone ? (
+              missing(state.spot.zone.error)
+            ) : state.spot.zone.value === null ? (
+              "Not mapped"
+            ) : (
+              <>
+                Zone {state.spot.zone.value.code}
+                {state.spot.zone.value.inSfha
+                  ? " · Special Flood Hazard Area"
+                  : state.spot.zone.value.subtype
+                    ? ` · ${state.spot.zone.value.subtype.toLowerCase()}`
+                    : ""}
+              </>
+            )}
+          </SpotRow>
+          <SpotRow
+            label="Ground elevation"
+            source={
+              "error" in state.spot.elevation
+                ? "USGS 3D Elevation Program"
+                : `USGS 3D Elevation Program${state.spot.elevation.value.surveyYear ? `, surveyed ${state.spot.elevation.value.surveyYear}` : ""}`
+            }
+          >
+            {"error" in state.spot.elevation
+              ? missing(state.spot.elevation.error)
+              : `${state.spot.elevation.value.feet.toFixed(1)} ft (${state.spot.elevation.value.metres.toFixed(1)} m)`}
+          </SpotRow>
+          <SpotRow label="Tree canopy" source="National Land Cover Database 2021">
+            {"error" in state.spot.canopy
+              ? missing(state.spot.canopy.error)
+              : state.spot.canopy.value === null
+                ? "Not mapped here"
+                : `${state.spot.canopy.value}% of the land cover cell`}
+          </SpotRow>
+          <SpotRow label="Paving and buildings" source="National Land Cover Database 2021">
+            {"error" in state.spot.paving
+              ? missing(state.spot.paving.error)
+              : state.spot.paving.value === null
+                ? "Not mapped here"
+                : `${state.spot.paving.value}% of the land cover cell`}
+          </SpotRow>
+        </dl>
+      )}
+      <div className="spot-foot">
+        <button type="button" className="btn btn-sm" onClick={onCentre}>
+          Read the middle of this place
+        </button>
+        <small>Read from public sources as published. The spot you click is not stored.</small>
+      </div>
+    </section>
+  );
+}
+
 export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon; tracks: TrackLine[] }) {
   const boxRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MlMap | null>(null);
+  const pinRef = useRef<Marker | null>(null);
+  const askRef = useRef(0);
+  const centreRef = useRef<LatLon>(place);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [mine, setMine] = useState<PlacePoint | null>(null);
+  const [spot, setSpot] = useState<SpotState>({ status: "idle" });
 
   const [fema, setFema] = useState(true);
-  const [slr, setSlr] = useState<"off" | "slr1" | "slr3" | "slr6">("off");
+  const [slr, setSlr] = useState<Slr>("off");
   const [canopy, setCanopy] = useState(false);
   const [paving, setPaving] = useState(false);
   const [showTracks, setShowTracks] = useState(false);
+
+  /** Ask the server about one spot. Only the newest question's answer is shown. */
+  const inspect = useCallback(async (p: LatLon) => {
+    const asked = ++askRef.current;
+    setSpot({ status: "loading" });
+    try {
+      const res = await fetch("/api/inspect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(p),
+      });
+      const body = (await res.json()) as Spot & { error?: string };
+      if (asked !== askRef.current) return;
+      if (!res.ok) setSpot({ status: "failed", reason: body.error ?? "That spot could not be read. Try again." });
+      else setSpot({ status: "done", spot: body });
+    } catch {
+      if (asked === askRef.current) setSpot({ status: "failed", reason: "That spot could not be read. Check your connection." });
+    }
+  }, []);
 
   useEffect(() => {
     let dead = false;
@@ -154,6 +281,7 @@ export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon;
 
         const point = recallPoint(slug);
         const centre: LatLon = point ?? place;
+        centreRef.current = centre;
         setMine(point);
 
         map = new maplibre.Map({
@@ -165,10 +293,25 @@ export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon;
           maxZoom: 17,
           cooperativeGestures: true,
           attributionControl: { compact: true },
+          // Keeps the drawn map available to the browser's print and save.
+          canvasContextAttributes: { preserveDrawingBuffer: true },
         });
         mapRef.current = map;
         map.addControl(new maplibre.NavigationControl({ showCompass: false }), "top-right");
         map.addControl(new maplibre.ScaleControl({ unit: "imperial" }), "bottom-left");
+
+        const pinEl = document.createElement("div");
+        pinEl.className = "place-map-pin";
+        pinEl.setAttribute("aria-hidden", "true");
+        const pin = new maplibre.Marker({ element: pinEl });
+        pinRef.current = pin;
+
+        map.on("click", (e) => {
+          if (!map) return;
+          const p = { lat: e.lngLat.lat, lon: e.lngLat.lng };
+          pin.setLngLat([p.lon, p.lat]).addTo(map);
+          void inspect(p);
+        });
 
         map.on("load", () => {
           if (dead || !map) return;
@@ -206,7 +349,7 @@ export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon;
             type: "line",
             source: "tracks",
             layout: { visibility: "none", "line-join": "round", "line-cap": "round" },
-            paint: { "line-color": INK, "line-width": 1.4, "line-opacity": 0.75 },
+            paint: { "line-color": INK, "line-width": 1.2, "line-opacity": 0.55 },
           });
 
           map.addSource("ring", { type: "geojson", data: ring(centre, RING_METRES) });
@@ -243,6 +386,7 @@ export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon;
     return () => {
       dead = true;
       mapRef.current = null;
+      pinRef.current = null;
       map?.remove();
     };
     // The map is built once per place. Track data arrives with the page.
@@ -276,10 +420,17 @@ export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon;
     (map.getSource("ring") as GeoJSONSource | undefined)?.setData(ring(mine, RING_METRES));
   }, [ready, mine]);
 
+  const readCentre = useCallback(() => {
+    const c = centreRef.current;
+    const map = mapRef.current;
+    if (map && pinRef.current) pinRef.current.setLngLat([c.lon, c.lat]).addTo(map);
+    void inspect(c);
+  }, [inspect]);
+
   return (
     <div className="place-map-wrap">
       <div className="place-map-frame">
-        <div ref={boxRef} className="place-map" role="region" aria-label="Map of the neighbourhood with public map layers" />
+        <div ref={boxRef} className="place-map" role="region" aria-label="Map of the neighbourhood with public map layers. Click a spot to read what is on record there." />
         {failed && (
           <p className="place-map-failed">
             The map could not start in this browser. The records below do not depend on it.
@@ -287,71 +438,75 @@ export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon;
         )}
       </div>
 
-      <div className="place-layers">
-        <div className="kicker">public map layers</div>
-        <label className="place-layer">
-          <input type="checkbox" checked={fema} onChange={(e) => setFema(e.target.checked)} />
-          <span>
-            <strong>FEMA flood zones</strong>
-            <small>FEMA&apos;s flood map, in FEMA&apos;s own colours. Shown when zoomed in.</small>
-          </span>
-        </label>
-        <div className="place-layer">
-          <span>
-            <strong id="slr-label">Sea level rise</strong>
-            <small>Where NOAA maps the sea at the highest tides if it stood this much higher than today.</small>
-            <span className="place-seg" role="radiogroup" aria-labelledby="slr-label">
-              {SLR_OPTIONS.map((o) => (
-                <label key={o.value} data-on={slr === o.value ? "true" : undefined}>
-                  <input
-                    type="radio"
-                    name="slr"
-                    value={o.value}
-                    checked={slr === o.value}
-                    onChange={() => setSlr(o.value)}
-                  />
-                  {o.label}
-                </label>
-              ))}
-            </span>
-          </span>
-        </div>
-        <label className="place-layer">
-          <input type="checkbox" checked={showTracks} onChange={(e) => setShowTracks(e.target.checked)} />
-          <span>
-            <strong>Storm tracks</strong>
-            <small>
-              {tracks.length
-                ? "Paths of the tropical storms and hurricanes listed below. The map zooms out to show them."
-                : "NOAA's record has no tropical storm or hurricane track near this place."}
-            </small>
-          </span>
-        </label>
-        <label className="place-layer">
-          <input type="checkbox" checked={canopy} onChange={(e) => setCanopy(e.target.checked)} />
-          <span>
-            <strong>Tree canopy</strong>
-            <small>National land cover survey, 2021. Lower 48 states.</small>
-          </span>
-        </label>
-        <label className="place-layer">
-          <input type="checkbox" checked={paving} onChange={(e) => setPaving(e.target.checked)} />
-          <span>
-            <strong>Paving and buildings</strong>
-            <small>Share of ground that sheds water, national land cover survey, 2021. Lower 48 states.</small>
-          </span>
-        </label>
+      <aside className="place-side">
+        <SpotPanel state={spot} onCentre={readCentre} />
 
-        <p className="place-map-note">
-          The dashed ring is 500 m (about a third of a mile) out from the middle of this place.{" "}
-          {mine
-            ? `The dot marks ${mine.matched || "the address you searched"}. Only this browser tab can see it.`
-            : "It is centred on the block, not on a house."}
-        </p>
-        <p className="place-map-note">
-          Every layer is a public map as its publisher draws it. None of it is SPARC Labs model output.
-        </p>
-      </div>
+        <section className="place-layers">
+          <div className="kicker">public map layers</div>
+          <label className="place-layer">
+            <input type="checkbox" checked={fema} onChange={(e) => setFema(e.target.checked)} />
+            <span>
+              <strong>FEMA flood zones</strong>
+              <small>FEMA&apos;s flood map, in FEMA&apos;s own colours and labels. Shown when zoomed in.</small>
+            </span>
+          </label>
+          <div className="place-layer">
+            <span>
+              <strong id="slr-label">Sea level rise</strong>
+              <small>Where NOAA maps the sea at the highest tides if it stood this much higher than today.</small>
+              <span className="place-seg" role="radiogroup" aria-labelledby="slr-label">
+                {SLR_OPTIONS.map((o) => (
+                  <label key={o.value} data-on={slr === o.value ? "true" : undefined}>
+                    <input
+                      type="radio"
+                      name="slr"
+                      value={o.value}
+                      checked={slr === o.value}
+                      onChange={() => setSlr(o.value)}
+                    />
+                    {o.label}
+                  </label>
+                ))}
+              </span>
+            </span>
+          </div>
+          <label className="place-layer">
+            <input type="checkbox" checked={showTracks} onChange={(e) => setShowTracks(e.target.checked)} />
+            <span>
+              <strong>Storm tracks</strong>
+              <small>
+                {tracks.length
+                  ? "Paths of the tropical storms and hurricanes listed below. The map zooms out to show them."
+                  : "NOAA's record has no tropical storm or hurricane track near this place."}
+              </small>
+            </span>
+          </label>
+          <label className="place-layer">
+            <input type="checkbox" checked={canopy} onChange={(e) => setCanopy(e.target.checked)} />
+            <span>
+              <strong>Tree canopy</strong>
+              <small>National land cover survey, 2021. Lower 48 states.</small>
+            </span>
+          </label>
+          <label className="place-layer">
+            <input type="checkbox" checked={paving} onChange={(e) => setPaving(e.target.checked)} />
+            <span>
+              <strong>Paving and buildings</strong>
+              <small>Share of ground that sheds water, national land cover survey, 2021. Lower 48 states.</small>
+            </span>
+          </label>
+
+          <p className="place-map-note">
+            The dashed ring is 500 m (about a third of a mile) out from the middle of this place.{" "}
+            {mine
+              ? `The dot marks ${mine.matched || "the address you searched"}. Only this browser tab can see it.`
+              : "It is centred on the block, not on a house."}
+          </p>
+          <p className="place-map-note">
+            Every layer is a public map as its publisher draws it. None of it is SPARC Labs model output.
+          </p>
+        </section>
+      </aside>
     </div>
   );
 }

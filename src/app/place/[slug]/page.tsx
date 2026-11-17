@@ -3,14 +3,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { Kicker } from "@/components/marketing/page-shell";
+import { PlaceActions } from "@/components/place/PlaceActions";
 import { PlaceMap, type TrackLine } from "@/components/place/PlaceMap";
-import { LockedShelf, MissingCard, RecordCard, ShelfHead } from "@/components/place/cards";
-import { areasAt } from "@/lib/place/census";
+import { LockedShelf, MissingCard, RatingBar, RecordCard, ShelfHead } from "@/components/place/cards";
+import { GlanceRow } from "@/components/place/glance";
+import { Questions } from "@/components/place/questions";
 import { KM_PER_MILE, parsePlaceSlug } from "@/lib/place/coords";
-import { floodZonesAt } from "@/lib/place/fema";
-import { stormsNear, type NearbyStorm } from "@/lib/place/hurricanes";
+import type { NearbyStorm } from "@/lib/place/hurricanes";
 import type { Lookup } from "@/lib/place/lookup";
-import { claimsInTract, declarationsInCounty, type CountyDeclarations, type TractClaims } from "@/lib/place/openfema";
+import type { TractRisk } from "@/lib/place/nri";
+import type { CountyDeclarations, TractClaims } from "@/lib/place/openfema";
+import { loadPlace } from "@/lib/place/summary";
 
 // A place page: everything on the public record about the neighbourhood
 // around a block, and the layout of what paying would add.
@@ -28,6 +31,7 @@ type Props = { params: Promise<{ slug: string }> };
 const FEMA_SOURCE = "FEMA, National Flood Hazard Layer";
 const CLAIMS_SOURCE = "FEMA, National Flood Insurance Program claims (OpenFEMA)";
 const DECLARATIONS_SOURCE = "FEMA, Disaster Declarations Summaries (OpenFEMA)";
+const RISK_SOURCE = "FEMA, National Risk Index";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -137,24 +141,55 @@ function DeclarationsCard({ res, countyName }: { res: Lookup<CountyDeclarations>
   );
 }
 
+function RiskCard({ res, tractName }: { res: Lookup<TractRisk>; tractName: string }) {
+  if (!res.ok) return <MissingCard hazard="storm" about="FEMA's rating of every hazard" reason={res.reason} source={RISK_SOURCE} />;
+  const r = res.data;
+  const rated = r.hazards.filter((h) => h.rank > 0);
+  const unrated = r.hazards.filter((h) => h.rank === 0);
+  return (
+    <RecordCard
+      hazard="storm"
+      about="FEMA's rating of every hazard"
+      figure={r.overall.rating}
+      figureNote={`all hazards together, for ${tractName}`}
+      source={RISK_SOURCE}
+      asOf={r.version ? `version ${r.version}` : undefined}
+    >
+      <p>
+        FEMA rates each census tract in the country for eighteen natural hazards, from very low to very
+        high. For this tract:
+      </p>
+      <ul className="rating-list">
+        {rated.map((h) => (
+          <li key={h.hazard}>
+            <span>{h.hazard}</span>
+            <RatingBar rank={h.rank} />
+            <strong>{h.rating}</strong>
+          </li>
+        ))}
+      </ul>
+      {unrated.length > 0 && (
+        <p className="record-aside">
+          No rating from FEMA here for: {unrated.map((h) => h.hazard.toLowerCase()).join(", ")}.
+        </p>
+      )}
+      <p className="record-aside">
+        This is FEMA&apos;s rating of the census tract as a community, set against every other tract. It is not
+        a rating of a house, and two homes in one tract get the same rating.
+      </p>
+    </RecordCard>
+  );
+}
+
 export default async function PlacePage({ params }: Props) {
   const { slug: rawSlug } = await params;
   const place = parsePlaceSlug(rawSlug);
   if (!place) notFound();
   const slug = decodeURIComponent(rawSlug);
 
-  const areas = await areasAt(place);
-  const noArea = { ok: false as const, reason: areas.ok ? "" : areas.reason };
-  const [zones, claims, declarations] = await Promise.all([
-    floodZonesAt(place),
-    areas.ok ? claimsInTract(areas.data.tractGeoid) : noArea,
-    areas.ok ? declarationsInCounty(areas.data.stateFips, areas.data.countyFips) : noArea,
-  ]);
-  const storms = stormsNear(place);
-
-  const where = areas.ok
-    ? `${areas.data.localName ?? areas.data.countyName}, ${areas.data.stateAbbr}`
-    : "the United States";
+  const record = await loadPlace(place);
+  const { areas, zones, claims, declarations, risk, storms, glance } = record;
+  const where = glance.where;
   const tractName = areas.ok ? areas.data.tractName : "this census tract";
   const countyName = areas.ok ? areas.data.countyName : "this county";
 
@@ -180,18 +215,23 @@ export default async function PlacePage({ params }: Props) {
             What public registers hold about flood, storms, sea level and land cover around this place. The
             page shows the neighbourhood, not a house, and its address carries the block only.
           </p>
+          <PlaceActions slug={slug} glance={glance} />
+          <GlanceRow glance={glance} linked />
           <div className="place-jump">
-            <a className="btn btn-sm" href="#flood">Flood</a>
-            <a className="btn btn-sm" href="#heat">Heat</a>
-            <a className="btn btn-sm" href="#coming">Ground and wind</a>
-            <a className="btn btn-sm" href="#sources">Sources</a>
-            <Link className="btn btn-sm btn-ghost" href="/">Look up another address</Link>
+            <span className="kicker">on this page</span>
+            <a href="#map">Map</a>
+            <a href="#flood">Flood and storms</a>
+            <a href="#heat">Heat</a>
+            <a href="#hazards">Every hazard</a>
+            <a href="#questions">Questions to take with you</a>
+            <a href="#sources">Sources</a>
+            <Link href="/">Look up another address</Link>
           </div>
         </div>
       </section>
 
-      <section className="compact">
-        <div className="wrap">
+      <section id="map" className="place-map-section">
+        <div className="wrap-wide">
           <PlaceMap slug={slug} place={place} tracks={tracks} />
         </div>
       </section>
@@ -364,6 +404,32 @@ export default async function PlacePage({ params }: Props) {
         </div>
       </section>
 
+      <section id="hazards" className="hazard-row">
+        <div className="wrap">
+          <Kicker>every hazard</Kicker>
+          <h2>What else FEMA rates here</h2>
+          <p className="lead">Wildfire, earthquake, tornado, heat wave and the rest, as FEMA rates them for the area.</p>
+          <div className="shelf">
+            <ShelfHead name="On record" state="free" />
+            <div className="shelf-cards shelf-cards-one">
+              <RiskCard res={risk} tractName={tractName} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="questions" className="hazard-row">
+        <div className="wrap">
+          <Kicker>what to do with this</Kicker>
+          <h2>Questions to take with you</h2>
+          <p className="lead">
+            Chosen from what the record shows for this place. They are questions for people who can answer
+            them, not advice.
+          </p>
+          <Questions record={record} />
+        </div>
+      </section>
+
       <section id="coming" className="hazard-row">
         <div className="wrap">
           <Kicker>coming</Kicker>
@@ -429,6 +495,16 @@ export default async function PlacePage({ params }: Props) {
                   <td>Within {storms.radiusKm} km of the place</td>
                 </tr>
                 <tr>
+                  <td>Hazard ratings</td>
+                  <td>FEMA, National Risk Index</td>
+                  <td>The census tract ({tractName})</td>
+                </tr>
+                <tr>
+                  <td>A spot you click</td>
+                  <td>FEMA flood map; USGS 3D Elevation Program; National Land Cover Database 2021</td>
+                  <td>That spot, and the land cover cell it falls in</td>
+                </tr>
+                <tr>
                   <td>Sea level rise</td>
                   <td>NOAA Office for Coastal Management</td>
                   <td>Map layer</td>
@@ -449,7 +525,8 @@ export default async function PlacePage({ params }: Props) {
           <p className="record-aside" style={{ marginTop: 16, maxWidth: 820 }}>
             Your address: if you searched for one, it was sent to the Census Bureau&apos;s geocoder to find this
             block and was not stored. The link to this page holds the block, so sharing it does not share a
-            house. Map tiles load in your browser straight from the agencies above.
+            house. Map tiles load in your browser straight from the agencies above. A spot you click is sent
+            to those agencies to be read and is not stored. Saved places and notes stay in your browser.
           </p>
         </div>
       </section>

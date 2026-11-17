@@ -29,7 +29,7 @@ const SHELVES: { name: string; state: string; body: string }[] = [
   {
     name: "On record",
     state: "Free · no account",
-    body: "What public agencies already hold about the place: FEMA flood zones, flood insurance claims nearby, federal disaster declarations, past hurricane tracks, sea level rise, tree canopy and paving.",
+    body: "What public agencies already hold about the place: FEMA flood zones, flood insurance claims nearby, disaster declarations, past hurricane tracks, sea level rise, FEMA's rating of eighteen hazards, tree canopy and paving. Click anywhere on the map to read a spot.",
   },
   {
     name: "Modelled",
@@ -46,7 +46,7 @@ const SHELVES: { name: string; state: string; body: string }[] = [
 const HAZARDS: { name: string; record: string; model: string; whatIf: string; live: boolean }[] = [
   {
     name: "Flood",
-    record: "FEMA flood zones, insurance claims, disaster declarations, hurricane tracks, sea level rise",
+    record: "FEMA flood zones, insurance claims, disaster declarations, hurricane tracks, sea level rise, ground elevation",
     model: "Storm water through the neighbourhood: preset storms, your own storm, live radar",
     whatIf: "Rain garden, French drain, paving removed, rain barrels",
     live: true,
@@ -56,6 +56,13 @@ const HAZARDS: { name: string; record: string; model: string; whatIf: string; li
     record: "Tree canopy and paving",
     model: "Surface temperature, street air temperature, outdoor comfort in sun and shade",
     whatIf: "Trees, paving removed, cool roofs, cool pavement",
+    live: true,
+  },
+  {
+    name: "Everything else",
+    record: "FEMA's rating of eighteen hazards for the area: wildfire, earthquake, tornado and the rest",
+    model: "Not planned",
+    whatIf: "Not planned",
     live: true,
   },
   {
@@ -74,9 +81,24 @@ const HAZARDS: { name: string; record: string; model: string; whatIf: string; li
   },
 ];
 
+const KEEP: { title: string; body: string }[] = [
+  {
+    title: "Questions to take with you",
+    body: "Each place page ends with a list for the seller, the inspector and the insurer, chosen from what the record shows there. Print it and bring it to the viewing.",
+  },
+  {
+    title: "Save a place, with your note",
+    body: "A saved place keeps your note and a snapshot of what the record said that day. It stays in your browser: no account, and nothing is sent to us.",
+  },
+  {
+    title: "Compare the homes you are weighing up",
+    body: "Put up to four places side by side, record by record, with each row saying whether it describes the block, the census tract or the county.",
+  },
+];
+
 const STEPS = [
   { no: "01", title: "Find a place", body: "Type any US address. The site finds the block and drops the address." },
-  { no: "02", title: "Read the record", body: "A map of the neighbourhood with public layers, and a card for each record with its source and date." },
+  { no: "02", title: "Read the record", body: "A large map of the neighbourhood with public layers, a card for each record with its source and date, and a click anywhere to read that spot." },
   { no: "03", title: "Run the models", body: "Paid, and not on sale yet. Flood and heat for the neighbourhood, with the property in the middle." },
   { no: "04", title: "Try a project, or take the report", body: "Test what you could do about it, or take a report for one property and be done." },
 ];
@@ -145,6 +167,21 @@ export default function HomePage() {
               ))}
             </tbody>
           </table>
+        </div>
+      </Section>
+
+      <Section
+        kicker="keep hold of it"
+        title="Buying a home is a lot to carry. Put some of it down here."
+        action={<Link href="/places" className="btn">Your places <span className="arrow">→</span></Link>}
+      >
+        <div className="grid-3" style={{ gap: 18 }}>
+          {KEEP.map((k) => (
+            <div key={k.title} className="card" style={{ padding: 24 }}>
+              <h3 style={{ margin: "0 0 10px" }}>{k.title}</h3>
+              <p style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.6, margin: 0 }}>{k.body}</p>
+            </div>
+          ))}
         </div>
       </Section>
 

@@ -149,6 +149,22 @@ export function LockedShelf({ kind, cta = true }: { kind: ShelfKind; cta?: boole
   );
 }
 
+/**
+ * FEMA's five-step rating as a row of five squares. Length carries the rank
+ * and the rating word sits beside it, so nothing depends on colour. A hazard
+ * FEMA does not rate shows the word alone.
+ */
+export function RatingBar({ rank }: { rank: number }) {
+  if (rank < 1) return <span className="rating-bar rating-bar-none" aria-hidden />;
+  return (
+    <span className="rating-bar" aria-hidden>
+      {[1, 2, 3, 4, 5].map((i) => (
+        <span key={i} data-on={i <= rank ? "true" : undefined} />
+      ))}
+    </span>
+  );
+}
+
 export function ShelfHead({ name, state }: { name: string; state: "free" | "paid" | "coming" }) {
   const words = { free: "Free", paid: "Paid · not on sale yet", coming: "Coming" }[state];
   return (

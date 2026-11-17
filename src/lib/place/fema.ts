@@ -126,3 +126,26 @@ export async function floodZonesAt(place: LatLon): Promise<Lookup<FloodZones>> {
 
   return { ok: true, data: { zones, panelDate } };
 }
+
+/** The zone at one exact spot, for a point a visitor clicked on the map.
+ *  null when FEMA's digital map has no zone there. */
+export async function floodZoneAtPoint(p: LatLon): Promise<Lookup<FloodZone | null>> {
+  const q = new URLSearchParams({
+    geometry: `${p.lon},${p.lat}`,
+    geometryType: "esriGeometryPoint",
+    inSR: "4326",
+    spatialRel: "esriSpatialRelIntersects",
+    outFields: "FLD_ZONE,ZONE_SUBTY,SFHA_TF",
+    returnGeometry: "false",
+    f: "json",
+  });
+  const res = await askJson<ArcFeatures<ZoneRow>>(`${NFHL}/28/query?${q.toString()}`, WHO, {
+    revalidate: DAY_SECONDS,
+    retries: 2,
+  });
+  if (!res.ok) return res;
+  const a = res.data.features?.[0]?.attributes;
+  if (!a?.FLD_ZONE) return { ok: true, data: null };
+  const subtype = a.ZONE_SUBTY && a.ZONE_SUBTY.trim() ? sentenceCase(a.ZONE_SUBTY.trim()) : null;
+  return { ok: true, data: { code: a.FLD_ZONE, subtype, inSfha: a.SFHA_TF === "T" } };
+}

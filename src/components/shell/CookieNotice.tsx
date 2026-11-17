@@ -36,6 +36,7 @@ export function CookieNotice() {
     <div
       role="region"
       aria-label="Cookie notice"
+      data-print="hide"
       style={{
         position: "fixed",
         left: 16,

@@ -10,6 +10,7 @@ it. Where there is no gate yet, the page says so.
 | | |
 |---|---|
 | [`site-redesign-brief.md`](site-redesign-brief.md) | The site's direction from 17 November 2026: public records free for any US address, flood and heat models paid. What is built, what is not, and whose decision each point was. |
+| [`roadmap.md`](roadmap.md) | Everything a one-stop shop for buying and owning a home would need, by what it does for the visitor, with what is built, what is next and what waits on Kyle or the engines. |
 | [`placeholder-register.md`](placeholder-register.md) | A placeholder panel shows layout. It never shows digits. The register, the acceptance test, and the two CI gates. |
 | [`color-roles.md`](color-roles.md) | Three token layers, the decorative-vs-structural rule split, the AA failures and what each fix was worth. |
 | [`data-ramps.md`](data-ramps.md) | Why the brand ramp cannot encode severity, the two data ramps, and the greyscale legend test specified for Gate. |

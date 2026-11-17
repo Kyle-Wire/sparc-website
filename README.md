@@ -18,6 +18,13 @@ auth and Lemon Squeezy billing below are from the earlier site and unchanged.
 - `/place/<lat>,<lon>` asks the public registers about that block from the
   server ([`src/lib/place/`](src/lib/place)) and draws a map of public layers
   ([`src/components/place/PlaceMap.tsx`](src/components/place/PlaceMap.tsx)).
+- A click on the map goes to `POST /api/inspect`, which reads the flood zone,
+  ground elevation, tree canopy and paving at that spot. Nothing is stored.
+- `/places` lists saved and recently viewed places and `/compare?p=…&p=…`
+  sets up to four side by side. Saved places live in the visitor's browser
+  ([`saved-places.ts`](src/components/place/saved-places.ts)); there is no
+  account behind them yet.
+- What comes next, and why: [`docs/design/roadmap.md`](docs/design/roadmap.md).
 - Storm tracks come from a committed file built from NOAA's HURDAT2:
   `npm run data:hurricanes` rebuilds `src/data/hurricane-tracks.json` and its manifest.
 - The map library's worker is copied into `public/vendor/` before every `dev`

@@ -6,10 +6,11 @@ import { COMPANY, TAGLINE_LONG, COPYRIGHT_YEAR, OFFICE_CITY, OFFICE_STATE } from
 import { NavUserStatus } from "./NavUserStatus";
 import { MobileNav } from "./MobileNav";
 
-export type NavKey = "home" | "models" | "pricing" | "about" | "contact" | "account";
+export type NavKey = "home" | "places" | "models" | "pricing" | "about" | "contact" | "account";
 
 const NAV_LINKS: { href: Route; label: string; key: NavKey }[] = [
   { href: "/", label: "Look up a place", key: "home" },
+  { href: "/places", label: "Your places", key: "places" },
   { href: "/models", label: "The models", key: "models" },
   { href: "/pricing", label: "Pricing", key: "pricing" },
   { href: "/about", label: "About", key: "about" },
@@ -77,6 +78,7 @@ export function Footer() {
           <div>
             <h6>The site</h6>
             <Link href="/">Look up a place</Link>
+            <Link href="/places">Your places</Link>
             <Link href="/models">The models</Link>
             <Link href="/pricing">Pricing</Link>
           </div>

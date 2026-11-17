@@ -442,6 +442,48 @@ a.glance-item:hover { background: var(--paper); }
 .spot-foot { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); display: grid; gap: 8px; }
 .spot-foot .btn { justify-self: start; }
 
+/* While a place page asks its sources. The dots blink because requests to the
+   listed agencies are in flight for as long as this screen is shown; it is
+   replaced by the page the moment they answer. Not to be reused for anything
+   that is not actually waiting on something (see the note on .live-dot above). */
+.place-loading { list-style: none; margin: 24px 0 40px; padding: 0; max-width: 620px; border-top: 1px solid var(--line); }
+.place-loading li { padding: 12px 0 12px 22px; border-bottom: 1px solid var(--line); font-size: 14px; color: var(--ink-2); position: relative; }
+.place-loading li::before { content: ""; position: absolute; left: 2px; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; background: var(--rule); animation: blink 1.2s steps(2, start) infinite; }
+@media (prefers-reduced-motion: reduce) { .place-loading li::before { animation: none; } }
+
+/* A card's label row, with its link to the glossary. */
+.record-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.record-term { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* The block beside the area around it. Length carries the value; the block's
+   bar is ink and the area's is the structural grey, and both are labelled. */
+.share-bars { display: grid; gap: 8px; margin: 4px 0 10px; }
+.share-bar { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.4fr) 44px; gap: 10px; align-items: center; font-size: var(--fs-body); color: var(--ink-2); }
+.share-bar strong { font-family: var(--font-mono); font-size: 14px; color: var(--ink); text-align: right; }
+.share-track { display: block; height: 12px; background: var(--paper-2); border: 1px solid var(--line); border-radius: 2px; overflow: hidden; }
+.share-track > span { display: block; height: 100%; background: var(--rule); }
+.share-track > span[data-self="true"] { background: var(--ink); }
+
+/* Where the block's ground sits between the area's lowest and highest. */
+.height-band { margin: 6px 0 10px; }
+.height-track { position: relative; height: 12px; margin: 10px 8px 6px; background: var(--paper-2); border: 1px solid var(--line); border-radius: 2px; }
+.height-mark { position: absolute; top: 50%; width: 14px; height: 14px; border-radius: 50%; transform: translate(-50%, -50%); }
+.height-mark-block { background: var(--ink); border: 2px solid var(--bg-elevated); box-shadow: 0 0 0 1px var(--ink); }
+.height-mark-around { background: var(--bg-elevated); border: 2px solid var(--rule); }
+.height-ends { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--muted); }
+.height-key { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; font-size: 12px; color: var(--ink-2); }
+.height-key span { display: inline-flex; align-items: center; gap: 6px; }
+.height-key i.height-mark { position: static; transform: none; display: inline-block; width: 11px; height: 11px; }
+
+/* The glossary. */
+.glossary { display: grid; gap: 0; max-width: 860px; }
+.glossary-entry { padding: 22px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 90px; }
+.glossary-entry h3 { margin: 0 0 8px; }
+.glossary-entry p { font-size: 15px; line-height: 1.65; color: var(--ink-2); margin: 0 0 8px; max-width: 760px; }
+.glossary-entry .glossary-source { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+.glossary-entry:target { background: var(--bg-elevated); margin: 0 -16px; padding: 22px 16px; border-radius: 8px; border: 1px solid var(--rule); }
+.glossary-index { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: var(--fs-body); margin-bottom: 8px; }
+
 /* FEMA's five-step ratings. */
 .record-body ul.rating-list { list-style: none; margin: 8px 0 10px; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 32px; }
 .rating-list li { display: grid; grid-template-columns: minmax(110px, 1fr) auto minmax(0, 150px); gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px dotted var(--line); margin: 0; }

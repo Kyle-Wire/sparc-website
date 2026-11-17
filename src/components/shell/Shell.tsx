@@ -79,6 +79,7 @@ export function Footer() {
             <h6>The site</h6>
             <Link href="/">Look up a place</Link>
             <Link href="/places">Your places</Link>
+            <Link href="/glossary">Plain glossary</Link>
             <Link href="/models">The models</Link>
             <Link href="/pricing">Pricing</Link>
           </div>

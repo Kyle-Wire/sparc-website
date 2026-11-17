@@ -57,6 +57,20 @@ export function questionsFor(r: PlaceRecord): Group[] {
     });
   }
 
+  if (r.ground.ok && r.ground.data.lowerSharePct < 35) {
+    inspector.push({
+      ask: "In a heavy storm, where does water from the street and from the neighbouring lots end up? Does any of it run toward this house?",
+      because: `About ${100 - Math.round(r.ground.data.lowerSharePct)}% of the square kilometre around this block lies higher than the block.`,
+    });
+  }
+
+  if (r.cover.ok && r.cover.data.canopy.block < 10 && r.cover.data.paving.block > 60) {
+    inspector.push({
+      ask: "How hot do the upstairs rooms get on a summer afternoon, and is there shade on the south and west sides?",
+      because: `The land cover survey puts tree canopy at ${Math.round(r.cover.data.canopy.block)}% and paving and buildings at ${Math.round(r.cover.data.paving.block)}% of the block.`,
+    });
+  }
+
   if (r.storms.hurricanesNearby > 0) {
     inspector.push({
       ask: "How old is the roof, and has the house had wind or storm damage? Are there shutters or impact-rated windows?",

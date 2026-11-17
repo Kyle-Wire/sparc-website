@@ -123,9 +123,17 @@ Added in the second pass, after Kyle asked for a bigger map, a click to read any
 - **Your places:** save a place with a note and a snapshot of that day's record; a recently viewed list; compare up to four places. All of it lives in the visitor's browser. No account, nothing sent to the server (agent's call: it works today and needs no database change; an account that carries it across devices comes next).
 - **Copy link, and print or save as PDF.**
 
+Added in the third pass ("finish the free tier"):
+
+- **Tree canopy and paving as numbers:** the block against the square kilometre around it, with a bar for each.
+- **Ground height:** how much higher or lower the block's typical ground is than the area's, and how much of the area lies lower.
+- **A plain glossary** at `/glossary`: every term a place page uses, written from the publisher's own definition, linked and dated. Each card links to its entry.
+- **A loading screen** that appears at once and names who is being asked. A first visit to a place takes a few seconds.
+- The comparison and the questions list use the new numbers.
+
 Not built yet, in rough order:
 
-1. Tree canopy and paving as numbers (block against neighbourhood), not only as map layers and single spots.
+1. Our own copy of the slower sources, so a page does not depend on six public services answering live (see [`roadmap.md`](roadmap.md)).
 2. Saved places carried by an account, across devices.
 3. The place panel from section 5.
 4. A sample report that can be shown publicly. The proof-of-concept report names its block and stays private.
@@ -158,6 +166,8 @@ Each was opened and queried on 17 November 2026 before being used.
 | Sea level rise | NOAA Office for Coastal Management | `coast.noaa.gov/arcgis/rest/services/dc_slr` |
 | Hazard ratings for the tract | FEMA, National Risk Index (version December 2025) | `services.arcgis.com/XG15cJAlne2vxtgt/.../National_Risk_Index_Census_Tracts/FeatureServer/0` |
 | Ground elevation at a clicked spot | USGS 3D Elevation Program | `epqs.nationalmap.gov/v1/json` |
+| Ground height of the block and the area | USGS 3D Elevation Program | `elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer` |
+| Tree canopy and paving of the block and the area | National Land Cover Database 2021 | `www.mrlc.gov/geoserver/mrlc_download/wcs` |
 | Tree canopy and paving | USGS and partners, NLCD 2021 | `www.mrlc.gov/geoserver/mrlc_display/wms` |
 | Base map | USGS, The National Map | `basemap.nationalmap.gov` |
 

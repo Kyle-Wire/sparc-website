@@ -5,7 +5,7 @@ import { Nav, Footer } from "@/components/shell/Shell";
 import { Kicker } from "@/components/marketing/page-shell";
 import { PlaceActions } from "@/components/place/PlaceActions";
 import { PlaceMap, type TrackLine } from "@/components/place/PlaceMap";
-import { LockedShelf, MissingCard, RatingBar, RecordCard, ShelfHead } from "@/components/place/cards";
+import { HeightBand, LockedShelf, MissingCard, RatingBar, RecordCard, ShareBars, ShelfHead } from "@/components/place/cards";
 import { GlanceRow } from "@/components/place/glance";
 import { Questions } from "@/components/place/questions";
 import { KM_PER_MILE, parsePlaceSlug } from "@/lib/place/coords";
@@ -14,6 +14,7 @@ import type { Lookup } from "@/lib/place/lookup";
 import type { TractRisk } from "@/lib/place/nri";
 import type { CountyDeclarations, TractClaims } from "@/lib/place/openfema";
 import { loadPlace } from "@/lib/place/summary";
+import type { Ground, LandCover } from "@/lib/place/surroundings";
 
 // A place page: everything on the public record about the neighbourhood
 // around a block, and the layout of what paying would add.
@@ -32,6 +33,8 @@ const FEMA_SOURCE = "FEMA, National Flood Hazard Layer";
 const CLAIMS_SOURCE = "FEMA, National Flood Insurance Program claims (OpenFEMA)";
 const DECLARATIONS_SOURCE = "FEMA, Disaster Declarations Summaries (OpenFEMA)";
 const RISK_SOURCE = "FEMA, National Risk Index";
+const COVER_SOURCE = "National Land Cover Database 2021, USGS and partners (MRLC)";
+const GROUND_SOURCE = "USGS, 3D Elevation Program";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -79,7 +82,7 @@ function ClaimsCard({ res, tractName }: { res: Lookup<TractClaims>; tractName: s
   );
   if (c.total === 0) {
     return (
-      <RecordCard hazard="flood" about="Flood insurance claims nearby" figure="0" figureNote={`claims on record in ${tractName}`} source={CLAIMS_SOURCE}>
+      <RecordCard hazard="flood" about="Flood insurance claims nearby" term="flood-insurance-claim" figure="0" figureNote={`claims on record in ${tractName}`} source={CLAIMS_SOURCE}>
         <p>No flood insurance claim is on record in the census tract around this place.</p>
         {caveat}
       </RecordCard>
@@ -90,6 +93,7 @@ function ClaimsCard({ res, tractName }: { res: Lookup<TractClaims>; tractName: s
     <RecordCard
       hazard="flood"
       about="Flood insurance claims nearby"
+      term="flood-insurance-claim"
       figure={`${c.atLeast ? "over " : ""}${c.total.toLocaleString("en-US")}`}
       figureNote={`${c.total === 1 ? "claim" : "claims"} on record in ${tractName}`}
       source={CLAIMS_SOURCE}
@@ -115,6 +119,7 @@ function DeclarationsCard({ res, countyName }: { res: Lookup<CountyDeclarations>
     <RecordCard
       hazard="storm"
       about="Federal disaster declarations"
+      term="disaster-declaration"
       figure={d.total.toLocaleString("en-US")}
       figureNote={`for ${countyName}${d.firstYear ? ` since ${d.firstYear}` : ""}`}
       source={DECLARATIONS_SOURCE}
@@ -141,6 +146,77 @@ function DeclarationsCard({ res, countyName }: { res: Lookup<CountyDeclarations>
   );
 }
 
+function GroundCard({ res }: { res: Lookup<Ground> }) {
+  if (!res.ok) return <MissingCard hazard="flood" about="Ground height" reason={res.reason} source={GROUND_SOURCE} />;
+  const g = res.data;
+  const diff = g.blockFt - g.neighbourhoodFt;
+  const size = Math.abs(diff);
+  const level = size < 1;
+  const lower = Math.round(g.lowerSharePct);
+  return (
+    <RecordCard
+      hazard="flood"
+      about="Ground height"
+      figure={level ? "Level" : `${size.toFixed(size < 10 ? 1 : 0)} ft ${diff > 0 ? "higher" : "lower"}`}
+      figureNote={level ? "with the typical ground around it" : "than the typical ground around it"}
+      source={GROUND_SOURCE}
+      term="ground-height"
+    >
+      <p>
+        The block&apos;s ground is typically {Math.round(g.blockFt)} ft; across the square kilometre around it the
+        typical figure is {Math.round(g.neighbourhoodFt)} ft. About {lower}% of that area lies lower than the
+        block and about {100 - lower}% lies higher.
+      </p>
+      <HeightBand low={g.lowFt} high={g.highFt} around={g.neighbourhoodFt} block={g.blockFt} />
+      <p className="record-aside">
+        Height alone does not say where water goes; that takes a model of the streets. Open water in the
+        area is counted at its surface. Click the map to read the height of any one spot.
+      </p>
+    </RecordCard>
+  );
+}
+
+function CoverCards({ res }: { res: Lookup<LandCover> }) {
+  if (!res.ok) {
+    return <MissingCard hazard="heat" about="Tree canopy and paving" reason={res.reason} source={COVER_SOURCE} />;
+  }
+  const { canopy, paving } = res.data;
+  const aside = (
+    <p className="record-aside">
+      An average of the survey&apos;s cells over the block and over the square kilometre around it. Open water
+      counts as neither trees nor paving. The map layer above shows the pattern.
+    </p>
+  );
+  return (
+    <>
+      <RecordCard
+        hazard="heat"
+        about="Tree canopy"
+        figure={`${Math.round(canopy.block)}%`}
+        figureNote="of the block is under tree canopy"
+        source={COVER_SOURCE}
+        asOf="2021"
+        term="tree-canopy"
+      >
+        <ShareBars block={canopy.block} around={canopy.neighbourhood} />
+        {aside}
+      </RecordCard>
+      <RecordCard
+        hazard="heat"
+        about="Paving and buildings"
+        figure={`${Math.round(paving.block)}%`}
+        figureNote="of the block is paved or built on"
+        source={COVER_SOURCE}
+        asOf="2021"
+        term="paving"
+      >
+        <ShareBars block={paving.block} around={paving.neighbourhood} />
+        {aside}
+      </RecordCard>
+    </>
+  );
+}
+
 function RiskCard({ res, tractName }: { res: Lookup<TractRisk>; tractName: string }) {
   if (!res.ok) return <MissingCard hazard="storm" about="FEMA's rating of every hazard" reason={res.reason} source={RISK_SOURCE} />;
   const r = res.data;
@@ -150,6 +226,7 @@ function RiskCard({ res, tractName }: { res: Lookup<TractRisk>; tractName: strin
     <RecordCard
       hazard="storm"
       about="FEMA's rating of every hazard"
+      term="risk-index"
       figure={r.overall.rating}
       figureNote={`all hazards together, for ${tractName}`}
       source={RISK_SOURCE}
@@ -188,7 +265,7 @@ export default async function PlacePage({ params }: Props) {
   const slug = decodeURIComponent(rawSlug);
 
   const record = await loadPlace(place);
-  const { areas, zones, claims, declarations, risk, storms, glance } = record;
+  const { areas, zones, claims, declarations, risk, cover, ground, storms, glance } = record;
   const where = glance.where;
   const tractName = areas.ok ? areas.data.tractName : "this census tract";
   const countyName = areas.ok ? areas.data.countyName : "this county";
@@ -225,6 +302,7 @@ export default async function PlacePage({ params }: Props) {
             <a href="#hazards">Every hazard</a>
             <a href="#questions">Questions to take with you</a>
             <a href="#sources">Sources</a>
+            <Link href="/glossary">What the words mean</Link>
             <Link href="/">Look up another address</Link>
           </div>
         </div>
@@ -257,6 +335,7 @@ export default async function PlacePage({ params }: Props) {
                   <RecordCard
                     hazard="flood"
                     about="FEMA flood zone"
+                    term="flood-zone"
                     figure={`Zone ${zones.data.zones[0].code}`}
                     figureNote={
                       zones.data.zones.length > 1
@@ -304,12 +383,14 @@ export default async function PlacePage({ params }: Props) {
                 <MissingCard hazard="flood" about="FEMA flood zone" reason={zones.reason} source={FEMA_SOURCE} />
               )}
 
+              <GroundCard res={ground} />
               <ClaimsCard res={claims} tractName={tractName} />
               <DeclarationsCard res={declarations} countyName={countyName} />
 
               <RecordCard
                 hazard="storm"
                 about="Tropical storms and hurricanes"
+                term="storm-track"
                 figure={storms.total.toLocaleString("en-US")}
                 figureNote={`tracked within ${storms.radiusKm} km (${miles(storms.radiusKm)} miles)`}
                 source="NOAA National Hurricane Center, HURDAT2 best tracks"
@@ -338,7 +419,7 @@ export default async function PlacePage({ params }: Props) {
                 </p>
               </RecordCard>
 
-              <RecordCard hazard="flood" about="Sea level rise" source="NOAA Office for Coastal Management, Sea Level Rise Viewer data">
+              <RecordCard hazard="flood" about="Sea level rise" term="sea-level-rise" source="NOAA Office for Coastal Management, Sea Level Rise Viewer data">
                 <p>
                   NOAA maps where the sea would reach at the highest tides if it stood 1, 3 or 6 feet above
                   today&apos;s high-tide line. Switch the layer on in the map above to see whether that water
@@ -373,21 +454,12 @@ export default async function PlacePage({ params }: Props) {
             <span className="hazard-mark" data-hazard="heat" aria-hidden />
             Heat
           </h2>
-          <p className="lead">How much of the neighbourhood is trees and how much is paving, and what a model would add.</p>
+          <p className="lead">How much of the block is trees and how much is paving, set against the area around it, and what a model would add.</p>
 
           <div className="shelf">
             <ShelfHead name="On record" state="free" />
             <div className="shelf-cards">
-              <RecordCard hazard="heat" about="Tree canopy and paving" source="National Land Cover Database 2021, USGS and partners (MRLC)" asOf="2021">
-                <p>
-                  The national land cover survey maps tree canopy and the share of ground covered by paving
-                  and buildings. Switch either layer on in the map above.
-                </p>
-                <p className="record-aside">
-                  These are map layers only for now, and they cover the lower 48 states. Figures for this
-                  block against its neighbourhood are not on the site yet.
-                </p>
-              </RecordCard>
+              <CoverCards res={cover} />
             </div>
           </div>
 
@@ -512,7 +584,12 @@ export default async function PlacePage({ params }: Props) {
                 <tr>
                   <td>Tree canopy, paving</td>
                   <td>National Land Cover Database 2021 (MRLC)</td>
-                  <td>Map layer</td>
+                  <td>The block, and the square kilometre around it; also a map layer</td>
+                </tr>
+                <tr>
+                  <td>Ground height</td>
+                  <td>USGS, 3D Elevation Program</td>
+                  <td>The block, and the square kilometre around it</td>
                 </tr>
                 <tr>
                   <td>Census areas, base map</td>

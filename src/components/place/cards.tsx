@@ -29,6 +29,7 @@ export function RecordCard({
   children,
   source,
   asOf,
+  term,
 }: {
   hazard: Hazard;
   /** What the card is about, in a few words. */
@@ -41,10 +42,19 @@ export function RecordCard({
   source: string;
   /** A date or vintage for the record, in words. */
   asOf?: string;
+  /** Anchor of this card's entry on /glossary, e.g. "flood-zone". */
+  term?: string;
 }) {
   return (
     <article className="record-card" data-hazard={hazard}>
-      <div className="kicker">{about}</div>
+      <div className="record-top">
+        <div className="kicker">{about}</div>
+        {term && (
+          <Link className="record-term" href={{ pathname: "/glossary", hash: term }}>
+            What is this?
+          </Link>
+        )}
+      </div>
       {figure !== undefined && (
         <div className="record-figure">
           <span className="record-figure-value">{figure}</span>
@@ -145,6 +155,58 @@ export function LockedShelf({ kind, cta = true }: { kind: ShelfKind; cta?: boole
           <Link href="/contact">Ask for a report</Link>
         </p>
       )}
+    </div>
+  );
+}
+
+/**
+ * The block beside the area around it, as two bars on one scale of 0 to 100
+ * percent. The block's bar comes first and is the darker one; each bar has
+ * its label and its figure in words, so nothing depends on the shade.
+ */
+export function ShareBars({ block, around }: { block: number; around: number }) {
+  const rows = [
+    { label: "This block", value: block, self: true },
+    { label: "The square kilometre around it", value: around, self: false },
+  ];
+  return (
+    <div className="share-bars" role="img" aria-label={`This block ${Math.round(block)} percent; the square kilometre around it ${Math.round(around)} percent.`}>
+      {rows.map((r) => (
+        <div key={r.label} className="share-bar">
+          <span>{r.label}</span>
+          <span className="share-track">
+            <span data-self={r.self ? "true" : undefined} style={{ width: `${Math.max(0, Math.min(100, r.value))}%` }} />
+          </span>
+          <strong>{Math.round(r.value)}%</strong>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Where the block's ground sits between the lowest and highest surface in the
+ * square kilometre around it: a band from low to high with two marks, the
+ * area's typical height (hollow) and the block's (solid).
+ */
+export function HeightBand({ low, high, around, block }: { low: number; high: number; around: number; block: number }) {
+  const span = high - low;
+  const at = (v: number) => (span > 0 ? Math.max(0, Math.min(100, ((v - low) / span) * 100)) : 50);
+  const ft = (v: number) => `${Math.round(v)} ft`;
+  return (
+    <div className="height-band" role="img" aria-label={`The block's typical ground is ${ft(block)}; the area's is ${ft(around)}; the area runs from ${ft(low)} to ${ft(high)}.`}>
+      <div className="height-track">
+        <span className="height-mark height-mark-around" style={{ left: `${at(around)}%` }} />
+        <span className="height-mark height-mark-block" style={{ left: `${at(block)}%` }} />
+      </div>
+      <div className="height-ends">
+        <span>lowest {ft(low)}</span>
+        <span>highest {ft(high)}</span>
+      </div>
+      <div className="height-key">
+        <span><i className="height-mark height-mark-block" /> this block, {ft(block)}</span>
+        <span><i className="height-mark height-mark-around" /> typical for the area, {ft(around)}</span>
+      </div>
     </div>
   );
 }

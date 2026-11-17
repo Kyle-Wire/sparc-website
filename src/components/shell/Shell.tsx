@@ -2,17 +2,17 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Route } from "next";
 import * as React from "react";
-import { BRAND_LONG, COMPANY, TAGLINE_LONG, VERSION, COPYRIGHT_YEAR, OFFICE_CITY, OFFICE_STATE } from "@/lib/brand";
+import { COMPANY, TAGLINE_LONG, COPYRIGHT_YEAR, OFFICE_CITY, OFFICE_STATE } from "@/lib/brand";
 import { NavUserStatus } from "./NavUserStatus";
 import { MobileNav } from "./MobileNav";
 
-export type NavKey = "home" | "product" | "domains" | "pricing" | "about" | "contact" | "download" | "docs" | "account" | "demo";
+export type NavKey = "home" | "places" | "models" | "pricing" | "about" | "contact" | "account";
 
 const NAV_LINKS: { href: Route; label: string; key: NavKey }[] = [
-  { href: "/", label: "Home", key: "home" },
-  { href: "/product", label: "Product", key: "product" },
-  { href: "/domains", label: "Domains", key: "domains" },
-  { href: "/demo", label: "Demo", key: "demo" },
+  { href: "/", label: "Look up a place", key: "home" },
+  { href: "/places", label: "Your places", key: "places" },
+  { href: "/models", label: "The models", key: "models" },
+  { href: "/pricing", label: "Pricing", key: "pricing" },
   { href: "/about", label: "About", key: "about" },
 ];
 
@@ -73,27 +73,19 @@ export function Footer() {
               <LogoLockup height={32} />
             </Link>
             <p className="foot-tag" style={{ marginTop: 14 }}>{TAGLINE_LONG}</p>
-            <div className="row" style={{ marginTop: 18, gap: 8, flexWrap: "wrap" }}>
-              <span className="pill"><span className="dot" style={{ background: "var(--crimson)" }} /> sidecar · ready</span>
-              <span className="pill"><span className="dot" style={{ background: "var(--purple)" }} /> claude · sonnet-4.6</span>
-            </div>
+            <p className="foot-tag" style={{ marginTop: 10 }}>A screening tool. Not for engineering decisions.</p>
           </div>
           <div>
-            <h6>Product</h6>
-            <Link href="/product">Overview</Link>
-            <Link href="/product#pipeline">Pipeline</Link>
-            <Link href="/product#causal">Causal model</Link>
-            <Link href="/product#scenarios">Scenarios</Link>
-            <Link href="/domains">Domains</Link>
-            <Link href="/demo">Demo</Link>
-            <Link href="/changelog">Changelog</Link>
+            <h6>The site</h6>
+            <Link href="/">Look up a place</Link>
+            <Link href="/places">Your places</Link>
+            <Link href="/models">The models</Link>
+            <Link href="/pricing">Pricing</Link>
           </div>
           <div>
             <h6>Company</h6>
             <Link href="/about">About</Link>
-            <Link href="/about#thesis">Thesis</Link>
             <Link href="/about#principles">Principles</Link>
-            <Link href="/research">Research</Link>
             <Link href="/contact">Contact</Link>
           </div>
           <div>
@@ -102,12 +94,11 @@ export function Footer() {
             <Link href={{ pathname: "/privacy", hash: "cookies" }}>Cookies</Link>
             <Link href="/terms">Terms</Link>
             <Link href="/data-use">Data use</Link>
-            <Link href="/docs">Docs</Link>
           </div>
         </div>
         <div className="foot-bottom">
-          <span>© {COPYRIGHT_YEAR} {COMPANY.toUpperCase()} · {VERSION}</span>
-          <span>{OFFICE_CITY} · {OFFICE_STATE} · {BRAND_LONG.toUpperCase()}</span>
+          <span>© {COPYRIGHT_YEAR} {COMPANY.toUpperCase()}</span>
+          <span>{OFFICE_CITY} · {OFFICE_STATE}</span>
         </div>
       </div>
     </footer>

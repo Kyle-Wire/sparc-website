@@ -1,11 +1,39 @@
-# sparclabs.co — SPARC Labs marketing site & account portal
+# sparclabs.co — SPARC Labs
 
-Next.js 15 (App Router, TypeScript) site for **SPARC Labs** (_Spatial Research Labs_).
-Marketing pages, gated `/account/*` portal, Supabase auth, Lemon Squeezy billing.
+Next.js 16 (App Router, TypeScript) site for **SPARC Labs**. Environmental
+screening for home buyers: look up any US address and see the public record
+around it (flood zones, flood insurance claims, disaster declarations, storm
+tracks, sea level rise), free. The company's own flood and heat models are the
+paid part and are not on the site yet.
+
+The direction, what is built and what is not: [`docs/design/site-redesign-brief.md`](docs/design/site-redesign-brief.md).
+This is a first draft of the redesign. The gated `/account/*` portal, Supabase
+auth and Lemon Squeezy billing below are from the earlier site and unchanged.
+
+## Place pages
+
+- `/` is the search box. `POST /api/geocode` turns an address into a block
+  (coordinates rounded to three decimals) through the US Census Bureau's
+  geocoder. The address is not stored and never appears in a URL.
+- `/place/<lat>,<lon>` asks the public registers about that block from the
+  server ([`src/lib/place/`](src/lib/place)) and draws a map of public layers
+  ([`src/components/place/PlaceMap.tsx`](src/components/place/PlaceMap.tsx)).
+- A click on the map goes to `POST /api/inspect`, which reads the flood zone,
+  ground elevation, tree canopy and paving at that spot. Nothing is stored.
+- `/places` lists saved and recently viewed places and `/compare?p=…&p=…`
+  sets up to four side by side. Saved places live in the visitor's browser
+  ([`saved-places.ts`](src/components/place/saved-places.ts)); there is no
+  account behind them yet.
+- What comes next, and why: [`docs/design/roadmap.md`](docs/design/roadmap.md).
+- Storm tracks come from a committed file built from NOAA's HURDAT2:
+  `npm run data:hurricanes` rebuilds `src/data/hurricane-tracks.json` and its manifest.
+- The map library's worker is copied into `public/vendor/` before every `dev`
+  and `build` (`scripts/copy-map-worker.mjs`); that folder is git-ignored.
 
 ## Stack
 
-- **Next.js 15** (App Router · typed routes · server components by default)
+- **Next.js 16** (App Router · typed routes · server components by default)
+- **maplibre-gl 6** for the place map; public raster layers from USGS, FEMA, NOAA and MRLC
 - **Supabase** for auth (magic link + Google + Microsoft) and storage; Vault for BYOK secrets
 - **Lemon Squeezy** for billing (Pursue, Converge per-seat); Transcend = sales-assisted
 - **Plain CSS** with [`tokens.css`](src/styles/tokens.css) as the design source of truth

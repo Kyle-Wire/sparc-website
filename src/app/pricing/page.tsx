@@ -1,50 +1,62 @@
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
-import { COMPANY, EMAIL_PRIMARY } from "@/lib/brand";
+import { EMAIL_PRIMARY } from "@/lib/brand";
 
 export const metadata = { title: "Pricing" };
 
-// This page was reset to a true statement on 2026-10-29.
+// History, kept because the rule it produced still stands.
 //
-// What was here before: four named tiers at $0 / $49 / $160-per-seat / Custom,
-// live "Start Pursue" and "Start Converge" buttons posting to /api/checkout, a
-// tier-by-tier comparison table, a 30-day refund line, support response windows
-// of 48h and 24h, and an FAQ answer offering academic pricing on request.
-//
-// None of it was confirmed. The prices were placeholders, several listed
-// entitlements are not confirmed to ship, and there is no support rota, refund
-// policy or discount programme behind the promises. Checkout is disabled in
+// Until 2026-10-29 this page showed four named tiers with placeholder prices,
+// two live purchase buttons, a refund line and support windows. None of it was
+// confirmed, so it was all withdrawn and checkout was disabled in
 // src/app/api/checkout/route.ts.
 //
-// Do not restore prices, entitlement lists or purchase buttons to this page
-// until every line is something SPARC Labs LLC can be held to in a contract.
+// On 2026-11-17 the site changed direction (docs/design/site-redesign-brief.md).
+// This page now says what is free, what will be paid, and that nothing is on
+// sale. The rule is unchanged:
+//
+//   Do not put a price, an entitlement list or a purchase button on this page
+//   until every line is something SPARC Labs LLC can be held to in a contract.
 
-type Standing = { k: string; v: string };
-
-const STANDING: Standing[] = [
+const PLANS: { name: string; state: string; who: string; what: string[] }[] = [
   {
-    k: "No self-serve purchase",
-    v: "Checkout is switched off. There is nothing on this site you can buy with a card today.",
+    name: "The public record",
+    state: "Free · no account",
+    who: "Anyone.",
+    what: [
+      "Any US address",
+      "FEMA flood zones, flood insurance claims nearby, disaster declarations",
+      "Hurricane and tropical storm tracks, sea level rise",
+      "Tree canopy and paving",
+    ],
   },
   {
-    k: "No published prices",
-    v: "The tier prices previously shown here were internal placeholders, not offers. They are gone rather than left standing as numbers we would not repeat in a quote.",
+    name: "A report",
+    state: "Planned · bought once",
+    who: "Someone buying a home. You get the report and you are done.",
+    what: [
+      "Flood and heat modelled for the neighbourhood around one property",
+      "Findings first, with how much evidence stands behind each",
+      "What to check at the house",
+    ],
   },
   {
-    k: "No standing discounts",
-    v: "There is no academic, student or faculty discount programme. This page previously said there was. That was getting ahead of ourselves, and it is withdrawn.",
-  },
-  {
-    k: "No support commitment",
-    v: "We publish no response-time commitment and no uptime figure. Support terms will be written into an agreement before they are advertised anywhere.",
+    name: "A subscription",
+    state: "Planned · monthly",
+    who: "A home owner testing projects over time.",
+    what: [
+      "The flood and heat models, with your own storms",
+      "What-if runs: rain garden, French drain, less paving, more trees",
+      "Saved places and runs",
+    ],
   },
 ];
 
 const BEFORE_WE_CHARGE: string[] = [
-  "The unit we price — what one licence actually covers, and for how long.",
-  "What each hazard module includes, and which areas it is validated for.",
-  "Support terms, in writing, with a response window we can actually staff.",
+  "What one report or one month covers, exactly.",
+  "What each model has been tested against, and its margins, in a methods paper.",
+  "A check that your device can run the flood model before you pay, with a plain answer if it cannot.",
   "Billing, cancellation and refund terms, published in the Terms of Service before any charge is taken.",
 ];
 
@@ -53,50 +65,44 @@ export default function PricingPage() {
     <>
       <Nav active="pricing" />
       <PageHero
-        kicker="pricing · being re-established"
-        title="We are not selling SPARC yet."
-        lead="This page used to show four tiers, two live purchase buttons and a set of commitments we had not earned. It is now a straight account of where commercial terms actually stand. Prices, entitlements and support terms are being rebuilt from scratch."
+        kicker="pricing · nothing on sale yet"
+        title="The public record is free. The models will be paid."
+        lead="Looking up what is on record costs nothing and needs no account. Our own flood and heat models will be the paid part. There are no prices here yet, because there is nothing we can sell you today."
         accent="var(--amber)"
       />
 
-      <Section kicker="where this stands" title="What is true today.">
-        <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-          {STANDING.map((s, i) => (
-            <div
-              key={s.k}
-              style={{
-                padding: "20px 22px",
-                borderTop: i === 0 ? "none" : "1px solid var(--line)",
-                display: "grid",
-                gap: 6,
-              }}
-            >
-              <div style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)" }}>{s.k}</div>
-              <div style={{ fontSize: 14, lineHeight: 1.6, color: "var(--ink-2)" }}>{s.v}</div>
+      <Section kicker="what is planned" title="Three ways to use it.">
+        <div className="grid-3 pricing-tiers" style={{ gap: 18, alignItems: "stretch" }}>
+          {PLANS.map((p) => (
+            <div key={p.name} className="card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 10 }}>
+              <div className="kicker">{p.state}</div>
+              <h3 style={{ margin: 0 }}>{p.name}</h3>
+              <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6, margin: 0 }}>{p.who}</p>
+              <ul style={{ margin: "4px 0 0", paddingLeft: 18, fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6 }}>
+                {p.what.map((w) => (
+                  <li key={w}>{w}</li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
         <p style={{ marginTop: 20, fontSize: 14, lineHeight: 1.7, color: "var(--ink-2)", maxWidth: 760 }}>
-          {COMPANY} is a small company whose models are in active development. The validation work
-          behind them is real, and we publish its limits alongside its results. The commercial
-          wrapper around that work is not finished — and we would rather say so here than let a
-          procurement officer discover it after a purchase order.
+          The two paid plans are a plan, not an offer. What each includes may change before it goes on sale.
         </p>
       </Section>
 
-      <Section sunken kicker="access today" title="How to work with us in the meantime.">
+      <Section sunken kicker="today" title="A report, run by hand.">
         <p style={{ fontSize: 15, lineHeight: 1.7, color: "var(--ink-2)", maxWidth: 760, margin: "0 0 20px" }}>
-          Everything is a conversation right now. If you have a study area and a decision behind it,
-          tell us what you are trying to decide and we will tell you whether the relevant module is
-          validated for your situation — including where it is not. Any engagement is scoped and
-          priced in writing, individually, with the uncertainty stated up front.
+          Until the models are on the site, a report is something we run ourselves when someone asks. Tell
+          us the place and what you are trying to decide. We will say what we can and cannot model there
+          before anything is agreed, and any price is given in writing, individually.
         </p>
         <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
           <Link href="/contact" className="btn btn-accent">
-            Start a conversation <span className="arrow">→</span>
+            Ask for a report <span className="arrow">→</span>
           </Link>
-          <Link href="/research" className="btn">
-            Read the methods
+          <Link href="/models" className="btn">
+            How the models work
           </Link>
         </div>
         <p className="mono" style={{ marginTop: 18, fontSize: 11, color: "var(--muted)" }}>
@@ -118,8 +124,9 @@ export default function PricingPage() {
           ))}
         </ul>
         <p style={{ marginTop: 22, fontSize: 14, lineHeight: 1.7, color: "var(--muted)", maxWidth: 760 }}>
-          Until all four exist, this page carries no prices. The{" "}
-          <Link href="/terms">Terms of Service</Link> state the licence position as it stands.
+          Until all four exist, this page carries no prices. No support commitment, response time or
+          discount is offered either. The <Link href="/terms">Terms of Service</Link> state the licence
+          position as it stands.
         </p>
       </Section>
 

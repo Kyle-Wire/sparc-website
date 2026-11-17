@@ -6,3 +6,5 @@ out
 .env.*.local
 *.tsbuildinfo
 .DS_Store
+# Copied from node_modules by scripts/copy-map-worker.mjs before dev and build
+public/vendor/

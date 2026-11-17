@@ -111,6 +111,13 @@
      beside a word or a glyph that says the same thing, so a reader who cannot
      resolve the hue loses nothing -- which is the pattern insar's deliverable
      verdicts already get right, and the reason it degrades gracefully. */
+  /* Hazard identity. One hue per hazard, the same two the report uses: flood is
+     FloodSim's blue-green, heat is the accent crimson. Like status colour it is
+     always the redundant channel -- every card it marks also says "flood" or
+     "heat" in words -- and both clear AA as text on paper. */
+  --flood: #0b6a88;  /* 5.57:1 on paper */
+  --heat: var(--crimson);
+
   --status-live: var(--crimson);
   --status-warn: var(--amber-ink);
   --status-ai: var(--purple);

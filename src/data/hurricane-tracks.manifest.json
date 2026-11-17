@@ -1,0 +1,27 @@
+{
+  "built": "2026-11-17T18:02:54.196Z",
+  "keep": {
+    "south": 16,
+    "north": 52,
+    "west": -165,
+    "east": -60
+  },
+  "sources": [
+    {
+      "basin": "Atlantic",
+      "record": "1851 to 2025",
+      "url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-1851-2025-092326.txt",
+      "bytes": 7071568,
+      "sha256": "75202780ce56c8458f16fbef5fb8a026b99b00878dbb95c458211b3e6ef125b4",
+      "stormsKept": 1550
+    },
+    {
+      "basin": "Northeast and Central Pacific",
+      "record": "1949 to 2025",
+      "url": "https://www.nhc.noaa.gov/data/hurdat/hurdat2-nepac-1949-2025-092926.txt",
+      "bytes": 4087516,
+      "sha256": "caece626f7038db64a803a73f5985b563693f0130f3ff16b4b0a0a93c7aa0507",
+      "stormsKept": 1054
+    }
+  ]
+}

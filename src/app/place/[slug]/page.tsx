@@ -568,14 +568,16 @@ export default async function PlacePage({ params }: Props) {
             Ground movement
           </h2>
           <p className="lead">
-            Whether the ground is sinking or shifting, measured from satellite radar over years, and the measured
-            rate carried forward.
+            Whether the ground is sinking or rising, measured from satellite radar over years, and where it is
+            heading over ten years against its surroundings.
           </p>
           <div className="shelf">
             <ShelfHead name="On record" state="coming" />
             <p className="shelf-empty">
-              No public register of ground movement is on this page yet. Which one to show, if any, has not been
-              decided.
+              Every report gets two readings free: whether the ground the house stands on is sinking or rising,
+              from NASA&apos;s OPERA ground-motion product and labelled screening, and the USGS map of ground prone to
+              sinkholes. Neither is shown on this page yet. Whether the free reading can be shown here, for the
+              block rather than a house, has not been decided.
             </p>
           </div>
           <div className="shelf shelf-pair">

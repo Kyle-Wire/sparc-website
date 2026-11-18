@@ -45,7 +45,17 @@ export default function ModelsPage() {
               </div>
               <h3>{e.name}</h3>
               <p>{e.summary}</p>
-              <div className="kicker" style={{ marginTop: 6 }}>what a buyer reads</div>
+              {e.free && (
+                <>
+                  <div className="kicker" style={{ marginTop: 6 }}>free with every report</div>
+                  <ul>
+                    {e.free.map((f) => (
+                      <li key={f}>{f}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              <div className="kicker" style={{ marginTop: 6 }}>{e.free ? "paid" : "what a buyer reads"}</div>
               <ul>
                 {e.findings.map((f) => (
                   <li key={f}>{f}</li>

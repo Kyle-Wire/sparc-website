@@ -174,15 +174,15 @@ const SHELVES: Record<
   },
   "ground-model": {
     label: "ground movement · measured from radar",
-    note: "Layout only. No radar has been processed for this place, so there are no numbers here. A reading covers the ground around the property, set against the area's own undisturbed ground.",
+    note: "Layout only. No radar has been processed for this place, so there are no numbers here. A reading describes the ground around the property, not the house, set against a near ring and a wide ring around it.",
     plot: "Where a map of ground movement would go. Nothing has been measured, so nothing is drawn.",
-    slots: ["Movement at the house", "Against its surroundings", "Steady or new", "Where the satellite cannot see"],
+    slots: ["With its surroundings or on its own", "Steady, or new from a given year", "Seasonal swing, research", "Where the satellite cannot see"],
   },
   "ground-whatif": {
-    label: "what if · the rate carried forward",
-    note: "Layout only. Nothing has been measured. The measured rate, carried forward, would show how things are likely to continue. It is a projection of a measurement, not a forecast.",
-    plot: "Where the record of movement over the years, and the rate carried forward, would go. Nothing has been measured, so nothing is drawn.",
-    slots: ["How it is likely to continue", "When it could matter"],
+    label: "what if · ten years ahead",
+    note: "Layout only. Nothing has been measured. The ground at the property against its wide surroundings, carried forward ten years with a band that widens. It is a projection of a measurement, not a forecast, and it names no point at which damage begins.",
+    plot: "Where the record of movement over the years, and the band carried forward, would go. Nothing has been measured, so nothing is drawn.",
+    slots: ["Ten years ahead, against the wide ring", "How wide the band grows"],
   },
   "wind-model": {
     label: "wind model · through the seasons",

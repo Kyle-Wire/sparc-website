@@ -127,7 +127,7 @@ Hosting is Vercel. Supabase holds accounts and contact messages. Resend sends em
 
 **The paid path's request** goes through `/api/waitlist`, like the contact form, so it has the same open problems: untested on the live site, refused if a Turnstile secret is set, and one row per email address. It sends the rounded block and never the street address.
 
-**Ground movement has no free shelf.** No public register of ground movement was chosen, so the place page says so.
+**Ground movement follows Climate Inspection D38 and D39 (18 November 2026).** Every report gets two readings free: whether the ground the house stands on is sinking or rising (NASA's OPERA DISP-S1, labelled screening) and the USGS sinkhole-prone ground map. The rings, steady or new, the seasonal swing (labelled research), ten years ahead (no damage threshold) and the full processing run are paid. A held section reads "in review", and a refused reading shows no number and says why. The words "stable", "stopped" and "safe" are never used. Neither free reading is on the public place page yet. Whether the free rate may be shown there, for the block centre rather than a house, is Kyle's decision and has not been made.
 
 ## 7. Decisions waiting on Kyle
 

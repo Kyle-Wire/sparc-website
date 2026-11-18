@@ -4,9 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import "maplibre-gl/dist/maplibre-gl.css";
-import type { Map as MlMap, GeoJSONSource } from "maplibre-gl";
+import type { Map as MlMap, GeoJSONSource, Marker } from "maplibre-gl";
 import { PlaceSearch } from "@/components/place/PlaceSearch";
-import { BASE_STYLE, RASTERS, SpotList, type Spot } from "@/components/place/PlaceMap";
+import { BASE_STYLE, RASTERS, SpotList, needsTwoFingers, setBase, type BaseKind, type Spot } from "@/components/place/PlaceMap";
+import FEMA_LEGEND from "@/data/fema-flood-zones-legend.json";
 import { DEFAULT_STORM, HAZARD_STATE_WORDS, floodSortName, type BlockReadings, type HazardState } from "@/lib/listings/blocks";
 import type { PublicListing } from "@/lib/listings/feed";
 
@@ -203,6 +204,65 @@ function BlockModels({ answer }: { answer: BlockAnswer }) {
   );
 }
 
+/** What every mark on the map means, and the switches for the base map. */
+function MapLegend(props: {
+  base: BaseKind;
+  onBase: (b: BaseKind) => void;
+  grey: boolean;
+  onGrey: (g: boolean) => void;
+  fema: boolean;
+  onFema: (f: boolean) => void;
+  femaVisible: boolean;
+}) {
+  return (
+    <details className="map-legend" open>
+      <summary>Legend</summary>
+      <div className="map-legend-body">
+        <fieldset className="map-legend-group">
+          <legend className="map-legend-title">Base map</legend>
+          <div className="map-legend-seg" role="radiogroup" aria-label="Base map">
+            {(["map", "aerial"] as const).map((b) => (
+              <button key={b} type="button" role="radio" aria-checked={props.base === b} onClick={() => props.onBase(b)}>
+                {b === "map" ? "Map" : "Aerial photo"}
+              </button>
+            ))}
+          </div>
+          <label className="map-legend-check">
+            <input type="checkbox" checked={props.grey} onChange={(e) => props.onGrey(e.target.checked)} /> Black and white
+          </label>
+        </fieldset>
+        <div className="map-legend-group">
+          <div className="map-legend-title">Homes for sale</div>
+          <div className="map-legend-row">
+            <span className="map-legend-dot" aria-hidden /> A listing, where its feed places it
+          </div>
+          <div className="map-legend-row">
+            <span className="map-legend-dot map-legend-dot-picked" aria-hidden /> The listing you opened
+          </div>
+          <div className="map-legend-row">
+            <span className="map-legend-ring" aria-hidden /> The address you searched
+          </div>
+        </div>
+        <div className="map-legend-group">
+          <label className="map-legend-check map-legend-title">
+            <input type="checkbox" checked={props.fema} onChange={(e) => props.onFema(e.target.checked)} /> FEMA flood zones
+          </label>
+          {!props.femaVisible && props.fema && <p className="map-legend-note">Shown once you zoom in to a town.</p>}
+          {FEMA_LEGEND.items.map((it) => (
+            <div key={it.label} className="map-legend-row">
+              {/* FEMA's own swatch, copied from its legend by scripts/fetch-fema-legend.mjs. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={it.image} alt="" width={20} height={20} />
+              {it.label}
+            </div>
+          ))}
+          <p className="map-legend-note">FEMA&apos;s map for insurance and building rules, read {FEMA_LEGEND.read}. Not a forecast.</p>
+        </div>
+      </div>
+    </details>
+  );
+}
+
 export function HomeMap() {
   const boxRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MlMap | null>(null);
@@ -211,7 +271,12 @@ export function HomeMap() {
   const [area, setArea] = useState<Load<AreaAnswer>>({ status: "idle" });
   const [picked, setPicked] = useState<Listing | null>(null);
   const [fema, setFema] = useState(true);
+  const [base, setBaseKind] = useState<BaseKind>("map");
+  const [grey, setGrey] = useState(true);
+  const [found, setFound] = useState<string | null>(null);
   const listingsRef = useRef<Listing[]>([]);
+  const searchPin = useRef<Marker | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
 
   const showPins = useCallback((listings: Listing[]) => {
     listingsRef.current = listings;
@@ -243,13 +308,29 @@ export function HomeMap() {
           zoom: US_VIEW.zoom,
           minZoom: 3,
           maxZoom: 17,
-          cooperativeGestures: true,
+          cooperativeGestures: needsTwoFingers(),
           attributionControl: { compact: true },
         });
         mapRef.current = map;
         map.addControl(new maplibre.NavigationControl({ showCompass: false }), "top-right");
         map.addControl(new maplibre.ScaleControl({ unit: "imperial" }), "bottom-left");
         map.on("zoomend", () => map && setZoom(map.getZoom()));
+        // On a wide screen the card and the legend sit over the map, so the
+        // map's centre (where a search lands, and where "Show homes for sale
+        // here" looks) is the open part between them.
+        const pad = () => {
+          if (!map) return;
+          const wide = window.innerWidth > 640;
+          const card = cardRef.current?.offsetWidth ?? 0;
+          map.setPadding(wide ? { left: card + 32, right: 312, top: 0, bottom: 0 } : { left: 0, right: 0, top: 0, bottom: 0 });
+        };
+        pad();
+        window.addEventListener("resize", pad);
+        map.once("remove", () => window.removeEventListener("resize", pad));
+        const pinEl = document.createElement("div");
+        pinEl.className = "place-map-pin";
+        pinEl.setAttribute("aria-hidden", "true");
+        searchPin.current = new maplibre.Marker({ element: pinEl });
         map.on("load", () => {
           if (dead || !map) return;
           const f = RASTERS.find((r) => r.id === "fema");
@@ -267,6 +348,18 @@ export function HomeMap() {
               "circle-color": "#1a1416",
               "circle-stroke-color": "#f7f4ee",
               "circle-stroke-width": 2,
+            },
+          });
+          map.addLayer({
+            id: "listings-picked",
+            type: "circle",
+            source: "listings",
+            filter: ["==", ["get", "key"], ""],
+            paint: {
+              "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 7, 16, 12],
+              "circle-color": "rgba(0,0,0,0)",
+              "circle-stroke-color": "#1a1416",
+              "circle-stroke-width": 3,
             },
           });
           map.on("click", "listings", (e) => {
@@ -292,6 +385,24 @@ export function HomeMap() {
     const m = mapRef.current;
     if (m?.getLayer("fema")) m.setLayoutProperty("fema", "visibility", fema ? "visible" : "none");
   }, [fema]);
+
+  useEffect(() => {
+    const m = mapRef.current;
+    if (m) setBase(m, base, grey);
+  }, [base, grey]);
+
+  useEffect(() => {
+    const m = mapRef.current;
+    if (m?.getLayer("listings-picked")) m.setFilter("listings-picked", ["==", ["get", "key"], picked?.listing_key ?? ""]);
+  }, [picked]);
+
+  function flyToFound(f: { slug: string; point: { lat: number; lon: number } }) {
+    const m = mapRef.current;
+    setFound(f.slug);
+    if (!m) return;
+    searchPin.current?.setLngLat([f.point.lon, f.point.lat]).addTo(m);
+    m.flyTo({ center: [f.point.lon, f.point.lat], zoom: 15 });
+  }
 
   async function loadHere() {
     const m = mapRef.current;
@@ -338,37 +449,66 @@ export function HomeMap() {
       <div className="home-map-frame">
         <div ref={boxRef} className="home-map" />
         {failed && <p className="home-map-failed">The map could not start in this browser. The search still works.</p>}
-        <div className="home-map-card">
+        <div className="home-map-card" ref={cardRef}>
           <span className="kicker">environmental screening · any US address</span>
           <h1>See what is on record before you buy.</h1>
-          <PlaceSearch compact />
-          <div className="home-map-tools">
-            <button type="button" className="btn btn-sm" onClick={goToMe}>
-              Go to where I am
-            </button>
-            <label className="home-map-toggle">
-              <input type="checkbox" checked={fema} onChange={(e) => setFema(e.target.checked)} /> FEMA flood zones
-            </label>
-          </div>
+          <ol className="home-steps">
+            <li data-state={near ? "done" : "now"}>
+              <span className="home-step-no" aria-hidden>1</span>
+              <div>
+                <strong>Find an area.</strong> Search an address, or zoom the map.
+                <PlaceSearch compact onFound={flyToFound} help="Free, no account. The address moves the map and is not stored." />
+                <div className="home-map-tools">
+                  <button type="button" className="btn btn-sm" onClick={goToMe}>
+                    Go to where I am
+                  </button>
+                  {found && (
+                    <Link href={`/place/${found}` as Route}>
+                      The full public record for this block <span className="arrow">→</span>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </li>
+            <li data-state={!near ? "later" : area.status === "done" ? "done" : "now"}>
+              <span className="home-step-no" aria-hidden>2</span>
+              <div>
+                <strong>Show homes for sale.</strong>{" "}
+                {near ? (
+                  <button type="button" className="btn btn-accent btn-sm" onClick={loadHere} disabled={area.status === "loading"}>
+                    {area.status === "loading" ? "Loading…" : "Show homes for sale here"}
+                  </button>
+                ) : (
+                  <span className="home-step-hint">Zoom in to a neighbourhood first.</span>
+                )}
+                {area.status === "done" && <p className="home-step-hint">{areaLine(area.data)}</p>}
+                {area.status === "failed" && <p className="home-step-hint">{area.reason}</p>}
+              </div>
+            </li>
+            <li data-state={picked ? "done" : area.status === "done" && area.data.listings.length ? "now" : "later"}>
+              <span className="home-step-no" aria-hidden>3</span>
+              <div>
+                <strong>Click a home.</strong> See the listing, the public record for its block, and its report.
+              </div>
+            </li>
+          </ol>
         </div>
+        <MapLegend
+          base={base}
+          onBase={setBaseKind}
+          grey={grey}
+          onGrey={setGrey}
+          fema={fema}
+          onFema={setFema}
+          femaVisible={zoom >= (RASTERS.find((r) => r.id === "fema")?.minzoom ?? 11)}
+        />
         {picked && <ListingPanel key={picked.listing_key} listing={picked} onClose={() => setPicked(null)} />}
       </div>
 
-      <div className="wrap home-map-bar" aria-live="polite">
-        {near ? (
-          <button type="button" className="btn btn-accent btn-sm" onClick={loadHere} disabled={area.status === "loading"}>
-            {area.status === "loading" ? "Loading homes for sale…" : "Show homes for sale here"}
-          </button>
-        ) : (
-          <span>Zoom in to a neighbourhood to see homes for sale there.</span>
-        )}
-        {area.status === "done" && <span>{areaLine(area.data)}</span>}
-        {area.status === "failed" && <span>{area.reason}</span>}
-        <small>
-          Listings from RentCast, shown as it gives them. Pins sit where the feed puts them; what we show for each
-          is about its block, not the house.
-        </small>
-      </div>
+      <p className="wrap home-map-credit">
+        Listings from RentCast, shown as it gives them. A pin sits where the feed puts it; what we show for each is
+        about its block, not the house.
+      </p>
 
       {area.status === "done" && area.data.listings.length > 0 && (
         <div className="wrap home-map-sort">

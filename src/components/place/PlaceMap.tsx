@@ -45,7 +45,7 @@ interface RasterDef {
   attribution: string;
 }
 
-const RASTERS: RasterDef[] = [
+export const RASTERS: RasterDef[] = [
   {
     id: "paving",
     tiles: wms("NLCD_2021_Impervious_L48"),
@@ -83,7 +83,7 @@ const RASTERS: RasterDef[] = [
   },
 ];
 
-const BASE_STYLE: StyleSpecification = {
+export const BASE_STYLE: StyleSpecification = {
   version: 8,
   sources: {
     base: {
@@ -134,7 +134,7 @@ const SLR_OPTIONS: { value: Slr; label: string }[] = [
 
 /* ---- what /api/inspect returns ---- */
 type Item<T> = { value: T } | { error: string };
-interface Spot {
+export interface Spot {
   zone: Item<{ code: string; subtype: string | null; inSfha: boolean } | null>;
   elevation: Item<{ feet: number; metres: number; resolutionM: number | null; surveyYear: number | null }>;
   canopy: Item<number | null>;
@@ -162,6 +162,56 @@ function missing(reason: string) {
   return <span className="spot-missing">No answer. {reason}</span>;
 }
 
+/** What public sources say at one point, as /api/inspect returns it. */
+export function SpotList({ spot }: { spot: Spot }) {
+  return (
+    <dl className="spot-list">
+      <SpotRow label="FEMA flood zone" source="FEMA National Flood Hazard Layer">
+        {"error" in spot.zone ? (
+          missing(spot.zone.error)
+        ) : spot.zone.value === null ? (
+          "Not mapped"
+        ) : (
+          <>
+            Zone {spot.zone.value.code}
+            {spot.zone.value.inSfha
+              ? " · Special Flood Hazard Area"
+              : spot.zone.value.subtype
+                ? ` · ${spot.zone.value.subtype.toLowerCase()}`
+                : ""}
+          </>
+        )}
+      </SpotRow>
+      <SpotRow
+        label="Ground elevation"
+        source={
+          "error" in spot.elevation
+            ? "USGS 3D Elevation Program"
+            : `USGS 3D Elevation Program${spot.elevation.value.surveyYear ? `, surveyed ${spot.elevation.value.surveyYear}` : ""}`
+        }
+      >
+        {"error" in spot.elevation
+          ? missing(spot.elevation.error)
+          : `${spot.elevation.value.feet.toFixed(1)} ft (${spot.elevation.value.metres.toFixed(1)} m)`}
+      </SpotRow>
+      <SpotRow label="Tree canopy" source="National Land Cover Database 2021">
+        {"error" in spot.canopy
+          ? missing(spot.canopy.error)
+          : spot.canopy.value === null
+            ? "Not mapped here"
+            : `${spot.canopy.value}% of the land cover cell`}
+      </SpotRow>
+      <SpotRow label="Paving and buildings" source="National Land Cover Database 2021">
+        {"error" in spot.paving
+          ? missing(spot.paving.error)
+          : spot.paving.value === null
+            ? "Not mapped here"
+            : `${spot.paving.value}% of the land cover cell`}
+      </SpotRow>
+    </dl>
+  );
+}
+
 function SpotPanel({ state, onCentre }: { state: SpotState; onCentre: () => void }) {
   return (
     <section className="spot-panel" aria-live="polite">
@@ -175,50 +225,7 @@ function SpotPanel({ state, onCentre }: { state: SpotState; onCentre: () => void
       {state.status === "loading" && <p className="spot-hint">Asking FEMA, USGS and the land cover survey…</p>}
       {state.status === "failed" && <p className="spot-hint">{state.reason}</p>}
       {state.status === "done" && (
-        <dl className="spot-list">
-          <SpotRow label="FEMA flood zone" source="FEMA National Flood Hazard Layer">
-            {"error" in state.spot.zone ? (
-              missing(state.spot.zone.error)
-            ) : state.spot.zone.value === null ? (
-              "Not mapped"
-            ) : (
-              <>
-                Zone {state.spot.zone.value.code}
-                {state.spot.zone.value.inSfha
-                  ? " · Special Flood Hazard Area"
-                  : state.spot.zone.value.subtype
-                    ? ` · ${state.spot.zone.value.subtype.toLowerCase()}`
-                    : ""}
-              </>
-            )}
-          </SpotRow>
-          <SpotRow
-            label="Ground elevation"
-            source={
-              "error" in state.spot.elevation
-                ? "USGS 3D Elevation Program"
-                : `USGS 3D Elevation Program${state.spot.elevation.value.surveyYear ? `, surveyed ${state.spot.elevation.value.surveyYear}` : ""}`
-            }
-          >
-            {"error" in state.spot.elevation
-              ? missing(state.spot.elevation.error)
-              : `${state.spot.elevation.value.feet.toFixed(1)} ft (${state.spot.elevation.value.metres.toFixed(1)} m)`}
-          </SpotRow>
-          <SpotRow label="Tree canopy" source="National Land Cover Database 2021">
-            {"error" in state.spot.canopy
-              ? missing(state.spot.canopy.error)
-              : state.spot.canopy.value === null
-                ? "Not mapped here"
-                : `${state.spot.canopy.value}% of the land cover cell`}
-          </SpotRow>
-          <SpotRow label="Paving and buildings" source="National Land Cover Database 2021">
-            {"error" in state.spot.paving
-              ? missing(state.spot.paving.error)
-              : state.spot.paving.value === null
-                ? "Not mapped here"
-                : `${state.spot.paving.value}% of the land cover cell`}
-          </SpotRow>
-        </dl>
+        <SpotList spot={state.spot} />
       )}
       <div className="spot-foot">
         <button type="button" className="btn btn-sm" onClick={onCentre}>

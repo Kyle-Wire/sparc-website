@@ -2,14 +2,18 @@ import Link from "next/link";
 import type { Route } from "next";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { Kicker, Section } from "@/components/marketing/page-shell";
-import { PlaceSearch } from "@/components/place/PlaceSearch";
+import { HomeMap } from "@/components/home/HomeMap";
 import { LockedShelf } from "@/components/place/cards";
 
-// The home page is the search box. Everything under it explains what the
-// search returns and what paying would add.
+// The home page is a map with the search box on it (Climate Inspection D42,
+// SPEC-LISTINGS.md §1). Homes for sale load on the map when a visitor asks
+// for an area. Everything under it explains what the search returns and what
+// paying would add.
 //
 // Claims on this page, and what each rests on:
 //   "free, no account"           the place page needs neither (src/app/place).
+//   homes for sale               RentCast's listings, shown as it gives them
+//                                (src/components/home/HomeMap.tsx).
 //   the list of public records   each is fetched live on a place page; sources
 //                                are in docs/design/site-redesign-brief.md s.11.
 //   the paid shelves             described as not on sale, and drawn with the
@@ -108,23 +112,16 @@ export default function HomePage() {
     <>
       <Nav active="home" />
 
-      <section className="home-hero grid-bg">
-        <div className="wrap">
-          <Kicker dot>environmental screening · any US address</Kicker>
-          <h1>See what is on record before you buy.</h1>
-          <p className="lead">
-            Flood zones, flood insurance claims, disaster declarations, storm tracks and sea level rise for
-            the neighbourhood around any address in the United States. The public record is free.
-          </p>
-          <PlaceSearch />
-          <div className="place-examples">
-            <span>Or look at:</span>
-            {EXAMPLES.map((e) => (
-              <Link key={e.slug} href={`/place/${e.slug}` as Route}>
-                {e.label}
-              </Link>
-            ))}
-          </div>
+      <HomeMap />
+
+      <section className="compact">
+        <div className="wrap place-examples">
+          <span>Or look at the record for:</span>
+          {EXAMPLES.map((e) => (
+            <Link key={e.slug} href={`/place/${e.slug}` as Route}>
+              {e.label}
+            </Link>
+          ))}
         </div>
       </section>
 

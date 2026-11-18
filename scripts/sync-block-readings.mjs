@@ -31,9 +31,14 @@ if (!url || !key) {
 }
 const db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 
+// The hash is of the file's raw bytes. Text is read as UTF-8; a statement
+// holding "Â" means it was decoded as Latin-1 somewhere ("44 Â°C"),
+// and the file is refused rather than shown that way.
 const read = (name) => {
-  const text = readFileSync(join(dir, name), "utf8");
-  return { json: JSON.parse(text), sha: createHash("sha256").update(text).digest("hex") };
+  const bytes = readFileSync(join(dir, name));
+  const text = bytes.toString("utf8");
+  if (text.includes("Â")) throw new Error(`${name}: holds a mis-decoded character (Â); refusing to load it`);
+  return { json: JSON.parse(text), sha: createHash("sha256").update(bytes).digest("hex") };
 };
 
 const index = read("index.json").json;

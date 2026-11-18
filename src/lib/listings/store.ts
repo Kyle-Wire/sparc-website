@@ -13,11 +13,11 @@ import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/sup
 import {
   AREA_KEEP_DAYS,
   FEED_SOURCE,
-  MONTHLY_CAP,
   PAGE_LIMIT,
   areaFresh,
-  budgetMonth,
   fromRentCast,
+  mayCallFeed,
+  type TakeAnswer,
   type ListingRow,
   type PublicListing,
 } from "./feed";
@@ -26,8 +26,10 @@ import type { BlockReadings, ModelPlace } from "./blocks";
 export type AreaStatus =
   | "kept" //            listings from the last 30 days, no request spent
   | "fetched" //         one request spent just now
-  | "budget_spent" //    this month's requests are used; loads next month
-  | "feed_not_connected" // no RentCast key on this server
+  | "budget_spent" //    45 used in the last 31 days; loads next month
+  | "day_spent" //       10 used in the last day; loads tomorrow
+  | "zip_recent" //      this ZIP was tried in the last day and failed
+  | "feed_not_connected" // no RentCast key, or not the production site
   | "store_not_connected" // no database on this server
   | "failed"; //         the feed or the database did not answer
 
@@ -63,24 +65,25 @@ export async function areaListings(zip: string, now = new Date()): Promise<Area>
 
   const { data: area, error } = await db.from("listing_areas").select("fetched_at").eq("zip", zip).maybeSingle();
   if (error) return { zip, status: "failed", fetchedAt: null, listings: [] };
-  if (area && areaFresh(area.fetched_at as string, now)) {
-    return { zip, status: "kept", fetchedAt: area.fetched_at as string, listings: await kept() };
+  const fetched = (area?.fetched_at as string | null | undefined) ?? null;
+  if (areaFresh(fetched, now)) {
+    return { zip, status: "kept", fetchedAt: fetched, listings: await kept() };
   }
 
   // Past here a request would be spent. Older listings, if any, are still
   // shown with their date while the area cannot be refreshed.
-  const stale = area ? { fetchedAt: area.fetched_at as string, listings: await kept() } : { fetchedAt: null, listings: [] };
+  const stale = fetched ? { fetchedAt: fetched, listings: await kept() } : { fetchedAt: null, listings: [] };
 
   const key = process.env.RENTCAST_API_KEY;
-  if (!key) return { zip, status: "feed_not_connected", ...stale };
+  if (!key || !mayCallFeed(process.env)) return { zip, status: "feed_not_connected", ...stale };
 
-  const { data: took, error: takeError } = await db.rpc("take_feed_request", {
-    p_source: FEED_SOURCE,
-    p_month: budgetMonth(now),
-    p_cap: MONTHLY_CAP,
-  });
+  // The database decides; its ceilings cannot be changed from here.
+  const { data: took, error: takeError } = await db.rpc("take_feed_request", { p_source: FEED_SOURCE, p_zip: zip });
   if (takeError) return { zip, status: "failed", ...stale };
-  if (took !== true) return { zip, status: "budget_spent", ...stale };
+  const answer = took as TakeAnswer;
+  if (answer === "window_spent") return { zip, status: "budget_spent", ...stale };
+  if (answer === "day_spent") return { zip, status: "day_spent", ...stale };
+  if (answer !== "ok") return { zip, status: "zip_recent", ...stale };
 
   let records: unknown[];
   try {
@@ -119,17 +122,12 @@ export async function areaListings(zip: string, now = new Date()): Promise<Area>
   return { zip, status: "fetched", fetchedAt, listings: await kept() };
 }
 
-/** Requests spent this month, for the map's note. Null when unknown. */
-export async function requestsUsed(now = new Date()): Promise<number | null> {
+/** Requests used in the last 31 days, for the map's note. Null when unknown. */
+export async function requestsUsed(): Promise<number | null> {
   const db = admin();
   if (!db) return null;
-  const { data } = await db
-    .from("feed_requests")
-    .select("used")
-    .eq("source", FEED_SOURCE)
-    .eq("month", budgetMonth(now))
-    .maybeSingle();
-  return data ? Number(data.used) : 0;
+  const { data, error } = await db.rpc("feed_requests_used", { p_source: FEED_SOURCE });
+  return error ? null : Number(data);
 }
 
 export async function modelPlaces(): Promise<ModelPlace[]> {
@@ -170,4 +168,4 @@ export async function isSubscriber(): Promise<boolean> {
   }
 }
 
-export { AREA_KEEP_DAYS, MONTHLY_CAP };
+export { AREA_KEEP_DAYS };

@@ -9,9 +9,27 @@
 
 export const FEED_SOURCE = "RentCast";
 
-/** The site's own cap. RentCast's free plan is 50 requests a month, it has no
- *  hard cap, and it bills each request over 50; five are kept for testing. */
-export const MONTHLY_CAP = 45;
+/** The site's own ceilings, for the map's words only. The ones that count are
+ *  fixed inside the database function take_feed_request
+ *  (supabase/migrations/0006_listings.sql), where no caller can raise them.
+ *  RentCast's free plan is 50 requests a month, with no hard cap and a charge
+ *  for each request over; five are kept spare. */
+export const WINDOW_CAP = 45;
+export const WINDOW_DAYS = 31;
+export const DAY_CAP = 10;
+
+/** What take_feed_request answers. */
+export type TakeAnswer = "ok" | "window_spent" | "day_spent" | "zip_recent";
+
+/**
+ * Only one site may spend requests, so there is one log against one database:
+ * the production deployment. A preview, or a computer running the site, is
+ * refused unless RENTCAST_ALLOW_NONPROD=1 is set, and that must only be done
+ * against the production database (docs/HANDOFF.md).
+ */
+export function mayCallFeed(env: Record<string, string | undefined>): boolean {
+  return env.VERCEL_ENV === "production" || env.RENTCAST_ALLOW_NONPROD === "1";
+}
 
 /** How long a ZIP code's listings are kept before the feed is asked again. */
 export const AREA_KEEP_DAYS = 30;
@@ -120,14 +138,10 @@ export function fromRentCast(r: RentCastListing, zip: string, fetchedAt: string)
   };
 }
 
-/** "2026-11", in UTC, the month the budget is counted in. */
-export function budgetMonth(d: Date): string {
-  return d.toISOString().slice(0, 7);
-}
-
-/** Whether an area fetched at `fetchedAt` is still fresh at `now`. */
-export function areaFresh(fetchedAt: string, now: Date): boolean {
-  return now.getTime() - new Date(fetchedAt).getTime() < AREA_KEEP_DAYS * 86_400_000;
+/** Whether an area fetched at `fetchedAt` is still fresh at `now`. Null means
+ *  it was tried and never fetched. */
+export function areaFresh(fetchedAt: string | null, now: Date): boolean {
+  return fetchedAt !== null && now.getTime() - new Date(fetchedAt).getTime() < AREA_KEEP_DAYS * 86_400_000;
 }
 
 export function isZip(z: unknown): z is string {

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { areaFresh, budgetMonth, fromRentCast, isZip, MONTHLY_CAP } from "./feed";
+import { areaFresh, fromRentCast, isZip, WINDOW_CAP } from "./feed";
 import { blockOf, floodSortName, hazardStates, placeForBlock, sortByFloodDepth, type BlockReadings, type ModelPlace } from "./blocks";
 
 // The RentCast record below is the example in its Property Listings Schema
@@ -50,16 +50,15 @@ test("a record with no id is dropped; missing values stay missing, never zero", 
   assert.equal(r?.PostalCode, "78723");
 });
 
-test("the budget is counted per UTC month and stops below RentCast's fifty", () => {
-  assert.equal(budgetMonth(new Date("2026-11-30T23:59:59Z")), "2026-11");
-  assert.equal(budgetMonth(new Date("2026-12-01T00:00:00Z")), "2026-12");
-  assert.ok(MONTHLY_CAP < 50);
+test("the site's ceiling sits below RentCast's fifty", () => {
+  assert.ok(WINDOW_CAP < 50);
 });
 
 test("an area is kept thirty days", () => {
   const now = new Date("2026-11-18T00:00:00Z");
   assert.equal(areaFresh("2026-10-20T00:00:00Z", now), true);
   assert.equal(areaFresh("2026-10-18T00:00:00Z", now), false);
+  assert.equal(areaFresh(null, now), false);
   assert.equal(isZip("19147"), true);
   assert.equal(isZip("1914"), false);
 });

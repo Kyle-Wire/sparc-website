@@ -13,7 +13,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { inUsBounds, roundPlace } from "@/lib/place/coords";
 import { zipAreaAt } from "@/lib/place/census";
 import { blockOf, DEFAULT_STORM, sortByFloodDepth } from "@/lib/listings/blocks";
-import { MONTHLY_CAP } from "@/lib/listings/feed";
+import { WINDOW_CAP, WINDOW_DAYS } from "@/lib/listings/feed";
 import { areaListings, isSubscriber, readingsFor, requestsUsed } from "@/lib/listings/store";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { isSameOrigin } from "@/lib/require-same-origin";
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       source: "RentCast",
       listings,
       sort,
-      budget: { cap: MONTHLY_CAP, used },
+      budget: { cap: WINDOW_CAP, days: WINDOW_DAYS, used },
     },
     { headers: NO_STORE },
   );

@@ -25,12 +25,12 @@ type Listing = PublicListing & { slug: string };
 
 interface AreaAnswer {
   zip: string;
-  status: "kept" | "fetched" | "budget_spent" | "feed_not_connected" | "store_not_connected" | "failed";
+  status: "kept" | "fetched" | "budget_spent" | "day_spent" | "zip_recent" | "feed_not_connected" | "store_not_connected" | "failed";
   fetchedAt: string | null;
   source: string;
   listings: Listing[];
   sort: { name: string; order: { key: string; depth_cm: number; spread_cm: [number, number] | null }[]; leftOut: number } | null;
-  budget: { cap: number; used: number | null };
+  budget: { cap: number; days: number; used: number | null };
 }
 
 interface BlockAnswer {
@@ -64,6 +64,14 @@ function areaLine(a: AreaAnswer): string {
       return n
         ? `${homes}, from ${a.source}, as of ${longDay(a.fetchedAt)}. Newer listings for this area load next month.`
         : "Listings for this area load next month.";
+    case "day_spent":
+      return n
+        ? `${homes}, from ${a.source}, as of ${longDay(a.fetchedAt)}. Newer listings for this area load tomorrow.`
+        : "Today's listings requests are used. Listings for this area load tomorrow.";
+    case "zip_recent":
+      return n
+        ? `${homes}, from ${a.source}, as of ${longDay(a.fetchedAt)}.`
+        : "The listings feed did not answer for this area today. It is tried again tomorrow.";
     case "feed_not_connected":
     case "store_not_connected":
       return "Homes for sale are not connected on this site yet. Searching an address still works everywhere.";

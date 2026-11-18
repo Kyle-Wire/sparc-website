@@ -10,6 +10,7 @@ import { stormsNear, type NearbyStorms } from "./hurricanes";
 import type { Lookup } from "./lookup";
 import { riskInTract, type TractRisk } from "./nri";
 import { claimsInTract, declarationsInCounty, type CountyDeclarations, type TractClaims } from "./openfema";
+import { groundAround, landCoverAround, type Ground, type LandCover } from "./surroundings";
 
 /** The headline records in a form small enough to keep and compare. A null
  *  means the source did not answer, never "zero". */
@@ -34,6 +35,10 @@ export interface PlaceRecord {
   claims: Lookup<TractClaims>;
   declarations: Lookup<CountyDeclarations>;
   risk: Lookup<TractRisk>;
+  /** Tree canopy and paving: the block against the square kilometre around it. */
+  cover: Lookup<LandCover>;
+  /** Ground height: the block against the square kilometre around it. */
+  ground: Lookup<Ground>;
   storms: NearbyStorms;
   glance: Glance;
 }
@@ -42,11 +47,13 @@ export async function loadPlace(place: LatLon): Promise<PlaceRecord> {
   const areas = await areasAt(place);
   const noArea = { ok: false as const, reason: areas.ok ? "" : areas.reason };
 
-  const [zones, claims, declarations, risk] = await Promise.all([
+  const [zones, claims, declarations, risk, cover, ground] = await Promise.all([
     floodZonesAt(place),
     areas.ok ? claimsInTract(areas.data.tractGeoid) : noArea,
     areas.ok ? declarationsInCounty(areas.data.stateFips, areas.data.countyFips) : noArea,
     areas.ok ? riskInTract(areas.data.tractGeoid) : noArea,
+    landCoverAround(place),
+    groundAround(place),
   ]);
   const storms = stormsNear(place);
 
@@ -65,6 +72,8 @@ export async function loadPlace(place: LatLon): Promise<PlaceRecord> {
     claims,
     declarations,
     risk,
+    cover,
+    ground,
     storms,
     glance: {
       where: areas.ok

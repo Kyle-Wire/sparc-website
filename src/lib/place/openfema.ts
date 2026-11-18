@@ -37,6 +37,7 @@ export async function claimsInTract(tractGeoid: string): Promise<Lookup<TractCla
   const res = await askJson<{ NfipClaims?: { yearOfLoss: number | null }[] }>(url, WHO, {
     revalidate: 7 * DAY_SECONDS,
     timeoutMs: 25_000,
+    retries: 1,
   });
   if (!res.ok) return res;
 
@@ -109,6 +110,7 @@ export async function declarationsInCounty(
   const res = await askJson<{ DisasterDeclarationsSummaries?: DeclarationRow[] }>(url, WHO, {
     revalidate: 7 * DAY_SECONDS,
     timeoutMs: 25_000,
+    retries: 1,
   });
   if (!res.ok) return res;
 

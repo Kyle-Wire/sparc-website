@@ -38,8 +38,9 @@ Not the number of layers. Four things which, as far as the agent knows, nobody o
 | FEMA's National Risk Index: eighteen hazards rated for the tract (wildfire, earthquake, tornado, heat wave, and the rest) | Built |
 | Click anywhere on the map: flood zone, ground elevation, tree canopy and paving at that spot | Built |
 | The place at a glance: the five headline records in one row | Built |
-| Tree canopy and paving as numbers, block against neighbourhood against city | Next |
-| Ground height against the surrounding 100 m and 1 km (is this block a low spot?) | Next |
+| Tree canopy and paving as numbers: the block against the square kilometre around it | Built |
+| Tree canopy and paving against the whole city | Next |
+| Ground height: the block against the square kilometre around it (is this block a low spot?) | Built |
 | Sea level rise as a sentence for the block, not only a layer | Next (needs a different NOAA product; the map service cannot answer for a point) |
 | Flood insurance policies in force nearby (how many neighbours carry it) | Next (OpenFEMA `NfipPolicies`) |
 | Repeatedly flooded properties in the area, as a count | Next (OpenFEMA `NfipMultipleLossProperties`) |
@@ -117,7 +118,9 @@ Not the number of layers. Four things which, as far as the agent knows, nobody o
 | Address dropped after lookup; links hold the block; the exact point stays in the visitor's browser | Built |
 | A methods paper for each model: what it is, what it has been tested against, its margins | Kyle, Engine |
 | Confidence labels on every modelled finding, set by fixed rules | Engine (rules exist in the Climate Inspection repo) |
-| A plain glossary: flood zone codes, "100-year storm", surface against air temperature | Next (FEMA's and NOAA's own definitions, linked) |
+| A plain glossary: every term on a place page, from the publisher's own definition, linked and dated | Built |
+| Our own copy of the slower sources (claims, declarations, hazard ratings, land cover), refreshed on a schedule, so a page does not wait on an agency's server or fail when one throttles | Next, Kyle (storage cost; the agencies throttled a single machine during testing) |
+| A loading screen that names who is being asked, shown at once while a place is read | Built |
 | Tell us what you saw: "this street floods", "it did not", with a date and a photo | Kyle (moderation, privacy; it is also the cheapest validation data there is) |
 | Validation, published: every place where the model has been compared with a measurement, good and bad | Engine |
 | A data log: when each source was last fetched and what version | Next |
@@ -138,6 +141,7 @@ Not the number of layers. Four things which, as far as the agent knows, nobody o
 
 ## Order suggested for the next three steps
 
-1. **Numbers for trees, paving and ground height**, and the plain glossary. They finish the free tier.
-2. **An account for saved places** and the "what changed" check. They finish "come back".
-3. **FloodSim guided mode in the site** with the device check. It is the first thing nobody else has.
+1. ~~Numbers for trees, paving and ground height, and the plain glossary.~~ Done on 17 November 2026.
+2. **Our own copy of the slower sources.** Every place page asks six public services live. In testing, FEMA and USGS both began refusing one machine after a few dozen lookups. This is what stands between the free tier and real traffic.
+3. **An account for saved places** and the "what changed" check. They finish "come back".
+4. **FloodSim guided mode in the site** with the device check. It is the first thing nobody else has.

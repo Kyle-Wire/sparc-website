@@ -33,6 +33,27 @@ export async function askJson<T>(url: string, who: string, opts: AskOptions = {}
   return last;
 }
 
+/** The same, for a source that answers with a file rather than JSON. */
+export async function askBytes(url: string, who: string, opts: AskOptions = {}): Promise<Lookup<ArrayBuffer>> {
+  const { retries = 0, revalidate, timeoutMs = 20_000 } = opts;
+  let last: Lookup<ArrayBuffer> = { ok: false, reason: `${who} did not answer. Try again in a minute.` };
+  for (let i = 0; i <= retries; i++) {
+    if (i > 0) await sleep(900 * i);
+    try {
+      const res = await fetch(url, {
+        headers: { "User-Agent": USER_AGENT },
+        signal: AbortSignal.timeout(timeoutMs),
+        ...(revalidate ? { next: { revalidate } } : { cache: "no-store" as const }),
+      });
+      if (res.ok) return { ok: true, data: await res.arrayBuffer() };
+      last = { ok: false, reason: `${who} answered with an error (${res.status}).` };
+    } catch {
+      last = { ok: false, reason: `${who} did not answer. Try again in a minute.` };
+    }
+  }
+  return last;
+}
+
 async function askOnce<T>(url: string, who: string, opts: AskOptions): Promise<Lookup<T>> {
   const { revalidate, timeoutMs = 15_000 } = opts;
   try {

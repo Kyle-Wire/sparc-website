@@ -65,6 +65,47 @@ const ROWS: Row[] = [
     cell: (r) => (!r.zones.ok ? DASH : r.zones.data.panelDate ? longDate(r.zones.data.panelDate) : "Not given"),
   },
   {
+    label: "Ground height against the area around it",
+    area: "the block, set against a square kilometre",
+    cell: (r) => {
+      if (!r.ground.ok) return DASH;
+      const diff = r.ground.data.blockFt - r.ground.data.neighbourhoodFt;
+      const size = Math.abs(diff);
+      return (
+        <>
+          <strong>{size < 1 ? "Level" : `${size.toFixed(size < 10 ? 1 : 0)} ft ${diff > 0 ? "higher" : "lower"}`}</strong>
+          <small>{Math.round(r.ground.data.lowerSharePct)}% of the area lies lower than the block</small>
+        </>
+      );
+    },
+  },
+  {
+    label: "Tree canopy",
+    area: "the block",
+    cell: (r) =>
+      !r.cover.ok ? (
+        DASH
+      ) : (
+        <>
+          <strong>{Math.round(r.cover.data.canopy.block)}%</strong>
+          <small>{Math.round(r.cover.data.canopy.neighbourhood)}% across the square kilometre around it</small>
+        </>
+      ),
+  },
+  {
+    label: "Paving and buildings",
+    area: "the block",
+    cell: (r) =>
+      !r.cover.ok ? (
+        DASH
+      ) : (
+        <>
+          <strong>{Math.round(r.cover.data.paving.block)}%</strong>
+          <small>{Math.round(r.cover.data.paving.neighbourhood)}% across the square kilometre around it</small>
+        </>
+      ),
+  },
+  {
     label: "Flood insurance claims",
     area: "the census tract",
     cell: (r) =>

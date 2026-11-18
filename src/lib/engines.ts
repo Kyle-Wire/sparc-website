@@ -24,6 +24,11 @@
  *                  and refusing readings it has failed on (fast mining
  *                  subsidence). Kyle's own repository only (Climate Inspection
  *                  DECISIONS.md D25). Insar_Pipeline_KF is never opened.
+ *                  What is free and what is paid, the hundred-metre reading,
+ *                  the rings, "detectable from", the research label on the
+ *                  seasonal swing, the ten-year band with no damage threshold,
+ *                  the review hold and the words never used: Climate
+ *                  Inspection DECISIONS.md D38 and D39 (18 November 2026).
  *   WindSim        README and docs/design.md at cc15851: winds through urban
  *                  terrain on OpenFOAM, on a workstation. Its outputs include
  *                  Hazus damage ratios and an optional dollar loss; this site
@@ -52,6 +57,9 @@ export interface Engine {
   where: string;
   /** One or two sentences: what it does, without a number. */
   summary: string;
+  /** What every report carries for this hazard at no charge. Omitted where
+   *  nothing is free yet. */
+  free?: string[];
   /** What a buyer reads on the Modelled shelf (directive §4, §13). */
   findings: string[];
   /** The choices a paying user makes before a run. Words only: these are
@@ -65,6 +73,8 @@ export interface Engine {
   never: string[];
   /** Can a subscriber start a run themself, or is it run for them? */
   selfServe: "run-it-yourself" | "queued-for-you" | "run-for-you";
+  /** What an order shows when a section is held back for review. */
+  held?: string;
   /** The status line, honest about today. */
   status: string;
   /** Repository and the commit the sentences above were read at. */
@@ -139,26 +149,34 @@ export const ENGINES: Engine[] = [
     name: "SPARC InSAR",
     runsOn: "our-workstation",
     where:
-      "On our workstation. Radar images of the area are gathered and processed for you; you then read and explore the result.",
+      "On our workstation. The radar for the place is gathered and processed for you; you then read and explore the result.",
     summary:
-      "Measures how the ground has moved over years from satellite radar, which passes over the same ground every twelve days, through cloud and at night. Movement is reported only where it stands out from the area's own undisturbed ground.",
+      "Measures how the ground has moved over years from satellite radar, which passes over the same ground every twelve days, through cloud and at night. Each reading describes the ground the house stands on, averaged over about a hundred metres around it, not the house itself.",
+    free: [
+      "Whether the ground the house stands on is sinking or rising, from NASA's OPERA ground-motion product, labelled screening",
+      "The USGS map of ground prone to sinkholes",
+    ],
     findings: [
-      "Whether the ground at the house is sinking or rising",
-      "Whether it moves with its surroundings or on its own",
-      "Whether the rate is steady or new",
-      "Where the satellite cannot see",
+      "Whether that ground moves with its surroundings or on its own, against a near ring and a wide ring",
+      "Whether the rate is steady, or a change detectable from a given year, with the rates before and after",
+      "The seasonal swing, labelled research until it passes its test",
+      "Ten years ahead: the ground at the house against the wide ring, with a band that widens",
     ],
-    choices: ["The years of radar to read", "How far around the house to compare"],
-    whatIf: ["The measured rate carried forward"],
+    choices: ["The years of radar to read", "Our own full processing of the place, beside NASA's product"],
+    whatIf: ["Ten years ahead, against the wide ring"],
     whatIfNote:
-      "The rate measured so far, carried forward, to show how things are likely to continue and when they could matter. It is a projection of a measurement, not a forecast of a collapse.",
+      "The measured movement of the ground at the house against its wide surroundings, carried forward ten years with a band that widens. It names no point at which damage begins: radar blended over a block cannot measure strain across one house.",
     never: [
+      "That ground is stable, has stopped or is safe; only whether it moves beyond what the satellite can detect there",
       "A sudden collapse: radar shows slow movement, not an overnight drop",
-      "A reading where the pipeline has failed its own checks; it refuses instead",
-      "A statement about the house's foundation",
+      "A number where the checks refuse a reading; the section says why instead",
+      "Anything about the house's own foundation, or when damage would begin",
     ],
+    held:
+      "A ground section can be held for a person to review, for example when the ground at the house moves on its own or a new rate appears. The order then shows it as in review, not as failed. Our own full processing takes one to two days for a place and is shared by every property near it, so a paid order may wait on it.",
     selfServe: "run-for-you",
-    status: "The pipeline runs end to end on one workstation. It is not connected to the site yet.",
+    status:
+      "Defined, with each reading marked free or paid and ready, in review or refused. No radar has been read for any place yet.",
     source: { repo: "Kyle-Wire/insar_pipeline", commit: "3612eda" },
   },
   {

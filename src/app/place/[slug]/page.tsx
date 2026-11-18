@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { Suspense, type ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { Kicker } from "@/components/marketing/page-shell";
 import { PlaceActions } from "@/components/place/PlaceActions";
 import { PlaceMap, type TrackLine } from "@/components/place/PlaceMap";
-import { HeightBand, LockedShelf, MissingCard, RatingBar, RecordCard, ShareBars, ShelfHead } from "@/components/place/cards";
+import { HeightBand, LockedShelf, MissingCard, PendingCard, RatingBar, RecordCard, ShareBars, ShelfHead } from "@/components/place/cards";
 import { GlanceRow } from "@/components/place/glance";
 import { Questions } from "@/components/place/questions";
 import { KM_PER_MILE, parsePlaceSlug } from "@/lib/place/coords";
@@ -13,7 +14,8 @@ import type { NearbyStorm } from "@/lib/place/hurricanes";
 import type { Lookup } from "@/lib/place/lookup";
 import type { TractRisk } from "@/lib/place/nri";
 import { claimsNotLocatedPct, type CountyDeclarations, type TractClaims } from "@/lib/place/openfema";
-import { loadPlace } from "@/lib/place/summary";
+import type { FloodZones } from "@/lib/place/fema";
+import { finishPlace, glanceOf, startPlace } from "@/lib/place/summary";
 import type { Ground, LandCover } from "@/lib/place/surroundings";
 
 // A place page: everything on the public record about the neighbourhood
@@ -53,6 +55,12 @@ function longDate(iso: string): string {
     day: "numeric",
     timeZone: "UTC",
   });
+}
+
+/** Waits for one lookup inside a Suspense boundary, so the rest of the page
+ *  is sent first and this part follows when its source answers. */
+async function Later<T>({ value, children }: { value: Promise<T>; children: (v: T) => ReactNode }) {
+  return <>{children(await value)}</>;
 }
 
 /** "our copy of November 17, 2026", for a record read from the site's own copy of a FEMA table. */
@@ -274,15 +282,79 @@ function RiskCard({ res, tractName }: { res: Lookup<TractRisk>; tractName: strin
   );
 }
 
+function ZoneCard({ zones }: { zones: Lookup<FloodZones> }) {
+  const sfha = zones.ok ? zones.data.zones.filter((z) => z.inSfha) : [];
+  return zones.ok ? (
+    zones.data.zones.length === 0 ? (
+      <RecordCard hazard="flood" about="FEMA flood zone" figure="Not mapped" source={FEMA_SOURCE}>
+        <p>FEMA&apos;s digital flood map has no zone for this block. Not every part of the country is in it.</p>
+      </RecordCard>
+    ) : (
+      <RecordCard
+        hazard="flood"
+        about="FEMA flood zone"
+        term="flood-zone"
+        figure={`Zone ${zones.data.zones[0].code}`}
+        figureNote={
+          zones.data.zones.length > 1
+            ? `and ${zones.data.zones.length - 1} more on this block`
+            : (zones.data.zones[0].subtype ?? undefined)
+        }
+        source={FEMA_SOURCE}
+        asOf={zones.data.panelDate ? `map panel effective ${longDate(zones.data.panelDate)}` : undefined}
+      >
+        {zones.data.zones.length === 1 ? (
+          <p>
+            FEMA&apos;s flood map puts this block in Zone {zones.data.zones[0].code}
+            {zones.data.zones[0].subtype ? ` (${zones.data.zones[0].subtype.toLowerCase()})` : ""}.{" "}
+            {sfha.length
+              ? "FEMA classes it as a Special Flood Hazard Area."
+              : "FEMA does not class it as a Special Flood Hazard Area."}
+          </p>
+        ) : (
+          <>
+            <p>FEMA&apos;s flood map shows more than one zone on this block:</p>
+            <ul>
+              {zones.data.zones.map((z) => (
+                <li key={`${z.code}-${z.subtype ?? ""}`}>
+                  Zone {z.code}
+                  {z.subtype ? `, ${z.subtype.toLowerCase()}` : ""}
+                  {z.inSfha ? " (Special Flood Hazard Area)" : ""}
+                </li>
+              ))}
+            </ul>
+            <p>
+              {sfha.length
+                ? "Part of the block is in FEMA's Special Flood Hazard Area. "
+                : "None of them is a Special Flood Hazard Area. "}
+              The map above shows where the lines fall.
+            </p>
+          </>
+        )}
+        <p className="record-aside">
+          A flood zone is FEMA&apos;s map of flood hazard for insurance and building rules. It is
+          context, not a forecast for one house.
+        </p>
+      </RecordCard>
+    )
+  ) : (
+    <MissingCard hazard="flood" about="FEMA flood zone" reason={zones.reason} source={FEMA_SOURCE} />
+  );
+}
+
 export default async function PlacePage({ params }: Props) {
   const { slug: rawSlug } = await params;
   const place = parsePlaceSlug(rawSlug);
   if (!place) notFound();
   const slug = decodeURIComponent(rawSlug);
 
-  const record = await loadPlace(place);
-  const { areas, zones, claims, declarations, risk, cover, ground, storms, glance } = record;
-  const where = glance.where;
+  // The fast records are awaited here; FEMA's flood map, ground height and
+  // land cover are still being asked and each fills its own card below.
+  const start = await startPlace(place);
+  const record = finishPlace(start);
+  const { areas, claims, declarations, risk, storms } = start;
+  const early = glanceOf(start, null);
+  const where = early.where;
   const tractName = areas.ok ? areas.data.tractName : "this census tract";
   const countyName = areas.ok ? areas.data.countyName : "this county";
 
@@ -291,8 +363,6 @@ export default async function PlacePage({ params }: Props) {
     label: s.name ? `${s.name} ${s.year}` : `Unnamed ${s.year}`,
     lines: s.lines,
   }));
-
-  const sfha = zones.ok ? zones.data.zones.filter((z) => z.inSfha) : [];
 
   return (
     <>
@@ -308,8 +378,16 @@ export default async function PlacePage({ params }: Props) {
             What public registers hold about flood, storms, sea level and land cover around this place. The
             page shows the neighbourhood, not a house, and its address carries the block only.
           </p>
-          <PlaceActions slug={slug} glance={glance} />
-          <GlanceRow glance={glance} linked />
+          <Suspense fallback={<GlanceRow glance={early} linked zonePending />}>
+            <Later value={record}>
+              {(r) => (
+                <>
+                  <PlaceActions slug={slug} glance={r.glance} />
+                  <GlanceRow glance={r.glance} linked />
+                </>
+              )}
+            </Later>
+          </Suspense>
           <div className="place-paid-cta">
             <span>
               <strong>What could happen here?</strong> Flood, heat, ground movement and wind, modelled for this
@@ -353,64 +431,13 @@ export default async function PlacePage({ params }: Props) {
           <div className="shelf">
             <ShelfHead name="On record" state="free" />
             <div className="shelf-cards">
-              {zones.ok ? (
-                zones.data.zones.length === 0 ? (
-                  <RecordCard hazard="flood" about="FEMA flood zone" figure="Not mapped" source={FEMA_SOURCE}>
-                    <p>FEMA&apos;s digital flood map has no zone for this block. Not every part of the country is in it.</p>
-                  </RecordCard>
-                ) : (
-                  <RecordCard
-                    hazard="flood"
-                    about="FEMA flood zone"
-                    term="flood-zone"
-                    figure={`Zone ${zones.data.zones[0].code}`}
-                    figureNote={
-                      zones.data.zones.length > 1
-                        ? `and ${zones.data.zones.length - 1} more on this block`
-                        : (zones.data.zones[0].subtype ?? undefined)
-                    }
-                    source={FEMA_SOURCE}
-                    asOf={zones.data.panelDate ? `map panel effective ${longDate(zones.data.panelDate)}` : undefined}
-                  >
-                    {zones.data.zones.length === 1 ? (
-                      <p>
-                        FEMA&apos;s flood map puts this block in Zone {zones.data.zones[0].code}
-                        {zones.data.zones[0].subtype ? ` (${zones.data.zones[0].subtype.toLowerCase()})` : ""}.{" "}
-                        {sfha.length
-                          ? "FEMA classes it as a Special Flood Hazard Area."
-                          : "FEMA does not class it as a Special Flood Hazard Area."}
-                      </p>
-                    ) : (
-                      <>
-                        <p>FEMA&apos;s flood map shows more than one zone on this block:</p>
-                        <ul>
-                          {zones.data.zones.map((z) => (
-                            <li key={`${z.code}-${z.subtype ?? ""}`}>
-                              Zone {z.code}
-                              {z.subtype ? `, ${z.subtype.toLowerCase()}` : ""}
-                              {z.inSfha ? " (Special Flood Hazard Area)" : ""}
-                            </li>
-                          ))}
-                        </ul>
-                        <p>
-                          {sfha.length
-                            ? "Part of the block is in FEMA's Special Flood Hazard Area. "
-                            : "None of them is a Special Flood Hazard Area. "}
-                          The map above shows where the lines fall.
-                        </p>
-                      </>
-                    )}
-                    <p className="record-aside">
-                      A flood zone is FEMA&apos;s map of flood hazard for insurance and building rules. It is
-                      context, not a forecast for one house.
-                    </p>
-                  </RecordCard>
-                )
-              ) : (
-                <MissingCard hazard="flood" about="FEMA flood zone" reason={zones.reason} source={FEMA_SOURCE} />
-              )}
+              <Suspense fallback={<PendingCard hazard="flood" about="FEMA flood zone" who="FEMA's flood map" source={FEMA_SOURCE} />}>
+                <Later value={start.zones}>{(zones) => <ZoneCard zones={zones} />}</Later>
+              </Suspense>
 
-              <GroundCard res={ground} />
+              <Suspense fallback={<PendingCard hazard="flood" about="Ground height" who="USGS" source={GROUND_SOURCE} />}>
+                <Later value={start.ground}>{(ground) => <GroundCard res={ground} />}</Later>
+              </Suspense>
               <ClaimsCard res={claims} tractName={tractName} />
               <DeclarationsCard res={declarations} countyName={countyName} />
 
@@ -486,7 +513,9 @@ export default async function PlacePage({ params }: Props) {
           <div className="shelf">
             <ShelfHead name="On record" state="free" />
             <div className="shelf-cards">
-              <CoverCards res={cover} />
+              <Suspense fallback={<PendingCard hazard="heat" about="Tree canopy and paving" who="the land cover survey" source={COVER_SOURCE} />}>
+                <Later value={start.cover}>{(cover) => <CoverCards res={cover} />}</Later>
+              </Suspense>
             </div>
           </div>
 
@@ -525,7 +554,9 @@ export default async function PlacePage({ params }: Props) {
             Chosen from what the record shows for this place. They are questions for people who can answer
             them, not advice.
           </p>
-          <Questions record={record} />
+          <Suspense fallback={<p className="shelf-empty">The questions are chosen once every source has answered.</p>}>
+            <Later value={record}>{(r) => <Questions record={r} />}</Later>
+          </Suspense>
         </div>
       </section>
 
@@ -537,14 +568,17 @@ export default async function PlacePage({ params }: Props) {
             Ground movement
           </h2>
           <p className="lead">
-            Whether the ground is sinking or shifting, measured from satellite radar over years, and the measured
-            rate carried forward.
+            Whether the ground is sinking or rising, measured from satellite radar over years, and where it is
+            heading over ten years against its surroundings.
           </p>
           <div className="shelf">
             <ShelfHead name="On record" state="coming" />
             <p className="shelf-empty">
-              No public register of ground movement is on this page yet. Which one to show, if any, has not been
-              decided.
+              This shelf will show, free, whether the ground at the centre of this block is sinking or rising,
+              from NASA&apos;s OPERA ground-motion product and labelled screening, beside the USGS map of ground prone
+              to sinkholes. It will be a reading of the block&apos;s ground, not of any house, and where the satellite
+              cannot give a reading the card will say so rather than show a number. Neither is shown yet: no
+              radar has been read for any place.
             </p>
           </div>
           <div className="shelf shelf-pair">

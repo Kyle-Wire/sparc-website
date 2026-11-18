@@ -67,9 +67,9 @@ const HAZARDS: { name: string; record: string; model: string; whatIf: string; li
   },
   {
     name: "Ground",
-    record: "To be decided",
+    record: "Free with a report: sinking or rising, and ground prone to sinkholes",
     model: "Ground movement measured from satellite radar",
-    whatIf: "The measured rate carried forward",
+    whatIf: "Ten years ahead, against the wide surroundings",
     live: false,
   },
   {

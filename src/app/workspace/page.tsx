@@ -30,10 +30,11 @@ const FLOW: Record<EngineId, string[]> = {
     "Try a project; it is shown as a change across the neighbourhood with its range.",
   ],
   ground: [
-    "We gather the radar images of the area and process them.",
-    "Each reading is set against the area's own undisturbed ground before it is shown.",
+    "We read NASA's ground-motion product for the place, and our own full processing when it is ready.",
+    "The ground at the house is set against a near ring and a wide ring before anything is shown.",
+    "If the checks flag something, the section waits for a person to review it and says so.",
     "Explore the map and the record of movement over the years.",
-    "Carry the measured rate forward to see how it is likely to continue.",
+    "See the movement ten years ahead against the wide ring, with its band.",
   ],
   wind: [
     "We work out the wind through the neighbourhood from every direction.",

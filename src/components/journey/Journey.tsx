@@ -192,9 +192,14 @@ export function Journey({ slug, initialHazards }: { slug: string | null; initial
                   <span className="hazard-mark" data-hazard={e.id} aria-hidden />
                   {e.hazard}
                 </h3>
+                {e.free && (
+                  <p className="journey-aside" style={{ marginTop: 0 }}>
+                    <strong>Free with every report:</strong> {e.free.join("; ")}.
+                  </p>
+                )}
                 <div className="journey-get-cols">
                   <div>
-                    <div className="kicker">you read</div>
+                    <div className="kicker">{e.free ? "you read, paid" : "you read"}</div>
                     <ul>
                       {e.findings.map((f) => (
                         <li key={f}>{f}</li>
@@ -218,6 +223,7 @@ export function Journey({ slug, initialHazards }: { slug: string | null; initial
                     </ul>
                   </div>
                 </div>
+                {e.held && <p className="journey-aside">{e.held}</p>}
               </div>
             ))}
             <p className="journey-aside">

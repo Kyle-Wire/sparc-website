@@ -77,6 +77,7 @@ alter table public.feed_request_log enable row level security;
 --                       charge for each request over; five are kept spare)
 --   10 in any day      (so one visitor panning the map cannot spend the month)
 --   a ZIP code asked in the last 24 hours is not asked again
+--   only the source 'RentCast' is accepted
 -- An advisory lock per source makes two visitors at once take turns, so they
 -- cannot both take the last request.
 create or replace function public.take_feed_request(p_source text, p_zip text)
@@ -91,6 +92,11 @@ declare
   used_window int;
   used_day int;
 begin
+  -- One feed, one spelling: a caller cannot open a second budget by naming
+  -- the source differently.
+  if p_source is distinct from 'RentCast' then
+    return 'unknown_source';
+  end if;
   perform pg_advisory_xact_lock(hashtext('feed:' || p_source));
 
   if exists (

@@ -83,7 +83,8 @@ export async function areaListings(zip: string, now = new Date()): Promise<Area>
   const answer = took as TakeAnswer;
   if (answer === "window_spent") return { zip, status: "budget_spent", ...stale };
   if (answer === "day_spent") return { zip, status: "day_spent", ...stale };
-  if (answer !== "ok") return { zip, status: "zip_recent", ...stale };
+  if (answer === "zip_recent") return { zip, status: "zip_recent", ...stale };
+  if (answer !== "ok") return { zip, status: "failed", ...stale };
 
   let records: unknown[];
   try {

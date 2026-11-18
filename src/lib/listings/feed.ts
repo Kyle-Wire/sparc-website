@@ -19,7 +19,7 @@ export const WINDOW_DAYS = 31;
 export const DAY_CAP = 10;
 
 /** What take_feed_request answers. */
-export type TakeAnswer = "ok" | "window_spent" | "day_spent" | "zip_recent";
+export type TakeAnswer = "ok" | "window_spent" | "day_spent" | "zip_recent" | "unknown_source";
 
 /**
  * Only one site may spend requests, so there is one log against one database:

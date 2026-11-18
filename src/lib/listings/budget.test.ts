@@ -67,6 +67,13 @@ test("the ceiling is fixed in the database: the function takes no cap from its c
   await assert.rejects(db.query("select public.take_feed_request('RentCast', '00001', 1000)"));
 });
 
+test("a second spelling of the source gets no budget of its own", async () => {
+  await reset();
+  assert.equal(await take("00001", "rentcast"), "unknown_source");
+  assert.equal(await take("00001", "Other"), "unknown_source");
+  assert.equal((await db.query<{ n: number }>("select count(*)::int as n from public.feed_request_log")).rows[0].n, 0);
+});
+
 test("no more than ten in a day", async () => {
   await reset();
   for (let i = 0; i < 10; i++) assert.equal(await take(`d${i}`), "ok");

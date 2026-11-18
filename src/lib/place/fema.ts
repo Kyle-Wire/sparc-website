@@ -22,6 +22,9 @@ import type { LatLon } from "./coords";
 const NFHL = "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer";
 const WHO = "FEMA's flood map service";
 
+/** An answer from the flood map service is kept for a week. */
+const ZONES_KEPT = 7 * DAY_SECONDS;
+
 /** Half-widths of the box, in degrees: about 90 m north-south and 85 m
  *  east-west at mid-latitudes, a little larger than the rounding cell. */
 const HALF_LAT = 0.0008;
@@ -89,7 +92,7 @@ export async function floodZonesAt(place: LatLon): Promise<Lookup<FloodZones>> {
   const zonesRes = await askJson<ArcFeatures<ZoneRow>>(
     boxQuery(place, 28, "FLD_ZONE,ZONE_SUBTY,SFHA_TF,DFIRM_ID"),
     WHO,
-    { revalidate: DAY_SECONDS, retries: 2 },
+    { revalidate: ZONES_KEPT, retries: 2 },
   );
   if (!zonesRes.ok) return zonesRes;
 
@@ -110,7 +113,7 @@ export async function floodZonesAt(place: LatLon): Promise<Lookup<FloodZones>> {
 
   let panelDate: string | null = null;
   const panelsRes = await askJson<ArcFeatures<PanelRow>>(boxQuery(place, 3, "FIRM_PAN,EFF_DATE"), WHO, {
-    revalidate: DAY_SECONDS,
+    revalidate: ZONES_KEPT,
     retries: 1,
   });
   if (panelsRes.ok) {
@@ -140,7 +143,7 @@ export async function floodZoneAtPoint(p: LatLon): Promise<Lookup<FloodZone | nu
     f: "json",
   });
   const res = await askJson<ArcFeatures<ZoneRow>>(`${NFHL}/28/query?${q.toString()}`, WHO, {
-    revalidate: DAY_SECONDS,
+    revalidate: ZONES_KEPT,
     retries: 2,
   });
   if (!res.ok) return res;

@@ -25,6 +25,10 @@ auth and Lemon Squeezy billing below are from the earlier site and unchanged.
   ([`saved-places.ts`](src/components/place/saved-places.ts)); there is no
   account behind them yet.
 - What comes next, and why: [`docs/design/roadmap.md`](docs/design/roadmap.md).
+- Claims, declarations and hazard ratings are read from the site's own copy
+  of FEMA's tables in `src/data/fema` (one file per state). `npm run data:fema`
+  rebuilds it; `.github/workflows/data-refresh.yml` does so monthly and opens a
+  pull request. `/data` shows what is copied, what is asked live, and the dates.
 - Storm tracks come from a committed file built from NOAA's HURDAT2:
   `npm run data:hurricanes` rebuilds `src/data/hurricane-tracks.json` and its manifest.
 - The map library's worker is copied into `public/vendor/` before every `dev`

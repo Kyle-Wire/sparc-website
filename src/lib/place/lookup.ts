@@ -5,7 +5,9 @@
 // down must cost one card, not the page. FEMA's map server in particular drops
 // connections when it is busy (seen while testing, 17 Nov 2026).
 
-export type Lookup<T> = { ok: true; data: T } | { ok: false; reason: string };
+/** `final` marks an answer that asking again will not change: the source does
+ *  not cover the place. Without it, the source failed to answer this time. */
+export type Lookup<T> = { ok: true; data: T } | { ok: false; reason: string; final?: boolean };
 
 export const DAY_SECONDS = 86_400;
 

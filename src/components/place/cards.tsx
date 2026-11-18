@@ -1,6 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Em, Placeholder, PlaceholderPlot, PlaceholderTrack } from "@/components/system/placeholder";
+import { RetryButton } from "./RetryButton";
 
 /**
  * Cards for a place page.
@@ -75,17 +76,31 @@ export function RecordCard({
 
 /** A register that did not answer. The card keeps its place so the reader can
  *  see what is missing, and says so in a sentence. */
-export function MissingCard({ hazard, about, reason, source }: { hazard: Hazard; about: string; reason: string; source: string }) {
+export function MissingCard({
+  hazard,
+  about,
+  reason,
+  source,
+  final,
+}: {
+  hazard: Hazard;
+  about: string;
+  reason: string;
+  source: string;
+  /** The source does not cover this place; asking again will not help. */
+  final?: boolean;
+}) {
   return (
     <article className="record-card record-card-missing" data-hazard={hazard}>
       <div className="kicker">{about}</div>
       <div className="record-body">
         <p>
-          <strong>No answer right now.</strong> {reason}
+          <strong>{final ? "Not available for this place." : "No answer right now."}</strong> {reason}
         </p>
+        {!final && <RetryButton />}
       </div>
       <footer className="record-source">
-        <span className="record-basis">Not loaded</span>
+        <span className="record-basis">{final ? "Not covered" : "Not loaded"}</span>
         <span>{source}</span>
       </footer>
     </article>
@@ -104,7 +119,11 @@ function Slot({ label, track }: { label: string; track?: boolean }) {
   );
 }
 
-export type ShelfKind = "flood-model" | "flood-whatif" | "heat-model" | "heat-whatif";
+export type ShelfKind =
+  | "flood-model" | "flood-whatif"
+  | "heat-model" | "heat-whatif"
+  | "ground-model" | "ground-whatif"
+  | "wind-model";
 
 const SHELVES: Record<
   ShelfKind,
@@ -134,10 +153,39 @@ const SHELVES: Record<
     slots: ["Trees planted", "Paving removed", "Cool roof", "Cool pavement"],
     tracks: true,
   },
+  "ground-model": {
+    label: "ground movement · measured from radar",
+    note: "Layout only. No radar has been processed for this place, so there are no numbers here. A reading covers the ground around the property, set against the area's own undisturbed ground.",
+    plot: "Where a map of ground movement would go. Nothing has been measured, so nothing is drawn.",
+    slots: ["Movement at the house", "Against its surroundings", "Steady or new", "Where the satellite cannot see"],
+  },
+  "ground-whatif": {
+    label: "what if · the rate carried forward",
+    note: "Layout only. Nothing has been measured. The measured rate, carried forward, would show how things are likely to continue. It is a projection of a measurement, not a forecast.",
+    plot: "Where the record of movement over the years, and the rate carried forward, would go. Nothing has been measured, so nothing is drawn.",
+    slots: ["How it is likely to continue", "When it could matter"],
+  },
+  "wind-model": {
+    label: "wind model · through the seasons",
+    note: "Layout only. No wind model has been run for this place, so there are no numbers here. A run shows how wind moves between the buildings, season by season.",
+    plot: "Where a map of wind through the neighbourhood would go. Nothing has been modelled, so nothing is drawn.",
+    slots: ["Wind by season", "Where buildings funnel it", "Gusts at street level", "Gusts at roof level"],
+  },
+};
+
+/** Which hazard each shelf belongs to, for the request link. */
+const SHELF_HAZARD: Record<ShelfKind, string> = {
+  "flood-model": "flood",
+  "flood-whatif": "flood",
+  "heat-model": "heat",
+  "heat-whatif": "heat",
+  "ground-model": "ground",
+  "ground-whatif": "ground",
+  "wind-model": "wind",
 };
 
 /** A paid shelf, drawn as layout. `cta` adds the request link under it. */
-export function LockedShelf({ kind, cta = true }: { kind: ShelfKind; cta?: boolean }) {
+export function LockedShelf({ kind, cta = true, place }: { kind: ShelfKind; cta?: boolean; place?: string }) {
   const s = SHELVES[kind];
   return (
     <div className="shelf-locked">
@@ -152,7 +200,9 @@ export function LockedShelf({ kind, cta = true }: { kind: ShelfKind; cta?: boole
       {cta && (
         <p className="shelf-cta">
           Paid, and not on sale yet. For now a report is run by hand on request.{" "}
-          <Link href="/contact">Ask for a report</Link>
+          <Link href={{ pathname: "/start", query: place ? { place, hazard: SHELF_HAZARD[kind] } : { hazard: SHELF_HAZARD[kind] } }}>
+            Ask for a report
+          </Link>
         </p>
       )}
     </div>

@@ -111,7 +111,7 @@ export const BASE_STYLE: StyleSpecification = {
     },
   },
   layers: [
-    { id: "base", type: "raster", source: "base", paint: { "raster-saturation": -1 } },
+    { id: "base", type: "raster", source: "base", paint: { "raster-saturation": -1, "raster-contrast": 0.25 } },
     { id: "aerial", type: "raster", source: "aerial", layout: { visibility: "none" }, paint: { "raster-saturation": -1 } },
   ],
 };

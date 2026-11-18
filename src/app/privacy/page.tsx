@@ -1,46 +1,155 @@
+import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 import { COMPANY, COMPANY_LEGAL, EMAIL_PRIMARY, OFFICE_FULL, COPYRIGHT_YEAR } from "@/lib/brand";
 
 export const metadata = { title: "Privacy" };
 
-// Corrected 2026-10-30. This page described a shipped desktop application, a
-// live subscription and a metering stream, none of which exist: the desktop path
-// is frozen, self-serve checkout is disabled, and nothing emits metering events.
-// A privacy policy that overstates the data we handle is as much a
-// misrepresentation as one that understates it, and this is the page a
-// procurement reviewer reads. The corrected text below describes only the
-// website, which is the only thing currently running.
+// Rewritten 2026-11-18 for the site as it now runs.
+//
+// The page it replaces was written for a site with no address search, and two
+// of its sentences had become false: it said the site ran no analytics, while
+// the layout loads Vercel Web Analytics and Speed Insights (and the live site
+// serves both scripts); and it said nothing about addresses, which the site
+// now takes. This is a plain statement of what the code does, ahead of full
+// terms, which Kyle has said come later.
+//
+// Every sentence below is checkable against the code or a publisher's page:
+//   address handling     src/app/api/geocode/route.ts, src/lib/place/coords.ts,
+//                        src/components/place/place-point.ts
+//   map clicks           src/app/api/inspect/route.ts
+//   saved places         src/components/place/saved-places.ts
+//   map layers           src/components/place/PlaceMap.tsx, next.config.ts
+//   contact form         src/app/api/waitlist/route.ts
+//   analytics            src/app/layout.tsx; Vercel's statement that Web
+//                        Analytics uses no third-party cookies and discards
+//                        its visitor hash after 24 hours
+//                        (vercel.com/docs/analytics/privacy-policy, read
+//                        18 Nov 2026)
+//
+// If the code changes what happens to something a visitor gives us, this page
+// changes in the same pull request.
 //
 // This has not been reviewed by counsel. It should be before anyone signs a
 // contract or an E&O application that references it.
+
+const h2 = { fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: "10px 0 0" } as const;
 
 export default function PrivacyPage() {
   return (
     <>
       <Nav />
-      <PageHero kicker="privacy · plain english" title="What we collect, what we don't." lead={`${COMPANY} does not currently distribute software, so this covers this website and anything you send us directly.`} accent="var(--purple)" />
+      <PageHero
+        kicker="privacy · plain english"
+        title="What happens to what you give this site."
+        lead="An address you type is used to find the block and is not kept. Pages and links carry the block, not the house. Here is all of it, item by item."
+        accent="var(--purple)"
+      />
       <Section>
-        <article className="prose" style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 18, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>What we collect</h2>
-          <p>Account information you give us, if you create an account: email, and optionally a name and organization. Whatever you write in a contact or access request, so that we can reply to it. Nothing else.</p>
+        <article className="prose" style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 14, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
+          <h2 style={h2}>An address you type</h2>
+          <p>
+            It goes to our server, and from there to the US Census Bureau&apos;s geocoder, which turns it into a
+            location. We do not store it, log it or put it in a link. What comes back is rounded to about a
+            block, and that block is what the page address carries.
+          </p>
+          <p>
+            The exact point is sent back to your browser and kept there, for that tab only, so the map can
+            mark the address for you. It is gone when you close the tab. Someone you send the link to sees
+            the block and no mark.
+          </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>What we don&apos;t</h2>
-          <p>We do not run advertising, analytics or third-party trackers on this site. We do not sell anything through it, so there is no payment or subscription data. We do not receive project files, rasters, model outputs or LLM prompts from any installed application, because there is no installed application sending them. We do not train on anything you send us.</p>
+          <h2 style={h2}>A spot you click on the map</h2>
+          <p>
+            It goes to our server, which asks FEMA, the US Geological Survey and the national land cover
+            server what they hold for that spot. We do not store it.
+          </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>If we run a study for you</h2>
-          <p>A commissioned study is different and we will not describe it here in general terms: your inputs would leave your machine and come to ours. The handling terms belong in the engagement agreement, in writing, for that specific piece of work. See <a href="/data-use">data use</a>.</p>
+          <h2 style={h2}>The place you are looking at</h2>
+          <p>
+            To fill a place page, our server asks public agencies about the block: the Census Bureau, FEMA,
+            the US Geological Survey and the land cover server. Their answers are kept for a while so the
+            next lookup of the same block is quick. They are kept by block, not by visitor.
+          </p>
+          <p>
+            The map&apos;s pictures are different: your browser loads them straight from the US Geological
+            Survey, FEMA, NOAA and the land cover server. Those agencies receive your internet address and
+            the area of map you are looking at, as they would if you used their own map sites.
+          </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Your rights</h2>
-          <p>You can ask us to export, correct or delete anything we hold about you by emailing <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a>. We will respond within 30 days.</p>
+          <h2 style={h2}>Saved places, notes and recently viewed</h2>
+          <p>
+            These stay in your browser. They are never sent to us. They hold the block, the name of its
+            town, your note and a snapshot of that day&apos;s figures, and no address. Clearing your browsing
+            data removes them, and so do the &quot;Remove&quot; and &quot;Clear this list&quot; buttons on{" "}
+            <Link href="/places">Your places</Link>.
+          </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Subprocessors</h2>
-          <ul><li>Supabase — authentication and database for this site (US/EU)</li><li>Vercel — website hosting (US)</li><li>Resend — transactional email (US)</li></ul>
+          <h2 style={h2}>The contact form</h2>
+          <p>
+            What you write there (your name, email, organization if you give one, and your message) is
+            stored in our database and emailed to us so we can reply, along with the kind of browser you
+            used and the page you came from. You get an automatic email saying we have it. If you ask for a
+            report we will need
+            the real address of the property; we will ask for it by email, and how it is handled will be
+            agreed in writing for that piece of work.
+          </p>
 
-          <h2 id="cookies" style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0, scrollMarginTop: 96 }}>Cookies</h2>
-          <p>This site uses only strictly necessary cookies. When you sign in, Supabase sets an HttpOnly, Secure, SameSite session cookie (<code>sb-*-auth-token</code>) so we can keep you logged in across pages. That&apos;s it — no advertising cookies, no analytics cookies, no third-party trackers, no cross-site identifiers.</p>
-          <p>Because these cookies are strictly necessary to provide the service you requested, they&apos;re exempt from prior consent under GDPR and the ePrivacy Directive. You can clear them at any time from your browser&apos;s site settings; doing so will sign you out.</p>
+          <h2 style={h2}>Counting visits</h2>
+          <p>
+            The site uses Vercel Web Analytics to count page views and Vercel Speed Insights to measure how
+            fast pages load. Vercel says Web Analytics uses no third-party cookies and identifies a visit by
+            a hash that is discarded after 24 hours. The count includes which pages were viewed. A place
+            page&apos;s address holds a block, so a block can appear in that count; a street address cannot.
+          </p>
+          <p>
+            To stop abuse, the server may also count requests from one internet address for a short time.
+          </p>
 
+          <h2 style={h2}>What we do not do</h2>
+          <p>
+            No advertising and no advertising trackers. We do not sell or share a list of visitors, addresses
+            or places looked up, and we do not pass visitors to agents, lenders or insurers. We do not train
+            anything on what you send us.
+          </p>
+
+          <h2 style={h2}>Accounts</h2>
+          <p>
+            Nothing on the site needs an account today. If you have one from before, we hold the email you
+            signed up with and anything else you entered then, such as a name and organization.
+          </p>
+
+          <h2 style={h2}>Your rights</h2>
+          <p>
+            You can ask us to export, correct or delete anything we hold about you by emailing{" "}
+            <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a>. We will respond within 30 days.
+          </p>
+
+          <h2 style={h2}>Who else is involved</h2>
+          <ul>
+            <li>Vercel: hosts the website, and receives your internet address with each page you load, as any host does. Also the visit counting above.</li>
+            <li>Supabase: the database for contact messages and accounts.</li>
+            <li>Resend: sends the email that tells us a contact message has arrived.</li>
+            <li>US Census Bureau: receives an address you search for, from our server.</li>
+            <li>FEMA, US Geological Survey, NOAA and the national land cover server (MRLC): the sources of the records and map layers, as described above.</li>
+          </ul>
+
+          <h2 id="cookies" style={{ ...h2, scrollMarginTop: 96 }}>Cookies and browser storage</h2>
+          <p>
+            The site sets no advertising or tracking cookies. If you sign in to an account, Supabase sets a
+            session cookie (<code>sb-*-auth-token</code>) to keep you signed in; without an account there is
+            no such cookie.
+          </p>
+          <p>
+            Your browser&apos;s own storage holds three things, none of which leaves it: whether you have
+            dismissed the cookie notice, your saved and recently viewed places, and, for one tab, the exact
+            point of an address you searched.
+          </p>
+
+          <p style={{ fontSize: 13, color: "var(--muted)" }}>
+            Written 18 November 2026 for the site as it runs today. {COMPANY} will change this page whenever
+            the site changes what it does with something you give it. Full terms are still to come.
+          </p>
           <p style={{ fontSize: 13, color: "var(--muted)" }}>© {COPYRIGHT_YEAR} {COMPANY_LEGAL} · {OFFICE_FULL}</p>
         </article>
       </Section>

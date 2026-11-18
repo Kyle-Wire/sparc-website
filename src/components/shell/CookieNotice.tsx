@@ -60,8 +60,11 @@ export function CookieNotice() {
       }}
     >
       <p style={{ margin: 0, flex: "1 1 280px" }}>
-        We use only essential cookies to keep you signed in. No tracking, no
-        analytics.{" "}
+        {/* Was "No tracking, no analytics." The site does count page views
+            (Vercel Web Analytics, loaded in src/app/layout.tsx), so that
+            sentence was untrue. The details are on /privacy. */}
+        No advertising or tracking cookies. Page views are counted, and an
+        address you search for is not kept.{" "}
         <Link href="/privacy#cookies" style={{ textDecoration: "underline" }}>
           Learn more
         </Link>

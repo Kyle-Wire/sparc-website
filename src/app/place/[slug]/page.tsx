@@ -685,7 +685,7 @@ export default async function PlacePage({ params }: Props) {
                   </tr>
                   <tr>
                     <td>Census areas, base map</td>
-                    <td>US Census Bureau; USGS The National Map</td>
+                    <td>US Census Bureau; USGS The National Map, aerial imagery</td>
                     <td>Names of the tract and county; the map underneath</td>
                   </tr>
                 </tbody>

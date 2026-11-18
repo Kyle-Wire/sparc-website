@@ -22,6 +22,8 @@ What is not carried over (**agent's call**, following the research in section 3)
 - Body text and headings stay in Inter. The brand colours, the crimson accent button and the data ramps are unchanged. No brand hex was edited; three role tokens were added (`--ban`, `--ban-ink`, `--ban-muted`), and `check:colors` now holds them to 4.5:1 on ink.
 - The mist is decoration under the same rule as the brand ramp: no text colour, no control boundary, no data encoding. It is drawn from a formula, never from a place's data.
 
+**The base map is the USGS aerial photo in black and white, on every map, with no switch (Kyle, 18 November 2026: "Can we actually use just the black and white aerial? It looks a lot better.").** The topographic map and the Map / Aerial photo / Black and white controls were removed. The aerial carries no place names, so at national zoom the home map has no city or state labels. It works like a photo: zoom in to read the streets.
+
 The font is copied from the app with its licence (`public/fonts/PressStart2P-OFL.txt`, SIL Open Font License 1.1).
 
 ## 2. Layout changes, measured

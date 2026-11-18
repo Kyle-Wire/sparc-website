@@ -6,7 +6,7 @@ import type { Route } from "next";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { Map as MlMap, GeoJSONSource, Marker } from "maplibre-gl";
 import { PlaceSearch } from "@/components/place/PlaceSearch";
-import { BASE_STYLE, RASTERS, SpotList, needsTwoFingers, setBase, type BaseKind, type Spot } from "@/components/place/PlaceMap";
+import { BASE_STYLE, RASTERS, SpotList, needsTwoFingers, type Spot } from "@/components/place/PlaceMap";
 import FEMA_LEGEND from "@/data/fema-flood-zones-legend.json";
 import { DEFAULT_STORM, HAZARD_STATE_WORDS, floodSortName, type BlockReadings, type HazardState } from "@/lib/listings/blocks";
 import type { PublicListing } from "@/lib/listings/feed";
@@ -204,12 +204,8 @@ function BlockModels({ answer }: { answer: BlockAnswer }) {
   );
 }
 
-/** What every mark on the map means, and the switches for the base map. */
+/** What every mark on the map means, and the FEMA switch. */
 function MapLegend(props: {
-  base: BaseKind;
-  onBase: (b: BaseKind) => void;
-  grey: boolean;
-  onGrey: (g: boolean) => void;
   fema: boolean;
   onFema: (f: boolean) => void;
   femaVisible: boolean;
@@ -224,19 +220,6 @@ function MapLegend(props: {
     <details className="map-legend" open ref={legendRef}>
       <summary>Legend</summary>
       <div className="map-legend-body">
-        <fieldset className="map-legend-group">
-          <legend className="map-legend-title">Base map</legend>
-          <div className="map-legend-seg" role="radiogroup" aria-label="Base map">
-            {(["map", "aerial"] as const).map((b) => (
-              <button key={b} type="button" role="radio" aria-checked={props.base === b} onClick={() => props.onBase(b)}>
-                {b === "map" ? "Map" : "Aerial photo"}
-              </button>
-            ))}
-          </div>
-          <label className="map-legend-check">
-            <input type="checkbox" checked={props.grey} onChange={(e) => props.onGrey(e.target.checked)} /> Black and white
-          </label>
-        </fieldset>
         <div className="map-legend-group">
           <div className="map-legend-title">Homes for sale</div>
           <div className="map-legend-row">
@@ -277,8 +260,6 @@ export function HomeMap() {
   const [area, setArea] = useState<Load<AreaAnswer>>({ status: "idle" });
   const [picked, setPicked] = useState<Listing | null>(null);
   const [fema, setFema] = useState(true);
-  const [base, setBaseKind] = useState<BaseKind>("map");
-  const [grey, setGrey] = useState(true);
   const [found, setFound] = useState<string | null>(null);
   const listingsRef = useRef<Listing[]>([]);
   const searchPin = useRef<Marker | null>(null);
@@ -394,11 +375,6 @@ export function HomeMap() {
 
   useEffect(() => {
     const m = mapRef.current;
-    if (m) setBase(m, base, grey);
-  }, [base, grey]);
-
-  useEffect(() => {
-    const m = mapRef.current;
     if (m?.getLayer("listings-picked")) m.setFilter("listings-picked", ["==", ["get", "key"], picked?.listing_key ?? ""]);
   }, [picked]);
 
@@ -500,10 +476,6 @@ export function HomeMap() {
           </ol>
         </div>
         <MapLegend
-          base={base}
-          onBase={setBaseKind}
-          grey={grey}
-          onGrey={setGrey}
           fema={fema}
           onFema={setFema}
           femaVisible={zoom >= (RASTERS.find((r) => r.id === "fema")?.minzoom ?? 11)}

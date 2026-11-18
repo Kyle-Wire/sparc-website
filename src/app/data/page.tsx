@@ -99,7 +99,7 @@ export default function DataPage() {
     },
     {
       record: "Sea level rise; the base map",
-      publisher: "NOAA Office for Coastal Management; USGS The National Map",
+      publisher: "NOAA Office for Coastal Management; USGS The National Map, aerial imagery",
       how: "Map layer",
       detail: "Loaded by your browser straight from the agency while the map is on screen.",
     },

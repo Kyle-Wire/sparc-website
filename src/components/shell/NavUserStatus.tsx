@@ -59,16 +59,18 @@ export function NavUserStatus() {
     return <span style={{ width: 80, height: 28, display: "inline-block" }} aria-hidden />;
   }
 
+  // Hidden on 2026-11-18, on Kyle's decision: there is no "Sign in" or "Sign
+  // up" link for a visitor who is not signed in. An account does nothing for a
+  // visitor yet (saved places live in the browser), and the sign-up page still
+  // reads "Request access to SPARC" from the old product. The pages themselves
+  // remain at /login and /signup for anyone who already has an account, and a
+  // signed-in visitor still gets the account menu below. Put the links back
+  // when an account does something: see docs/HANDOFF.md.
   if (!email) {
     return (
-      <>
-        <Link href="/login" className="btn btn-ghost btn-sm" style={{ fontWeight: 500, fontSize: 12 }}>
-          Sign in
-        </Link>
-        <Link href="/contact" className="btn btn-primary btn-sm">
-          Ask for a report <span className="arrow">→</span>
-        </Link>
-      </>
+      <Link href="/contact" className="btn btn-primary btn-sm">
+        Ask for a report <span className="arrow">→</span>
+      </Link>
     );
   }
 

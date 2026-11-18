@@ -92,9 +92,6 @@ export function MobileNav({
         <div className="drawer-divider" />
 
         <div className="drawer-cta">
-          <Link href="/login" className="btn" onClick={close}>
-            Sign in
-          </Link>
           <Link href="/contact" className="btn btn-primary" onClick={close}>
             Ask for a report →
           </Link>

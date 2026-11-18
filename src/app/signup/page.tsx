@@ -4,7 +4,7 @@ import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 import { LoginForm } from "../login/login-parts";
 
-export const metadata = { title: "Request access" };
+export const metadata = { title: "Request access", robots: { index: false, follow: false } };
 
 export default function SignupPage() {
   return (

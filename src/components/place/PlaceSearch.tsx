@@ -17,7 +17,18 @@ interface GeocodeAnswer {
  * comes back as a block. The exact point is remembered in this browser tab
  * only; the page we navigate to carries the block.
  */
-export function PlaceSearch({ compact }: { compact?: boolean }) {
+export function PlaceSearch({
+  compact,
+  onFound,
+  help,
+}: {
+  compact?: boolean;
+  /** When given, a found address is handed back (the home map flies to it)
+   *  instead of opening its place page. */
+  onFound?: (found: { slug: string; point: { lat: number; lon: number } }) => void;
+  /** Replaces the line under the box. */
+  help?: string;
+}) {
   const router = useRouter();
   const [address, setAddress] = useState("");
   const [busy, setBusy] = useState(false);
@@ -46,6 +57,11 @@ export function PlaceSearch({ compact }: { compact?: boolean }) {
         return;
       }
       rememberPoint({ slug: answer.slug, ...answer.point, matched: answer.matched ?? "" });
+      if (onFound) {
+        onFound({ slug: answer.slug, point: answer.point });
+        setBusy(false);
+        return;
+      }
       router.push(`/place/${answer.slug}` as Route);
     } catch {
       setError("The search did not work. Check your connection and try again.");
@@ -77,6 +93,7 @@ export function PlaceSearch({ compact }: { compact?: boolean }) {
       </div>
       <p id="place-search-help" className="place-search-help" role={error ? "alert" : undefined}>
         {error ??
+          help ??
           "Free, no account. The address is used to find the block and is not stored; the page you land on shows the neighbourhood, not the house."}
       </p>
     </form>

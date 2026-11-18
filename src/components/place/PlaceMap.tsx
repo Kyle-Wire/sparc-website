@@ -83,19 +83,55 @@ export const RASTERS: RasterDef[] = [
   },
 ];
 
+const USGS = "https://basemap.nationalmap.gov/arcgis/rest/services";
+
+/**
+ * Two base maps from USGS The National Map, both public domain and keyless:
+ * the topographic map and aerial imagery (USDA NAIP and others, per the
+ * service's own credit, opened 18 November 2026). Both are drawn in black and
+ * white by default, so the coloured layers on top (FEMA's zones, the pins)
+ * are what the eye goes to.
+ */
 export const BASE_STYLE: StyleSpecification = {
   version: 8,
   sources: {
     base: {
       type: "raster",
-      tiles: ["https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}"],
+      tiles: [`${USGS}/USGSTopo/MapServer/tile/{z}/{y}/{x}`],
       tileSize: 256,
       maxzoom: 16,
       attribution: "Base map: USGS The National Map",
     },
+    aerial: {
+      type: "raster",
+      tiles: [`${USGS}/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}`],
+      tileSize: 256,
+      maxzoom: 16,
+      attribution: "Imagery: USDA, USGS The National Map: Orthoimagery",
+    },
   },
-  layers: [{ id: "base", type: "raster", source: "base" }],
+  layers: [
+    { id: "base", type: "raster", source: "base", paint: { "raster-saturation": -1 } },
+    { id: "aerial", type: "raster", source: "aerial", layout: { visibility: "none" }, paint: { "raster-saturation": -1 } },
+  ],
 };
+
+export type BaseKind = "map" | "aerial";
+
+/** Shows one base map and sets it in black and white or in colour. */
+export function setBase(map: MlMap, kind: BaseKind, grey: boolean) {
+  if (!map.getLayer("base") || !map.getLayer("aerial")) return;
+  map.setLayoutProperty("base", "visibility", kind === "map" ? "visible" : "none");
+  map.setLayoutProperty("aerial", "visibility", kind === "aerial" ? "visible" : "none");
+  for (const id of ["base", "aerial"]) map.setPaintProperty(id, "raster-saturation", grey ? -1 : 0);
+}
+
+/** A mouse wheel or trackpad zooms the map directly. On a touch screen one
+ *  finger still scrolls the page and two move the map, so a phone is never
+ *  trapped inside it. */
+export function needsTwoFingers(): boolean {
+  return typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+}
 
 const NEAR_ZOOM = 14.6;
 const TRACK_ZOOM = 6.2;
@@ -298,7 +334,7 @@ export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon;
           zoom: NEAR_ZOOM,
           minZoom: 4,
           maxZoom: 17,
-          cooperativeGestures: true,
+          cooperativeGestures: needsTwoFingers(),
           attributionControl: { compact: true },
           // Keeps the drawn map available to the browser's print and save.
           canvasContextAttributes: { preserveDrawingBuffer: true },

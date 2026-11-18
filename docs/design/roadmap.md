@@ -70,10 +70,12 @@ Not the number of layers. Four things which, as far as the agent knows, nobody o
 | Design your own storm; replay a named past storm; live radar ("is my street taking water now") | Engine |
 | HeatSim on a server: street air temperature by day and night, comfort in sun and shade | Engine, Kyle (server cost) |
 | Land surface temperature from satellite, block against neighbourhood and city | Engine |
-| A device check before any payment: can this computer run the flood model | Next |
+| A device check before any payment: can this computer run the flood model | Built (`/start`; FloodSim's own memory rule, tested) |
+| The paid path end to end: place, report or runs of your own, hazards, device, what you get, request | Built (request only; no checkout) |
+| A preview of the subscriber's workspace, and the report's layout | Built (layout only, no numbers) |
 | Runs for people whose device cannot: cloud GPUs, downscaled coarse runs, emulators | Engine, Kyle |
-| Ground movement from satellite radar, and the rate carried forward | Engine |
-| Wind through the seasons, as a map | Engine |
+| Ground movement from satellite radar, and the rate carried forward | Engine (shelves drawn on every place page) |
+| Wind through the seasons, as a map | Engine (shelf drawn on every place page) |
 | What the models have to work with here: terrain source and date, drain network or not, which model terms apply | Next (first version from public catalogues) |
 | Future conditions: heavier rain and hotter summers, stated as scenarios with their source | Kyle (the directive rules out future-climate claims for now) |
 | Basement and sewer backup | Engine |

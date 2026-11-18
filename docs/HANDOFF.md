@@ -16,7 +16,13 @@ A visitor can type any US address and get a page for the block around it:
 - save a place with a note, compare up to four, copy the link, print;
 - a plain glossary.
 
-The paid part (flood model, heat model, what-if projects) is drawn as empty layouts with an "Ask for a report" button that goes to the contact form. **Nothing is on sale. No model runs from the site.**
+The paid part covers four hazards: flood (FloodSim), heat (HeatSim), ground movement (Kyle's own InSAR pipeline) and wind (WindSim). It is drawn as empty layouts that hold no numbers, plus a paid path a visitor can walk all the way through:
+
+- **`/start`**: the place, a report or runs of your own, which hazards, a real check of the visitor's graphics card against FloodSim's own memory rule, what they will get and what it will never say, then a request. The request goes to the same inbox as the contact form.
+- **`/workspace`**: a preview of what a subscriber would use. One row per hazard: the choices, the run, the findings with their labels, the projects, and a run history.
+- **`/report/sample`**: the report's sections in the order of the Climate Inspection directive §7, as layout.
+
+**Nothing is on sale. No model runs from the site.** The device check is the one live piece. Its figures are the visitor's own device reporting on itself.
 
 **Open pull requests, as of writing:**
 
@@ -55,6 +61,9 @@ Each hazard has three shelves: on record (free), modelled (paid), what if (paid)
 | `src/app/page.tsx` | Home: the address search |
 | `src/app/place/[slug]/` | A place page. The slug is a latitude and longitude rounded to three decimals |
 | `src/app/compare`, `places`, `glossary`, `models`, `pricing`, `about`, `contact`, `privacy` | The other pages |
+| `src/app/start`, `workspace`, `report/sample` | The paid path: request, workspace preview, report layout |
+| `src/lib/engines.ts` | The four engines in one list: what each gives, where it runs, what it will never say, and the commit each sentence was read at. The models page, the place page, `/start` and `/workspace` all read it |
+| `src/lib/device.ts`, `src/components/journey/` | The device check (FloodSim's rule: 36 bytes a cell, nine storage buffers for tiled stepping) and the order steps |
 | `src/app/api/geocode`, `api/inspect` | Address to block; map click to what is at that spot |
 | `src/lib/place/` | One file per source: `census`, `fema`, `openfema`, `nri`, `hurricanes`, `point`, `surroundings`. `summary.ts` gathers them. `lookup.ts` is the one way to ask a source, with retries |
 | `src/components/place/` | The map, cards, questions, saved places |
@@ -71,7 +80,7 @@ Hosting is Vercel. Supabase holds accounts and contact messages. Resend sends em
 - **The map needs a real browser.** It is WebGL. Headless Edge with `--enable-unsafe-swiftshader` draws it.
 - **Go easy on the agencies.** FEMA's map server, FEMA's open data service and the USGS elevation service all refused one machine after a few dozen test lookups. They recover in a minute or so. A failed card during testing is usually that, not a bug.
 - **`fema.gov` pages refuse scripts** but open in a browser.
-- **Before a pull request:** `npm run typecheck`, `npm run lint`, `npm run check:design`, `npm run build`, `npm run check:placeholders:rendered`, `npm run security:audit`.
+- **Before a pull request:** `npm test`, `npm run typecheck`, `npm run lint`, `npm run check:design`, `npm run build`, `npm run check:placeholders:rendered`, `npm run security:audit`.
 - **Pull requests for Kyle:** always based on `main`, never stacked on another open branch, and the first line of the description says whether it is the only thing to merge. Say plainly whether it is safe to merge. Kyle merges; nobody else does.
 - **Never open** `Insar_Pipeline_KF` or anything from Kleinfelder. Do not copy code from FloodSim, HeatSim or sparc-resilience into this repo.
 
@@ -80,7 +89,7 @@ Hosting is Vercel. Supabase holds accounts and contact messages. Resend sends em
 1. **Merge PR 26, then switch on one GitHub setting** (Settings, Actions, General, Workflow permissions, "Allow GitHub Actions to create and approve pull requests"). Run the "data refresh" job once by hand from the Actions tab to see it work. *Done when* a pull request titled "Data: copy of FEMA tables" appears.
 2. **Kyle's own test of the live site** (the list is in section 8). *Done when* anything wrong for a block he knows is written down and fixed or explained.
 3. **Protect the two open lookups.** `/api/geocode` and `/api/inspect` pass requests on to public agencies. Rate limiting only switches on if the Upstash settings exist in Vercel, and whether they do was not checked. *Done when* a burst from one visitor is refused before it reaches an agency.
-4. **FloodSim in the site, guided.** Pick a preset storm, watch the water, read findings with their confidence labels. Check the visitor's device before anything is paid for. This is the first thing nobody else offers, and it depends on engine work in the FloodSim repo. *Done when* a visitor with a capable laptop can run one storm for their block from a place page.
+4. **FloodSim in the site, guided.** Pick a preset storm, watch the water, read findings with their confidence labels. The device check is built (`/start`); the run itself is not. This is the first thing nobody else offers, and it depends on engine work in the FloodSim repo. *Done when* a visitor with a capable laptop can run one storm for their block from a place page.
 5. **A sample report that can be shown publicly.** The proof-of-concept report names its block and stays private. *Done when* the models page links to a real report for a place that can be shown.
 6. **Accounts that do something:** saved places across devices. Then reword the sign-in and sign-up pages and put the links back.
 7. **Cards that arrive one by one.** Today the page waits for every source before showing anything but the loading screen. *Done when* the map and the quick cards appear at once and slow ones fill in.
@@ -114,16 +123,21 @@ Hosting is Vercel. Supabase holds accounts and contact messages. Resend sends em
 - Printing on paper. Only the print preview was looked at.
 - Any competitor's product.
 
-**No tests.** Nothing in `src/lib/place` has a unit test: the coordinate rounding, the storm-distance maths, the small TIFF reader, the summaries. The build gates check design rules, not arithmetic. Worth adding before the models arrive.
+**Few tests.** `npm test` runs the device check's arithmetic only (`src/lib/device.test.ts`). Nothing in `src/lib/place` has a unit test yet: the coordinate rounding, the storm-distance maths, the small TIFF reader, the summaries. The build gates check design rules, not arithmetic.
+
+**The paid path's request** goes through `/api/waitlist`, like the contact form, so it has the same open problems: untested on the live site, refused if a Turnstile secret is set, and one row per email address. It sends the rounded block and never the street address.
+
+**Ground movement has no free shelf.** No public register of ground movement was chosen, so the place page says so.
 
 ## 7. Decisions waiting on Kyle
 
 1. **"Ask for a report" is live.** Are you ready to receive requests, and what will you say to the first one?
 2. **Counting visits.** Vercel's page-view counting is switched on for the live site. The privacy page now says so. Keep it, or remove it?
 3. **Paid storage** for flood zones, elevation and land cover. Recommended: wait and see how often cards fail.
-4. **Search engines.** Place pages are hidden from them on purpose. City pages that can be found are a separate decision.
-5. **The October pull requests** (15, 17 to 21). Recommended: close them; redo what still matters against the new pages.
-6. **What a report costs and what a subscription includes.** Nothing can go on sale until this is written down.
+4. **What the four engines may promise.** The engine cards (`src/lib/engines.ts`) were written from each repository's README at the commit named there. Read them once, especially ground movement (no sudden collapse; no statement about a foundation) and wind (no damage or dollar figures, though WindSim computes them).
+5. **Search engines.** Place pages are hidden from them on purpose. City pages that can be found are a separate decision.
+6. **The October pull requests** (15, 17 to 21). Recommended: close them; redo what still matters against the new pages.
+7. **What a report costs and what a subscription includes.** Nothing can go on sale until this is written down.
 
 ## 8. Test list for the live site
 
@@ -139,5 +153,6 @@ On a laptop first, then items 1, 2, 3 and 9 on a phone. Each line says what to d
 8. **Save and come back.** Save a place, add a note, close the tab, reopen the site. "Your places" should still have it.
 9. **Compare.** Save a second place, tick both, press Compare. One column per place; each row says what area it describes.
 10. **The contact form.** Send one message. You should see "Thank you" on the page, get an email that says "We have your message", and find the message in the inbox.
+11. **The paid path.** From a place page press "Get a report or run it yourself". Choose "Run it yourself", tick Flood, press "Check this computer": on your laptop it should say Yes and name the graphics card; on a phone it will likely say no, and then points you to a report. Send one request: it should arrive in the same inbox as item 10, with the block and the hazards and no street address.
 
 Most useful to hear back, in order: where the record is wrong for a block you know; what you expected to see and did not; sentences you read twice; anything slow.

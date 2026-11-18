@@ -19,7 +19,8 @@
     "check:design": "npm run check:placeholders && npm run check:colors",
     "security:audit": "npm audit --omit=dev --audit-level=high",
     "email:dev": "email dev --dir src/emails --port 3001",
-    "email:build": "tsx scripts/render-emails.ts"
+    "email:build": "tsx scripts/render-emails.ts",
+    "test": "tsx --test src/lib/*.test.ts"
   },
   "dependencies": {
     "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",

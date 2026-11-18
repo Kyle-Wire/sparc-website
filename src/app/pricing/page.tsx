@@ -36,7 +36,7 @@ const PLANS: { name: string; state: string; who: string; what: string[] }[] = [
     state: "Planned · bought once",
     who: "Someone buying a home. You get the report and you are done.",
     what: [
-      "Flood and heat modelled for the neighbourhood around one property",
+      "Flood, heat, ground movement and wind, modelled for the neighbourhood around one property",
       "Findings first, with how much evidence stands behind each",
       "What to check at the house",
     ],
@@ -46,7 +46,8 @@ const PLANS: { name: string; state: string; who: string; what: string[] }[] = [
     state: "Planned · monthly",
     who: "A home owner testing projects over time.",
     what: [
-      "The flood and heat models, with your own storms",
+      "The flood model in your browser, with your own storms",
+      "Heat runs queued on our server; ground movement and wind worked out for you",
       "What-if runs: rain garden, French drain, less paving, more trees",
       "Saved places and runs",
     ],
@@ -67,7 +68,7 @@ export default function PricingPage() {
       <PageHero
         kicker="pricing · nothing on sale yet"
         title="The public record is free. The models will be paid."
-        lead="Looking up what is on record costs nothing and needs no account. Our own flood and heat models will be the paid part. There are no prices here yet, because there is nothing we can sell you today."
+        lead="Looking up what is on record costs nothing and needs no account. Our own flood, heat, ground movement and wind models will be the paid part. There are no prices here yet, because there is nothing we can sell you today."
         accent="var(--amber)"
       />
 
@@ -98,8 +99,8 @@ export default function PricingPage() {
           before anything is agreed, and any price is given in writing, individually.
         </p>
         <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
-          <Link href="/contact" className="btn btn-accent">
-            Ask for a report <span className="arrow">→</span>
+          <Link href="/start" className="btn btn-accent">
+            Get a report or run it yourself <span className="arrow">→</span>
           </Link>
           <Link href="/models" className="btn">
             How the models work

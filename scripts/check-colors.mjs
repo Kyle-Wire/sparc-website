@@ -75,6 +75,9 @@ const ROLES = [
   { token: "crimson", role: "white text on it", min: 4.5, grounds: ["white"], inverted: true },
   { token: "purple", role: "text", min: 4.5, grounds: ["paper", "white"] },
   { token: "amber-ink", role: "text", min: 4.5, grounds: ["paper", "white"] },
+  { token: "flood", role: "text", min: 4.5, grounds: ["paper", "white"] },
+  { token: "ground", role: "text", min: 4.5, grounds: ["paper", "white"] },
+  { token: "wind", role: "text", min: 4.5, grounds: ["paper", "white"] },
   { token: "amber-ink", role: "white text on it", min: 4.5, grounds: ["white"], inverted: true },
   { token: "rule", role: "structural boundary", min: 3, grounds: ["white", "paper", "paper-2", "paper-3"] },
 ];

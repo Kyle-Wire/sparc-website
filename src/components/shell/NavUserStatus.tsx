@@ -68,7 +68,7 @@ export function NavUserStatus() {
   // when an account does something: see docs/HANDOFF.md.
   if (!email) {
     return (
-      <Link href="/contact" className="btn btn-primary btn-sm">
+      <Link href="/start" className="btn btn-primary btn-sm">
         Ask for a report <span className="arrow">→</span>
       </Link>
     );

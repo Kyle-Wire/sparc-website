@@ -105,7 +105,7 @@ export default function AboutPage() {
 
       <Section kicker="get in touch" title="Want a report, or have a question?">
         <div className="row" style={{ gap: 10 }}>
-          <Link href="/contact" className="btn btn-accent">Ask for a report <span className="arrow">→</span></Link>
+          <Link href="/start" className="btn btn-accent">Ask for a report <span className="arrow">→</span></Link>
           <Link href="/" className="btn">Look up an address</Link>
         </div>
         <p className="mono" style={{ marginTop: 24, fontSize: 11, color: "var(--muted)", letterSpacing: "0.1em" }}>

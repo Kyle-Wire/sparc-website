@@ -203,7 +203,7 @@ export default function HomePage() {
           </div>
           <div className="row" style={{ marginTop: 24, gap: 10 }}>
             <Link href="/models" className="btn">How the models work <span className="arrow">→</span></Link>
-            <Link href="/contact" className="btn btn-accent">Ask for a report <span className="arrow">→</span></Link>
+            <Link href="/start" className="btn btn-accent">Ask for a report <span className="arrow">→</span></Link>
           </div>
         </div>
       </section>

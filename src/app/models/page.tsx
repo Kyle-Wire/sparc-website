@@ -2,11 +2,14 @@ import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 import { LockedShelf } from "@/components/place/cards";
+import { ENGINES, RUNS_ON_WORDS } from "@/lib/engines";
 
 export const metadata = { title: "The models" };
 
-// What this page may say about the two models, and where each sentence comes
-// from. Both are SPARC Labs' own engines, kept in their own repositories.
+// What this page may say about the models, and where each sentence comes
+// from. All four are SPARC Labs' own engines, kept in their own repositories.
+// The engine cards read src/lib/engines.ts, which records the commit each
+// sentence was read at; the notes below cover the first two.
 //
 //   FloodSim   its README: a 2D urban flood model that builds a 1 m model of
 //              an area from open data (terrain, buildings, streets, land
@@ -29,48 +32,51 @@ export default function ModelsPage() {
       <PageHero
         kicker="the models · paid · not on sale yet"
         title="What the public record cannot tell you."
-        lead="A flood zone is a line on a map. It does not say where the water goes on your street in a hard storm, or how hot the block gets in July. That takes a model of the neighbourhood."
+        lead="A flood zone is a line on a map. It does not say where the water goes on your street in a hard storm, how hot the block gets in July, whether the ground is settling or how the wind moves between the houses. That takes a model of the neighbourhood."
         accent="var(--flood)"
       />
 
-      <Section kicker="two engines" title="Flood and heat, for the neighbourhood around a home.">
-        <div className="grid-2" style={{ gap: 24 }}>
-          <div className="card" style={{ padding: 24, borderTop: "3px solid var(--flood)" }}>
-            <div className="kicker">flood</div>
-            <h3 style={{ margin: "10px 0 12px" }}>FloodSim</h3>
-            <div className="prose" style={{ fontSize: 14 }}>
-              <p>
-                Builds a model of the neighbourhood at one-metre detail from public data: the terrain
-                survey, building outlines, streets, land cover, soils and the official rainfall statistics
-                for the place. Then it runs a storm over it and follows the water.
-              </p>
+      <Section kicker="four engines" title="Flood, heat, ground movement and wind, for the neighbourhood around a home.">
+        <div className="engine-grid">
+          {ENGINES.map((e) => (
+            <div key={e.id} className="card engine-card" data-hazard={e.id}>
+              <div className="kicker">
+                {e.hazard} · {RUNS_ON_WORDS[e.runsOn]}
+              </div>
+              <h3>{e.name}</h3>
+              <p>{e.summary}</p>
+              <div className="kicker" style={{ marginTop: 6 }}>what a buyer reads</div>
               <ul>
-                <li>Preset storms of set severity, the kind engineers design to.</li>
-                <li>A storm you design yourself.</li>
-                <li>Rain as radar is recording it now.</li>
+                {e.findings.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
               </ul>
-              <p>It runs on your own computer&apos;s graphics card, in the browser.</p>
-            </div>
-          </div>
-          <div className="card" style={{ padding: 24, borderTop: "3px solid var(--heat)" }}>
-            <div className="kicker">heat</div>
-            <h3 style={{ margin: "10px 0 12px" }}>HeatSim</h3>
-            <div className="prose" style={{ fontSize: 14 }}>
-              <p>
-                Estimates the air temperature at street level, hour by hour, and how hot it feels outdoors
-                in sun and in shade. It is a physics model of how streets, roofs, trees and air trade
-                heat, with a small correction learned from street sensors in thirteen cities.
-              </p>
-              <ul>
-                <li>Street air temperature, by day and by night.</li>
-                <li>Outdoor comfort in sun, building shade and tree shade.</li>
-              </ul>
-              <p>
-                Surface temperature as satellites measure it sits on the same shelf: measured, not
-                modelled. HeatSim runs on a server.
+              <p className="engine-where">{e.where}</p>
+              <p className="engine-status">
+                <strong>Today:</strong> {e.status}
               </p>
             </div>
-          </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section kicker="how you would use them" title="Three ways in, one place at a time.">
+        <div className="grid-3" style={{ gap: 18 }}>
+          <Link href="/start" className="card engine-way">
+            <span className="kicker">start here</span>
+            <strong>Get a report, or run it yourself</strong>
+            <span>Pick the place and the hazards, check your computer, and send a request. Nothing is charged.</span>
+          </Link>
+          <Link href="/workspace" className="card engine-way">
+            <span className="kicker">preview</span>
+            <strong>The workspace</strong>
+            <span>What a subscriber would see: the choices, the run as it happens, the findings, the projects.</span>
+          </Link>
+          <Link href="/report/sample" className="card engine-way">
+            <span className="kicker">layout</span>
+            <strong>How a report is laid out</strong>
+            <span>Findings first, how sure each is, then limits and sources at the back.</span>
+          </Link>
         </div>
       </Section>
 
@@ -102,12 +108,12 @@ export default function ModelsPage() {
         <div className="prose">
           <ul>
             <li>
-              <strong>Not on the site yet.</strong> Neither model can be run from this site today. To start,
+              <strong>Not on the site yet.</strong> None of the four can be run from this site today. To start,
               a report is run by hand when someone asks for one.
             </li>
             <li>
-              <strong>Not validated for your address.</strong> Neither model has been checked against
-              measurements at any customer&apos;s property. Results are screening-level and will be labelled
+              <strong>Not validated for your address.</strong> None of the models has been checked
+              against measurements at any customer&apos;s property. Results are screening-level and will be labelled
               with how much evidence stands behind each one.
             </li>
             <li>
@@ -129,7 +135,7 @@ export default function ModelsPage() {
           <strong>A screening tool.</strong> Not an engineering study, and not for engineering decisions.
         </p>
         <div className="row" style={{ marginTop: 24, gap: 10 }}>
-          <Link href="/contact" className="btn btn-accent">Ask for a report <span className="arrow">→</span></Link>
+          <Link href="/start" className="btn btn-accent">Ask for a report <span className="arrow">→</span></Link>
           <Link href="/" className="btn">Look up the public record</Link>
         </div>
       </Section>

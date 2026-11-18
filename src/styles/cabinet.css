@@ -1,0 +1,448 @@
+/* ============================================================
+   The cabinet frame (docs/design/cabinet-frame.md)
+
+   The InSAR Pipeline app's design, brought to the site as a frame and a set
+   of labels only (Kyle, 18 Nov 2026: "Frame and labels only"):
+
+     - pixel borders: four hard edges and no corners, the stepped look of a
+       sprite box, drawn with box-shadow so nothing in the layout moves;
+     - one pixel font (Press Start 2P), for labels only: kickers, pills,
+       table and legend heads, step numbers. Body text and headings stay in
+       Inter, because decorative type slows reading (NN/g, legibility);
+     - one banner per page: the page inverted, ink ground and paper text;
+     - the mist: a small interferogram drawn in the browser
+       (src/components/system/Mist.tsx), on the banner's lower edge, a hovered
+       button, and the progress of a page that is still asking its sources.
+       Decoration only, like the brand ramp.
+
+   What it does not take from the app: scanlines over the page, the second
+   pixel font for body text, blinking cursors on links. The brand colours,
+   the accent button and the data ramps are unchanged.
+
+   Spacing comes from the --space-* scale (tokens.css). The rule, from the
+   Gestalt proximity research in the design note: tight inside a group, wider
+   between groups, and no gap that separates nothing.
+
+   This file loads after globals.css and overrides it; globals.css is left as
+   it was so the change can be read, and reverted, in one place.
+   ============================================================ */
+
+@font-face {
+  font-family: "Press Start 2P";
+  src: url("/fonts/PressStart2P.woff2") format("woff2");
+  font-display: swap;
+}
+
+:root {
+  --font-pixel: "Press Start 2P", var(--font-mono);
+  --fs-pixel: 8px;            /* the font's own grid; crisp at 8 and 16 only */
+  --px: 2px;                  /* one "pixel" of the border art */
+  --frame: var(--rule);       /* 3:1+ on every ground: a boundary a reader can find */
+  --frame-strong: var(--ink);
+  --drop: var(--paper-3);     /* the hard shadow under a raised control */
+  --lift: rgba(26, 20, 22, 0.16);
+
+  /* Before Mist.tsx draws the interferogram: the same pale fringes, smooth. */
+  --mist: linear-gradient(90deg, #c5cfe6, #bfdde3, #c9e3d6, #dde7c4, #f1e3c0, #efcdb5, #e5c2cf);
+
+  /* Body text up from 13px. 13px sat under every reading guideline the
+     design note cites; 15px is the floor for any honesty label as well. */
+  --fs-body: 15px;
+}
+
+/* globals.css sets body { overflow-x: hidden }, which makes the body a scroll
+   container (overflow-y computes to auto) and so nothing on the site could
+   stick: not the nav, not the "on this page" strip. clip hides the same
+   overflow without making a scroll container. */
+body { overflow-x: clip; }
+
+/* ---------- the frame ---------- */
+
+.card, .record-card, .questions-group, .place-saved, .spot-panel, .glance-row,
+.screening-note, .place-paid-cta, .report-card, .paid-strip, .place-map,
+[data-placeholder] {
+  border: 0;
+  border-radius: 0;
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--frame),
+    0 var(--px) 0 0 var(--frame),
+    calc(-1 * var(--px)) 0 0 0 var(--frame),
+    var(--px) 0 0 0 var(--frame);
+  margin: var(--px);
+}
+.card.dashed { box-shadow: none; outline: var(--px) dashed var(--frame); outline-offset: 0; }
+
+/* Things that float over the map get the frame and a hard drop, no blur. */
+.home-map-card, .listing-panel, .map-legend {
+  border: 0;
+  border-radius: 0;
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--frame-strong),
+    0 var(--px) 0 0 var(--frame-strong),
+    calc(-1 * var(--px)) 0 0 0 var(--frame-strong),
+    var(--px) 0 0 0 var(--frame-strong),
+    6px 6px 0 0 var(--lift);
+}
+
+/* A record card keeps its hazard bar, now inside the frame. */
+.record-card { border-left: 4px solid var(--ink); padding: 16px 18px 12px; gap: 8px; }
+.record-card[data-hazard="flood"] { border-left-color: var(--flood); }
+.record-card[data-hazard="heat"] { border-left-color: var(--heat); }
+.record-card-missing { box-shadow: none; outline: var(--px) dashed var(--frame); }
+.record-card-pending { box-shadow: none; outline: var(--px) dotted var(--frame); }
+
+/* Inside a placeholder: square, the dashes kept (they are the register). */
+[data-placeholder] [data-ph-surface], [data-placeholder] .ph-plot, [data-placeholder] .ph-track { border-radius: 0; }
+[data-placeholder] .ph-flag { border-radius: 0; border: 0; box-shadow: 0 0 0 var(--px) var(--fg); }
+
+/* Inner dividers are dashed, the group's edge is solid: one look for "a
+   part of this" and another for "the end of this" (common region). */
+.glance-item { border-right: var(--px) dashed var(--line); }
+.glance-item:last-child { border-right: 0; }
+
+/* ---------- controls ---------- */
+
+.btn {
+  border: 0;
+  border-radius: 0;
+  margin: var(--px);
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--frame-strong),
+    0 var(--px) 0 0 var(--frame-strong),
+    calc(-1 * var(--px)) 0 0 0 var(--frame-strong),
+    var(--px) 0 0 0 var(--frame-strong),
+    4px 4px 0 0 var(--drop);
+  transition: transform .08s steps(2), box-shadow .08s steps(2);
+}
+/* Reached for: the plain button fills with the mist. The accent and the ink
+   buttons keep their colour; the mist is not a second accent. */
+.btn:not(.btn-accent):not(.btn-primary):not(.btn-ghost):hover,
+.btn:not(.btn-accent):not(.btn-primary):not(.btn-ghost):focus-visible {
+  background-color: #e3e7ee;
+  background-image: var(--mist);
+  background-size: cover;
+  image-rendering: pixelated;
+  color: var(--ink);
+}
+.btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--frame-strong),
+    0 var(--px) 0 0 var(--frame-strong),
+    calc(-1 * var(--px)) 0 0 0 var(--frame-strong),
+    var(--px) 0 0 0 var(--frame-strong),
+    2px 2px 0 0 var(--drop);
+}
+.btn-accent {
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--ink),
+    0 var(--px) 0 0 var(--ink),
+    calc(-1 * var(--px)) 0 0 0 var(--ink),
+    var(--px) 0 0 0 var(--ink),
+    4px 4px 0 0 var(--ink);
+}
+.btn-accent:hover { filter: none; background: #b52d1b; }
+.btn-accent:active { box-shadow: 0 0 0 var(--px) var(--ink), 2px 2px 0 0 var(--ink); }
+.btn-ghost { box-shadow: none; }
+.btn-ghost:hover { background: transparent; text-decoration: underline; }
+.btn-ghost:active { box-shadow: none; }
+
+.input {
+  border: 0;
+  border-radius: 0;
+  box-shadow: 0 0 0 var(--px) var(--frame);
+}
+.input:focus { box-shadow: 0 0 0 var(--px) var(--ink); outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.place-seg, .map-legend-seg { border: 0; border-radius: 0; box-shadow: 0 0 0 var(--px) var(--frame); }
+.mobile-menu-btn, .drawer-close { border-radius: 0; border: 0; box-shadow: 0 0 0 var(--px) var(--frame); }
+
+/* ---------- the labels ---------- */
+
+.kicker, .label, .pill, .shelf-state, .glance-item dt, .spot-row dt,
+.foot-grid h6, .foot-bottom, .plain-table th, .map-legend > summary,
+.dl dt, h6, .paid-strip-name, .step-no {
+  font-family: var(--font-pixel);
+  font-size: var(--fs-pixel);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.7;
+  text-transform: uppercase;
+}
+.plain-table th { padding-top: 12px; padding-bottom: 10px; }
+.label { margin-bottom: 8px; }
+
+/* State: a block of text with a square in front, the way the app says it. */
+.pill {
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  box-shadow: 0 0 0 var(--px) currentColor;
+  padding: 5px 8px 4px;
+  gap: 8px;
+}
+.pill::before { content: ""; width: 6px; height: 6px; background: currentColor; flex: none; }
+.pill[data-state="later"] { color: var(--muted); }
+
+/* A numbered step: ink block, pixel numeral. */
+.step-no { display: inline-block; padding: 5px 7px 4px; background: var(--ink); color: var(--paper); }
+.home-step-no { border-radius: 0; font-family: var(--font-pixel); font-size: var(--fs-pixel); font-weight: 400; }
+.journey-step-num { border-radius: 0; }
+.stage-block .stage-num { border-radius: 0; }
+
+/* ---------- the banner: one per page ---------- */
+
+.page-hero, .place-head {
+  background: var(--ban);
+  color: var(--ban-ink);
+  border-bottom: 0;
+  position: relative;
+}
+.page-hero.grid-bg { background-image: none; }
+.page-hero > [aria-hidden] { display: none; }
+/* The fringe rule: the mist along the banner's lower edge. */
+.page-hero::after, .place-head::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 6px;
+  background-color: #e3e7ee;
+  background-image: var(--mist);
+  background-size: cover;
+  background-position: center;
+  image-rendering: pixelated;
+}
+.page-hero h1, .place-head h1, .page-hero h2, .place-head h2 { color: var(--ban-ink); }
+.page-hero .kicker, .place-head .kicker { color: var(--ban-muted); }
+.page-hero p.lead, .place-head p.lead { color: var(--ban-muted); }
+.page-hero a:not(.btn), .place-head a:not(.btn):not(.glance-item) { color: var(--ban-ink); text-decoration-color: var(--ban-muted); }
+.page-hero .page-hero-actions { margin-top: 20px; }
+
+.page-hero { padding: 48px 0 40px; }
+.page-hero h1 { margin: 12px 0 14px; }
+
+/* Buttons on the banner take its colours and invert when reached for. */
+.place-head .btn:not(.btn-accent), .page-hero .btn:not(.btn-accent) {
+  background: var(--ban);
+  color: var(--ban-ink);
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--ban-ink),
+    0 var(--px) 0 0 var(--ban-ink),
+    calc(-1 * var(--px)) 0 0 0 var(--ban-ink),
+    var(--px) 0 0 0 var(--ban-ink),
+    4px 4px 0 0 var(--ban-muted);
+}
+.place-head .btn.btn-ghost { box-shadow: none; text-decoration: underline; text-decoration-color: var(--ban-muted); }
+.place-head .btn:not(.btn-accent):not(.btn-ghost):hover, .page-hero .btn:not(.btn-accent):not(.btn-ghost):hover,
+.place-head .btn:not(.btn-accent):not(.btn-ghost):focus-visible, .page-hero .btn:not(.btn-accent):not(.btn-ghost):focus-visible {
+  background: var(--ban-ink);
+  background-image: none;
+  color: var(--ban);
+}
+.place-head .btn-accent, .page-hero .btn-accent {
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 0 var(--ban-ink),
+    0 var(--px) 0 0 var(--ban-ink),
+    calc(-1 * var(--px)) 0 0 0 var(--ban-ink),
+    var(--px) 0 0 0 var(--ban-ink),
+    4px 4px 0 0 var(--ban-muted);
+}
+.place-head .btn:focus-visible, .page-hero .btn:focus-visible { outline-color: var(--ban-ink); }
+.place-head .label { color: var(--ban-muted); }
+.place-head .place-note small { color: var(--ban-muted); }
+.place-head .input { box-shadow: 0 0 0 var(--px) var(--ban-ink); }
+
+/* The place banner: title and actions on one side, the record at a glance
+   under them, all above the map. */
+.place-head { padding: 28px 0 30px; }
+.place-head h1 { margin: 8px 0 8px; }
+.place-head p.lead { font-size: var(--fs-body); max-width: 72ch; }
+.place-head-top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 32px; }
+.place-head-top > div:first-child { min-width: 0; flex: 1 1 520px; }
+.place-head .place-actions { margin-top: 0; }
+.place-head .glance-row { margin-top: 20px; color: var(--ink); --frame: var(--ban-ink); }
+.place-head .glance-item dt, .place-head .glance-item small { color: var(--muted); }
+.place-head-actions { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--space-4) var(--space-6); margin-top: var(--space-5); }
+.place-head-actions .place-actions { flex: 0 1 auto; }
+.place-head .place-paid-cta {
+  flex: 1 1 420px;
+  max-width: 640px;
+  margin: var(--px);
+  padding: 10px 12px 10px 14px;
+  font-size: 14px;
+  background: transparent;
+  color: var(--ban-muted);
+  --frame: var(--ban-muted);
+}
+.place-head .place-paid-cta strong { color: var(--ban-ink); }
+
+/* ---------- on this page: a strip that stays ---------- */
+
+.place-jump {
+  position: sticky;
+  top: 64px;                  /* under the nav (60px) and its ramp strip (4px) */
+  z-index: 40;
+  margin: 0;
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  backdrop-filter: saturate(1.2);
+  box-shadow: 0 var(--px) 0 0 var(--frame);
+}
+.place-jump .wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px 18px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.place-jump .wrap::-webkit-scrollbar { display: none; }
+.place-jump a { color: var(--ink-2); text-decoration: none; padding: 2px 0; border-bottom: var(--px) solid transparent; }
+.place-jump a:hover, .place-jump a:focus-visible { color: var(--ink); border-bottom-color: var(--accent); }
+.place-jump .place-jump-end { margin-left: auto; }
+#map, .hazard-row, #sources { scroll-margin-top: 112px; }
+
+/* ---------- spacing ---------- */
+
+section { padding: var(--space-7) 0; }               /* 48 + 48 between two plain sections */
+section.compact { padding: var(--space-6) 0; }
+section.band { padding: var(--space-8) 0; background: var(--paper-2); box-shadow: 0 calc(-1 * var(--px)) 0 0 var(--line), 0 var(--px) 0 0 var(--line); }
+/* Two plain sections in a row share one gap, not two paddings. */
+body > section:not(.band):not(.place-head):not(.page-hero):not([style*="background"])
+  + section:not(.band):not(.place-map-section):not(.hazard-row):not([style*="background"]) { padding-top: var(--space-2); }
+
+/* The full source table folds; every card already names its own source. */
+.sources-more { margin-top: var(--space-4); }
+.sources-more > summary { cursor: pointer; font-size: 14px; color: var(--ink-2); padding: 6px 0; }
+.sources-more > summary:hover { color: var(--ink); }
+.section-head { margin-bottom: var(--space-5); padding-bottom: var(--space-3); gap: var(--space-5); }
+
+.place-map-section { padding: var(--space-4) 0 var(--space-6); }
+.hazard-row { padding: var(--space-6) 0 var(--space-7); }
+.hazard-row > .wrap > h2 { margin: 6px 0 4px; }
+.hazard-row > .wrap > p.lead { max-width: 72ch; }
+.shelf { margin-top: var(--space-5); }
+.shelf-head { margin-bottom: var(--space-3); padding-bottom: var(--space-2); }
+.shelf-cards { gap: var(--space-4); }
+.questions { gap: var(--space-4); margin-top: var(--space-4); }
+
+/* A <section> inside the listing panel is a part of a card, not a page
+   section: before this rule it carried the page's 80px of bottom padding. */
+.listing-part { padding: var(--space-3) 0 0; }
+
+footer { padding: var(--space-7) 0 var(--space-5); }
+.foot-bottom { margin-top: var(--space-6); padding-top: var(--space-4); }
+
+/* ---------- reading ---------- */
+
+.record-body { font-size: var(--fs-body); }
+.record-body p, .prose, .shelf-empty, .screening-note, .questions-group li { max-width: 72ch; }
+.prose { font-size: 16px; }
+.record-figure-value { font-feature-settings: "tnum"; }
+
+/* ---------- the paid shelves, folded ----------
+   Each hazard's paid shelves are one strip: what a run would give, in words,
+   and the way to ask for one. The layout panels open from it on a click.
+   Not a skeleton: nothing is loading, and the strip says so (NN/g on
+   skeleton screens: they mean "content is coming"). */
+.paid-strip { margin-top: var(--space-5); background: var(--paper); }
+.paid-strip-row { display: grid; grid-template-columns: repeat(var(--shelves, 2), minmax(0, 1fr)) auto; gap: var(--space-4) var(--space-6); align-items: center; padding: 14px 18px; }
+.paid-strip-shelf { min-width: 0; display: grid; gap: 4px; }
+.paid-strip-row > .btn { justify-self: start; }
+.paid-strip-name { display: flex; align-items: center; gap: 10px; color: var(--ink); }
+.paid-strip-shelf p { margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.paid-strip-more { border-top: var(--px) dashed var(--line); }
+.paid-strip-more > summary { cursor: pointer; padding: 10px 18px; font-size: 14px; color: var(--ink-2); list-style: none; }
+.paid-strip-more > summary::-webkit-details-marker { display: none; }
+.paid-strip-more > summary::before { content: "\25B6"; display: inline-block; width: 18px; font-size: 9px; transition: transform .1s steps(2); }
+.paid-strip-more[open] > summary::before { transform: rotate(90deg); }
+.paid-strip-more > summary:hover { color: var(--ink); }
+.paid-strip-more .shelf-pair { padding: 4px 18px 18px; }
+
+/* ---------- the home page ---------- */
+
+.place-examples-strip { padding: var(--space-3) 0; box-shadow: 0 var(--px) 0 0 var(--line); }
+.place-examples-strip .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 14px; color: var(--muted); }
+.place-examples-strip a {
+  color: var(--ink);
+  text-decoration: none;
+  padding: 4px 10px;
+  box-shadow: 0 0 0 var(--px) var(--frame);
+  margin: var(--px);
+}
+.place-examples-strip a:hover, .place-examples-strip a:focus-visible { background-color: #e3e7ee; background-image: var(--mist); background-size: cover; }
+
+.shelf-table th { vertical-align: bottom; }
+.shelf-table th .shelf-th-name { display: block; font-family: var(--font-sans); font-size: var(--fs-h4); font-weight: 700; text-transform: none; letter-spacing: 0; color: var(--ink); margin-top: 6px; }
+.shelf-table th .shelf-th-body { display: block; font-family: var(--font-sans); font-size: 13px; line-height: 1.5; text-transform: none; letter-spacing: 0; color: var(--ink-2); margin-top: 6px; max-width: 38ch; }
+.shelf-table td:first-child { white-space: nowrap; }
+
+.steps-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); }
+.steps-grid > div { padding: 16px 18px; }
+.steps-grid h3 { font-size: var(--fs-h4); margin: 10px 0 6px; }
+.steps-grid p { font-size: 14px; color: var(--ink-2); margin: 0; line-height: 1.55; }
+.steps-grid > div[data-state="later"] { box-shadow: none; outline: var(--px) dashed var(--frame); background: transparent; }
+.home-close { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); margin-top: var(--space-5); }
+.home-close .screening-note { margin: 0; flex: 1 1 520px; }
+
+/* ---------- the map furniture ---------- */
+
+.place-map { border: 0; }
+.home-map { border-bottom: 0; box-shadow: 0 var(--px) 0 0 var(--frame); }
+.place-loading li::before { border-radius: 0; background: var(--ink); }
+.place-loading { border-top: 0; }
+.place-loading li { border-bottom: var(--px) dashed var(--line); }
+.map-legend > summary { padding: 10px 14px; }
+.listing-sort-row { border-radius: 0; }
+.ws-chip { border-radius: 0; border: 0; box-shadow: 0 0 0 var(--px) var(--frame); margin: var(--px); }
+.glossary-entry:target { border-radius: 0; border: 0; box-shadow: 0 0 0 var(--px) var(--frame); }
+
+/* ---------- tablet ---------- */
+@media (max-width: 900px) {
+  .paid-strip-row { grid-template-columns: minmax(0, 1fr); }
+  .steps-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .glance-item { border-right: 0; border-bottom: var(--px) dashed var(--line); }
+  .glance-item:nth-child(odd) { border-right: var(--px) dashed var(--line); }
+  .glance-item:last-child { border-bottom: 0; }
+}
+
+/* ---------- mobile ---------- */
+@media (max-width: 640px) {
+  section { padding: var(--space-6) 0; }
+  section.compact { padding: var(--space-5) 0; }
+  section.band { padding: var(--space-7) 0; }
+  .hazard-row { padding: var(--space-5) 0 var(--space-6); }
+  .page-hero { padding: 32px 0 28px; }
+  .place-head { padding: 20px 0 24px; }
+  .place-jump { top: 60px; }
+  /* The record at a glance: one row that scrolls sideways, not five stacked
+     cells that push the map two screens down. */
+  .glance-row { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+  .glance-item, .glance-item:nth-child(odd) { flex: 0 0 62%; scroll-snap-align: start; border-bottom: 0; border-right: var(--px) dashed var(--line); }
+  .glance-item:last-child { border-right: 0; }
+  .place-head p.lead { font-size: 14px; }
+  .steps-grid { grid-template-columns: minmax(0, 1fr); }
+  .shelf-table th .shelf-th-body { display: none; }
+  .home-map-card { padding: 14px; gap: 8px; }
+  .home-steps > li[data-state="later"] .home-step-hint { display: none; }
+  .home-map-card, .listing-panel, .map-legend { box-shadow: 0 0 0 var(--px) var(--frame-strong); }
+  footer { padding: var(--space-6) 0 var(--space-4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .btn:active { transition: none; transform: none; }
+  .paid-strip-more > summary::before { transition: none; }
+}
+
+@media print {
+  .place-head, .page-hero { background: none; color: var(--ink); }
+  .place-head h1, .page-hero h1, .place-head .kicker, .place-head p.lead { color: var(--ink); }
+  .place-head::after, .page-hero::after { display: none; }
+  .paid-strip { display: none; }
+  /* A printed page carries the full source table, folded or not. */
+  .sources-more::details-content { content-visibility: visible; }
+  .sources-more > summary { display: none; }
+}

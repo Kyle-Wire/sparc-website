@@ -229,6 +229,44 @@ export function LockedShelf({ kind, cta = true, place }: { kind: ShelfKind; cta?
 }
 
 /**
+ * A hazard's paid shelves, folded into one strip: each shelf's name and what
+ * a run would give, in words, and one way to ask for it. The placeholder
+ * panels (LockedShelf) open from the strip on a click, so the layout is still
+ * there for anyone who wants to see it but no longer fills the page.
+ *
+ * The strip holds no figure and is not a placeholder panel: it describes a
+ * product, it does not depict a readout. See docs/design/cabinet-frame.md.
+ */
+export function PaidStrip({ shelves, place, hazard }: { shelves: { name: string; kind: ShelfKind }[]; place: string; hazard: string }) {
+  return (
+    <div className="paid-strip">
+      <div className="paid-strip-row" style={{ "--shelves": shelves.length } as React.CSSProperties}>
+        {shelves.map((sh) => (
+          <div key={sh.kind} className="paid-strip-shelf">
+            <span className="paid-strip-name">
+              {sh.name}
+              <span className="pill" data-state="later">Paid · not run</span>
+            </span>
+            <p>{SHELVES[sh.kind].slots.join(" · ")}</p>
+          </div>
+        ))}
+        <Link href={{ pathname: "/start", query: { place, hazard } }} className="btn btn-accent btn-sm">
+          Ask for a report <span className="arrow">→</span>
+        </Link>
+      </div>
+      <details className="paid-strip-more">
+        <summary>See the layout a run would fill</summary>
+        <div className="shelf-pair" style={shelves.length === 1 ? { gridTemplateColumns: "minmax(0, 1fr)" } : undefined}>
+          {shelves.map((sh) => (
+            <LockedShelf key={sh.kind} kind={sh.kind} cta={false} />
+          ))}
+        </div>
+      </details>
+    </div>
+  );
+}
+
+/**
  * The block beside the area around it, as two bars on one scale of 0 to 100
  * percent. The block's bar comes first and is the darker one; each bar has
  * its label and its figure in words, so nothing depends on the shade.

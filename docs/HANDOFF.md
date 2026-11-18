@@ -92,7 +92,7 @@ Hosting is Vercel. Supabase holds accounts and contact messages. Resend sends em
 4. **FloodSim in the site, guided.** Pick a preset storm, watch the water, read findings with their confidence labels. The device check is built (`/start`); the run itself is not. This is the first thing nobody else offers, and it depends on engine work in the FloodSim repo. *Done when* a visitor with a capable laptop can run one storm for their block from a place page.
 5. **A sample report that can be shown publicly.** The proof-of-concept report names its block and stays private. *Done when* the models page links to a real report for a place that can be shown.
 6. **Accounts that do something:** saved places across devices. Then reword the sign-in and sign-up pages and put the links back.
-7. **Cards that arrive one by one.** Today the page waits for every source before showing anything but the loading screen. *Done when* the map and the quick cards appear at once and slow ones fill in.
+7. **Cards that arrive one by one.** Done for the place page (18 November 2026): the census answer and the site's own FEMA tables come first, and FEMA's flood map, ground height and land cover each fill their own card as they answer (`startPlace` and `finishPlace` in `src/lib/place/summary.ts`). The comparison page still waits for everything.
 8. **Terms, and a lawyer's read of the privacy page.**
 9. **HeatSim on a server,** then the heat shelf.
 
@@ -104,7 +104,7 @@ Hosting is Vercel. Supabase holds accounts and contact messages. Resend sends em
 - **The contact form was not tested on the live site.** If a Turnstile secret is set in Vercel, the form will be refused, because the page has no Turnstile widget. Send one message through it to find out.
 - **The contact form keeps one message per email address.** A second message from the same person replaces the first in the database (the notification email still arrives).
 - **FEMA's claims download is slow and breaks off.** One complete copy took three tries. A monthly refresh may fail and need running again.
-- **First visit to a place takes 3 to 6 seconds.** Comparing four new places takes 10 to 20 seconds with no loading screen.
+- **First visit to a place:** the top of the page in under half a second, the slowest card after about 3 seconds (Chicago, measured locally on 18 November 2026). The loading screen still shows while the census is asked. Comparing four new places takes 10 to 20 seconds with no loading screen.
 
 **Says something untrue or out of date**
 
@@ -123,7 +123,7 @@ Hosting is Vercel. Supabase holds accounts and contact messages. Resend sends em
 - Printing on paper. Only the print preview was looked at.
 - Any competitor's product.
 
-**Few tests.** `npm test` runs the device check's arithmetic only (`src/lib/device.test.ts`). Nothing in `src/lib/place` has a unit test yet: the coordinate rounding, the storm-distance maths, the small TIFF reader, the summaries. The build gates check design rules, not arithmetic.
+**Few tests.** `npm test` runs the device check's arithmetic (`src/lib/device.test.ts`) and the headline row before and after FEMA answers (`src/lib/place/summary.test.ts`). Nothing in `src/lib/place` has a unit test yet: the coordinate rounding, the storm-distance maths, the small TIFF reader, the summaries. The build gates check design rules, not arithmetic.
 
 **The paid path's request** goes through `/api/waitlist`, like the contact form, so it has the same open problems: untested on the live site, refused if a Turnstile secret is set, and one row per email address. It sends the rounded block and never the street address.
 

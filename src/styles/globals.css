@@ -651,6 +651,8 @@ div.place-layer { grid-template-columns: 1fr; cursor: default; }
 .record-card[data-hazard="flood"] { border-left-color: var(--flood); }
 .record-card[data-hazard="heat"] { border-left-color: var(--heat); }
 .record-card-missing { background: var(--paper); border-style: dashed; border-left-style: solid; }
+.record-card-pending { background: var(--paper); border-style: dotted; border-left-style: solid; }
+.record-card-pending .record-body strong { font-weight: 600; }
 .record-figure { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
 .record-figure-value { font-family: var(--font-mono); font-size: var(--fs-display); font-weight: 700; letter-spacing: -0.02em; line-height: 1.05; }
 .record-figure-note { font-size: 14px; color: var(--ink-2); }

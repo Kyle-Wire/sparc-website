@@ -16,16 +16,20 @@ export interface GlanceItem {
   anchor: string;
 }
 
-export function glanceItems(g: Glance): GlanceItem[] {
+/** `zonePending` marks FEMA's flood map as still being asked, so the zone
+ *  reads "Asking FEMA" rather than the dash that means no answer. */
+export function glanceItems(g: Glance, zonePending = false): GlanceItem[] {
   const n = (v: number | null) => (v === null ? "—" : v.toLocaleString("en-US"));
   return [
-    {
-      key: "zone",
-      label: "FEMA flood zone",
-      value: g.zone === null ? "—" : g.zone === "Not mapped" ? g.zone : `Zone ${g.zone}`,
-      sub: g.sfha === null ? undefined : g.sfha ? "Special Flood Hazard Area on the block" : "No Special Flood Hazard Area",
-      anchor: "#flood",
-    },
+    zonePending
+      ? { key: "zone", label: "FEMA flood zone", value: "Asking FEMA", sub: "fills in when it answers", anchor: "#flood" }
+      : {
+          key: "zone",
+          label: "FEMA flood zone",
+          value: g.zone === null ? "—" : g.zone === "Not mapped" ? g.zone : `Zone ${g.zone}`,
+          sub: g.sfha === null ? undefined : g.sfha ? "Special Flood Hazard Area on the block" : "No Special Flood Hazard Area",
+          anchor: "#flood",
+        },
     { key: "claims", label: "Flood insurance claims", value: n(g.claims), sub: "in the census tract", anchor: "#flood" },
     { key: "declarations", label: "Disaster declarations", value: n(g.declarations), sub: "for the county", anchor: "#flood" },
     { key: "storms", label: "Storm tracks nearby", value: n(g.storms), sub: "within 100 km", anchor: "#flood" },
@@ -33,10 +37,10 @@ export function glanceItems(g: Glance): GlanceItem[] {
   ];
 }
 
-export function GlanceRow({ glance, linked }: { glance: Glance; linked?: boolean }) {
+export function GlanceRow({ glance, linked, zonePending }: { glance: Glance; linked?: boolean; zonePending?: boolean }) {
   return (
-    <dl className="glance-row">
-      {glanceItems(glance).map((it) => {
+    <dl className="glance-row" aria-busy={zonePending || undefined}>
+      {glanceItems(glance, zonePending).map((it) => {
         const body = (
           <>
             <dt>{it.label}</dt>

@@ -74,6 +74,25 @@ export function RecordCard({
   );
 }
 
+/** A register still being asked. It holds the card's place so nothing jumps
+ *  when the answer arrives, names who is being asked, and states no result. */
+export function PendingCard({ hazard, about, who, source }: { hazard: Hazard; about: string; who: string; source: string }) {
+  return (
+    <article className="record-card record-card-pending" data-hazard={hazard} aria-busy="true">
+      <div className="kicker">{about}</div>
+      <div className="record-body">
+        <p>
+          <strong>Asking {who} now.</strong> This card fills in when it answers.
+        </p>
+      </div>
+      <footer className="record-source">
+        <span className="record-basis">Asking</span>
+        <span>{source}</span>
+      </footer>
+    </article>
+  );
+}
+
 /** A register that did not answer. The card keeps its place so the reader can
  *  see what is missing, and says so in a sentence. */
 export function MissingCard({

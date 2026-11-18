@@ -86,22 +86,15 @@ export const RASTERS: RasterDef[] = [
 const USGS = "https://basemap.nationalmap.gov/arcgis/rest/services";
 
 /**
- * Two base maps from USGS The National Map, both public domain and keyless:
- * the topographic map and aerial imagery (USDA NAIP and others, per the
- * service's own credit, opened 18 November 2026). Both are drawn in black and
- * white by default, so the coloured layers on top (FEMA's zones, the pins)
- * are what the eye goes to.
+ * The base map: aerial imagery from USGS The National Map (USDA NAIP and
+ * others, per the service's own credit, opened 18 November 2026), public
+ * domain and keyless, drawn in black and white. It is the only base map
+ * (Kyle, 18 November 2026: "just the black and white aerial"), so the
+ * coloured layers on top (FEMA's zones, the pins) are what the eye goes to.
  */
 export const BASE_STYLE: StyleSpecification = {
   version: 8,
   sources: {
-    base: {
-      type: "raster",
-      tiles: [`${USGS}/USGSTopo/MapServer/tile/{z}/{y}/{x}`],
-      tileSize: 256,
-      maxzoom: 16,
-      attribution: "Base map: USGS The National Map",
-    },
     aerial: {
       type: "raster",
       tiles: [`${USGS}/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}`],
@@ -110,21 +103,8 @@ export const BASE_STYLE: StyleSpecification = {
       attribution: "Imagery: USDA, USGS The National Map: Orthoimagery",
     },
   },
-  layers: [
-    { id: "base", type: "raster", source: "base", paint: { "raster-saturation": -1, "raster-contrast": 0.25 } },
-    { id: "aerial", type: "raster", source: "aerial", layout: { visibility: "none" }, paint: { "raster-saturation": -1 } },
-  ],
+  layers: [{ id: "aerial", type: "raster", source: "aerial", paint: { "raster-saturation": -1 } }],
 };
-
-export type BaseKind = "map" | "aerial";
-
-/** Shows one base map and sets it in black and white or in colour. */
-export function setBase(map: MlMap, kind: BaseKind, grey: boolean) {
-  if (!map.getLayer("base") || !map.getLayer("aerial")) return;
-  map.setLayoutProperty("base", "visibility", kind === "map" ? "visible" : "none");
-  map.setLayoutProperty("aerial", "visibility", kind === "aerial" ? "visible" : "none");
-  for (const id of ["base", "aerial"]) map.setPaintProperty(id, "raster-saturation", grey ? -1 : 0);
-}
 
 /** A mouse wheel or trackpad zooms the map directly. On a touch screen one
  *  finger still scrolls the page and two move the map, so a phone is never

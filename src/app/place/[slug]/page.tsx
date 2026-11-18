@@ -12,7 +12,7 @@ import { KM_PER_MILE, parsePlaceSlug } from "@/lib/place/coords";
 import type { NearbyStorm } from "@/lib/place/hurricanes";
 import type { Lookup } from "@/lib/place/lookup";
 import type { TractRisk } from "@/lib/place/nri";
-import type { CountyDeclarations, TractClaims } from "@/lib/place/openfema";
+import { claimsNotLocatedPct, type CountyDeclarations, type TractClaims } from "@/lib/place/openfema";
 import { loadPlace } from "@/lib/place/summary";
 import type { Ground, LandCover } from "@/lib/place/surroundings";
 
@@ -55,6 +55,16 @@ function longDate(iso: string): string {
   });
 }
 
+/** "our copy of November 17, 2026", for a record read from the site's own copy of a FEMA table. */
+function copyNote(copied: string | null): string | undefined {
+  return copied ? `our copy of ${longDate(copied)}` : undefined;
+}
+
+function joinNotes(...parts: (string | undefined)[]): string | undefined {
+  const kept = parts.filter(Boolean);
+  return kept.length ? kept.join(" · ") : undefined;
+}
+
 function miles(km: number): number {
   return Math.round(km / KM_PER_MILE);
 }
@@ -74,15 +84,20 @@ function stormLine(s: NearbyStorm): string {
 function ClaimsCard({ res, tractName }: { res: Lookup<TractClaims>; tractName: string }) {
   if (!res.ok) return <MissingCard hazard="flood" about="Flood insurance claims nearby" reason={res.reason} source={CLAIMS_SOURCE} />;
   const c = res.data;
+  const notLocated = claimsNotLocatedPct();
   const caveat = (
     <p className="record-aside">
       Only homes insured through the National Flood Insurance Program can make a claim, so a low count does not
-      mean no flooding. Claims are published by census area, never by address.
+      mean no flooding. Claims are published by census area, never by address
+      {notLocated !== null && notLocated > 0
+        ? `, and FEMA has not placed about ${notLocated}% of all claims nationwide in any census area, so those are counted nowhere`
+        : ""}
+      .
     </p>
   );
   if (c.total === 0) {
     return (
-      <RecordCard hazard="flood" about="Flood insurance claims nearby" term="flood-insurance-claim" figure="0" figureNote={`claims on record in ${tractName}`} source={CLAIMS_SOURCE}>
+      <RecordCard hazard="flood" about="Flood insurance claims nearby" term="flood-insurance-claim" figure="0" figureNote={`claims on record in ${tractName}`} source={CLAIMS_SOURCE} asOf={copyNote(c.copied)}>
         <p>No flood insurance claim is on record in the census tract around this place.</p>
         {caveat}
       </RecordCard>
@@ -97,7 +112,7 @@ function ClaimsCard({ res, tractName }: { res: Lookup<TractClaims>; tractName: s
       figure={`${c.atLeast ? "over " : ""}${c.total.toLocaleString("en-US")}`}
       figureNote={`${c.total === 1 ? "claim" : "claims"} on record in ${tractName}`}
       source={CLAIMS_SOURCE}
-      asOf={c.firstYear && c.lastYear ? `${c.firstYear} to ${c.lastYear}` : undefined}
+      asOf={joinNotes(c.firstYear && c.lastYear ? `${c.firstYear} to ${c.lastYear}` : undefined, copyNote(c.copied))}
     >
       <p>
         Flood insurance claims were made in this census tract in {c.yearsWithClaims}{" "}
@@ -123,6 +138,7 @@ function DeclarationsCard({ res, countyName }: { res: Lookup<CountyDeclarations>
       figure={d.total.toLocaleString("en-US")}
       figureNote={`for ${countyName}${d.firstYear ? ` since ${d.firstYear}` : ""}`}
       source={DECLARATIONS_SOURCE}
+      asOf={copyNote(d.copied)}
     >
       {d.total > 0 ? (
         <>
@@ -147,7 +163,7 @@ function DeclarationsCard({ res, countyName }: { res: Lookup<CountyDeclarations>
 }
 
 function GroundCard({ res }: { res: Lookup<Ground> }) {
-  if (!res.ok) return <MissingCard hazard="flood" about="Ground height" reason={res.reason} source={GROUND_SOURCE} />;
+  if (!res.ok) return <MissingCard hazard="flood" about="Ground height" reason={res.reason} final={res.final} source={GROUND_SOURCE} />;
   const g = res.data;
   const diff = g.blockFt - g.neighbourhoodFt;
   const size = Math.abs(diff);
@@ -178,7 +194,7 @@ function GroundCard({ res }: { res: Lookup<Ground> }) {
 
 function CoverCards({ res }: { res: Lookup<LandCover> }) {
   if (!res.ok) {
-    return <MissingCard hazard="heat" about="Tree canopy and paving" reason={res.reason} source={COVER_SOURCE} />;
+    return <MissingCard hazard="heat" about="Tree canopy and paving" reason={res.reason} final={res.final} source={COVER_SOURCE} />;
   }
   const { canopy, paving } = res.data;
   const aside = (
@@ -230,7 +246,7 @@ function RiskCard({ res, tractName }: { res: Lookup<TractRisk>; tractName: strin
       figure={r.overall.rating}
       figureNote={`all hazards together, for ${tractName}`}
       source={RISK_SOURCE}
-      asOf={r.version ? `version ${r.version}` : undefined}
+      asOf={joinNotes(r.version ? `version ${r.version}` : undefined, copyNote(r.copied))}
     >
       <p>
         FEMA rates each census tract in the country for eighteen natural hazards, from very low to very

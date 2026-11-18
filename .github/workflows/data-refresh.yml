@@ -1,0 +1,84 @@
+name: data refresh
+
+# Once a month, take a fresh copy of the three FEMA tables the site reads from
+# its own files (scripts/build-fema-tables.mjs) and open a pull request with
+# the result. It never pushes to main and never merges: merging deploys the
+# live site, and that stays a person's decision.
+#
+# Why the checks run in this job. A pull request opened with the workflow's own
+# token does not start the ci workflow (GitHub does not let one workflow's
+# token trigger another), so the same gates run here, before the pull request
+# is opened. If any of them fails, no pull request is opened.
+#
+# One repo setting is needed, once: Settings -> Actions -> General -> Workflow
+# permissions -> "Allow GitHub Actions to create and approve pull requests".
+# Without it the last step fails and says so; nothing else is affected.
+#
+# The hurricane track file is not refreshed here. NOAA publishes each edition
+# under a new file name, so that copy is rebuilt by hand:
+# npm run data:hurricanes, after updating the names in the script.
+
+on:
+  schedule:
+    - cron: "23 7 3 * *" # the 3rd of each month, 07:23 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false
+
+env:
+  NEXT_TELEMETRY_DISABLED: "1"
+
+jobs:
+  fema-tables:
+    name: copy FEMA tables
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      # The script exits non-zero if a download is cut short or a source answers
+      # with an error, so a partial copy never reaches a pull request.
+      - run: npm run data:fema
+
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run check:design
+      - run: npm run build
+      - run: npm run check:placeholders:rendered
+
+      - name: Open a pull request with the new copy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add src/data/fema
+          if git diff --cached --quiet; then
+            echo "The copy is unchanged. Nothing to open."
+            exit 0
+          fi
+          month="$(date -u +%Y-%m)"
+          branch="data/fema-tables-${month}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "${branch}"
+          git commit -m "Data: copy of FEMA tables for ${month}"
+          git push --force origin "${branch}"
+          body="Monthly copy of FEMA's claims, declarations and National Risk Index tables, built by scripts/build-fema-tables.mjs. The counts read and the dates are in src/data/fema/manifest.json. Type check, lint, design gates and build passed in the job that opened this. Merging deploys the site."
+          if gh pr view "${branch}" --json number > /dev/null 2>&1; then
+            echo "A pull request for ${branch} is already open; it now carries this copy."
+            exit 0
+          fi
+          if ! gh pr create --base main --head "${branch}" --title "Data: copy of FEMA tables for ${month}" --body "${body}"; then
+            echo "::error::Could not open the pull request. If none exists for ${branch}, turn on 'Allow GitHub Actions to create and approve pull requests' under Settings -> Actions -> General. The branch was pushed and can be opened by hand."
+            exit 1
+          fi

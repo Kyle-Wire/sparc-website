@@ -131,9 +131,17 @@ Added in the third pass ("finish the free tier"):
 - **A loading screen** that appears at once and names who is being asked. A first visit to a place takes a few seconds.
 - The comparison and the questions list use the new numbers.
 
+Added in the fourth pass ("our own copy"):
+
+- **The site keeps its own copy of three FEMA tables:** flood insurance claims by tract and year, disaster declarations by county, and National Risk Index ratings by tract. `npm run data:fema` builds them into `src/data/fema`, one file per state, with a manifest of what was read and when. A place page reads the copy and asks FEMA only for a state the copy lacks.
+- **A monthly workflow** (`.github/workflows/data-refresh.yml`) rebuilds the copy, runs the checks, and opens a pull request. It never merges.
+- **Cards say when the copy was taken.** The claims card also says what share of all claims FEMA has not placed in any census area.
+- **`/data`:** where each record comes from, whether it is our copy or asked live, and its dates.
+- **"Try again"** on any card whose source did not answer. Answers from the slower live sources are kept longer.
+
 Not built yet, in rough order:
 
-1. Our own copy of the slower sources, so a page does not depend on six public services answering live (see [`roadmap.md`](roadmap.md)).
+1. Our own copy of the map-shaped sources (flood zones, elevation, land cover). They are still asked live on a first visit (see [`roadmap.md`](roadmap.md)).
 2. Saved places carried by an account, across devices.
 3. The place panel from section 5.
 4. A sample report that can be shown publicly. The proof-of-concept report names its block and stays private.

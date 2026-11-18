@@ -1,6 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Em, Placeholder, PlaceholderPlot, PlaceholderTrack } from "@/components/system/placeholder";
+import { RetryButton } from "./RetryButton";
 
 /**
  * Cards for a place page.
@@ -75,17 +76,31 @@ export function RecordCard({
 
 /** A register that did not answer. The card keeps its place so the reader can
  *  see what is missing, and says so in a sentence. */
-export function MissingCard({ hazard, about, reason, source }: { hazard: Hazard; about: string; reason: string; source: string }) {
+export function MissingCard({
+  hazard,
+  about,
+  reason,
+  source,
+  final,
+}: {
+  hazard: Hazard;
+  about: string;
+  reason: string;
+  source: string;
+  /** The source does not cover this place; asking again will not help. */
+  final?: boolean;
+}) {
   return (
     <article className="record-card record-card-missing" data-hazard={hazard}>
       <div className="kicker">{about}</div>
       <div className="record-body">
         <p>
-          <strong>No answer right now.</strong> {reason}
+          <strong>{final ? "Not available for this place." : "No answer right now."}</strong> {reason}
         </p>
+        {!final && <RetryButton />}
       </div>
       <footer className="record-source">
-        <span className="record-basis">Not loaded</span>
+        <span className="record-basis">{final ? "Not covered" : "Not loaded"}</span>
         <span>{source}</span>
       </footer>
     </article>

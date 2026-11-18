@@ -119,11 +119,13 @@ Not the number of layers. Four things which, as far as the agent knows, nobody o
 | A methods paper for each model: what it is, what it has been tested against, its margins | Kyle, Engine |
 | Confidence labels on every modelled finding, set by fixed rules | Engine (rules exist in the Climate Inspection repo) |
 | A plain glossary: every term on a place page, from the publisher's own definition, linked and dated | Built |
-| Our own copy of the slower sources (claims, declarations, hazard ratings, land cover), refreshed on a schedule, so a page does not wait on an agency's server or fail when one throttles | Next, Kyle (storage cost; the agencies throttled a single machine during testing) |
+| Our own copy of FEMA's three tables (claims, declarations, hazard ratings), read from the site's files and refreshed monthly by a workflow that opens a pull request | Built |
+| Our own copy of the map-shaped sources too (flood zones, elevation, land cover): they are asked live and kept for a week to half a year, and still fail on a first visit if the agency does not answer | Kyle (needs storage that costs money, or a large one-off download) |
+| A "Try again" button on any card whose source did not answer | Built |
 | A loading screen that names who is being asked, shown at once while a place is read | Built |
 | Tell us what you saw: "this street floods", "it did not", with a date and a photo | Kyle (moderation, privacy; it is also the cheapest validation data there is) |
 | Validation, published: every place where the model has been compared with a measurement, good and bad | Engine |
-| A data log: when each source was last fetched and what version | Next |
+| A data page: where each record comes from, whether it is our copy or asked live, and its dates | Built |
 | Who we are and how we are paid, in a paragraph | Next |
 | Accessibility pass: keyboard map controls, screen reader text for every layer, contrast | Next |
 | Spanish | Later |
@@ -142,6 +144,6 @@ Not the number of layers. Four things which, as far as the agent knows, nobody o
 ## Order suggested for the next three steps
 
 1. ~~Numbers for trees, paving and ground height, and the plain glossary.~~ Done on 17 November 2026.
-2. **Our own copy of the slower sources.** Every place page asks six public services live. In testing, FEMA and USGS both began refusing one machine after a few dozen lookups. This is what stands between the free tier and real traffic.
+2. ~~Our own copy of FEMA's tables.~~ Done on 17 November 2026: claims, declarations and hazard ratings no longer wait on FEMA. Flood zones, elevation and land cover are still asked live.
 3. **An account for saved places** and the "what changed" check. They finish "come back".
 4. **FloodSim guided mode in the site** with the device check. It is the first thing nobody else has.

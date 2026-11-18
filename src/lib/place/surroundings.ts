@@ -81,12 +81,13 @@ async function shareOf(p: LatLon, coverage: string): Promise<Lookup<Share>> {
     format: "GeoTIFF",
   });
   const res = await askBytes(`${WCS}?${q.toString()}`, "The land cover server", {
-    revalidate: 30 * DAY_SECONDS,
+    // One edition of the survey (2021) is read; keep an answer for half a year.
+    revalidate: 180 * DAY_SECONDS,
     retries: 1,
   });
   if (!res.ok) return res;
   const grid = readByteGrid(res.data);
-  if (!grid) return { ok: false, reason: "The land cover survey has no data for this place." };
+  if (!grid) return { ok: false, final: true, reason: "The land cover survey has no data for this place." };
 
   const block = blockBox(p);
   let allSum = 0;
@@ -108,7 +109,7 @@ async function shareOf(p: LatLon, coverage: string): Promise<Lookup<Share>> {
     }
   }
   if (allN < (GRID * GRID) / 2 || blockN === 0) {
-    return { ok: false, reason: "The land cover survey does not cover this place." };
+    return { ok: false, final: true, reason: "The national land cover survey used here covers the lower 48 states only." };
   }
   return { ok: true, data: { block: blockSum / blockN, neighbourhood: allSum / allN } };
 }
@@ -163,7 +164,7 @@ export async function groundAround(p: LatLon): Promise<Lookup<Ground>> {
   const who = "The USGS elevation service";
   // This service answers 502 for a few seconds at a time (seen 17 Nov 2026),
   // so it is asked up to four times, a little further apart each time.
-  const opts = { revalidate: 30 * DAY_SECONDS, retries: 3, timeoutMs: 25_000 };
+  const opts = { revalidate: 180 * DAY_SECONDS, retries: 3, timeoutMs: 25_000 };
   const [area, block] = await Promise.all([
     askJson<Stats>(statsUrl(areaBox(p)), who, opts),
     askJson<Stats>(statsUrl(blockBox(p)), who, opts),
@@ -174,7 +175,7 @@ export async function groundAround(p: LatLon): Promise<Lookup<Ground>> {
   const b = block.data.statistics?.[0];
   const h = area.data.histograms?.[0];
   if (!a || !b || !h || !h.counts?.length || !Number.isFinite(b.median) || !Number.isFinite(a.median)) {
-    return { ok: false, reason: "USGS has no elevation survey for this place." };
+    return { ok: false, final: true, reason: "USGS has no elevation survey for this place." };
   }
 
   // Share of the area's cells below the block's median, from the service's histogram.

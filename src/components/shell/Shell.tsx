@@ -80,6 +80,7 @@ export function Footer() {
             <Link href="/">Look up a place</Link>
             <Link href="/places">Your places</Link>
             <Link href="/glossary">Plain glossary</Link>
+            <Link href="/data">Data sources</Link>
             <Link href="/models">The models</Link>
             <Link href="/pricing">Pricing</Link>
           </div>

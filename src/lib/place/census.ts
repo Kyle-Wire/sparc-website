@@ -88,3 +88,18 @@ export async function areasAt(place: LatLon): Promise<Lookup<PlaceAreas>> {
     },
   };
 }
+
+/** The ZIP code area (the Census Bureau's ZCTA, which follows ZIP codes) a
+ *  rounded place falls in. Used to ask the listings feed by area, never by
+ *  address (Climate Inspection D42 item 3). Null when the point is in none. */
+export async function zipAreaAt(place: LatLon): Promise<Lookup<string | null>> {
+  const url = `${BASE}/geographies/coordinates?x=${place.lon}&y=${place.lat}&${VINTAGE}&layers=all`;
+  const res = await askJson<{ result?: { geographies?: Record<string, CensusArea[]> } }>(url, WHO, {
+    revalidate: 30 * DAY_SECONDS,
+  });
+  if (!res.ok) return res;
+  const g = res.data.result?.geographies ?? {};
+  const key = Object.keys(g).find((k) => k.includes("ZIP Code Tabulation Areas"));
+  const zcta = key ? (g[key]?.[0] as (CensusArea & { ZCTA5?: string }) | undefined) : undefined;
+  return { ok: true, data: zcta?.ZCTA5 ?? zcta?.GEOID ?? null };
+}

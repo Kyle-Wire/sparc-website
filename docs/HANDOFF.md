@@ -64,6 +64,8 @@ Each hazard has three shelves: on record (free), modelled (paid), what if (paid)
 | `src/app/start`, `workspace`, `report/sample` | The paid path: request, workspace preview, report layout |
 | `src/lib/engines.ts` | The four engines in one list: what each gives, where it runs, what it will never say, and the commit each sentence was read at. The models page, the place page, `/start` and `/workspace` all read it |
 | `src/lib/device.ts`, `src/components/journey/` | The device check (FloodSim's rule: 36 bytes a cell, nine storage buffers for tiled stepping) and the order steps |
+| `src/components/home/HomeMap.tsx`, `src/lib/listings/`, `src/app/api/listings` | The map-first home page and homes for sale (Climate Inspection D42, SPEC-LISTINGS.md): RentCast listings by ZIP code, kept 30 days, with the site's own cap of 45 requests a month; the listing panel in three parts; model readings per block for subscribers only |
+| `supabase/migrations/0006_listings.sql`, `scripts/sync-block-readings.mjs` | The listings, the monthly counter, and the per-block model readings, all server-only. The script copies Climate Inspection's `screen_<place>.json` into the database, because this repository is public and the readings are paid |
 | `src/app/api/geocode`, `api/inspect` | Address to block; map click to what is at that spot |
 | `src/lib/place/` | One file per source: `census`, `fema`, `openfema`, `nri`, `hurricanes`, `point`, `surroundings`. `summary.ts` gathers them. `lookup.ts` is the one way to ask a source, with retries |
 | `src/components/place/` | The map, cards, questions, saved places |
@@ -86,6 +88,12 @@ Hosting is Vercel. Supabase holds accounts and contact messages. Resend sends em
 
 ## 5. What to work on, in order
 
+0. **Switch on homes for sale (Kyle, 18 November 2026: RentCast's free plan, D42).** Four steps, all Kyle's:
+   - Apply `supabase/migrations/0006_listings.sql` to the Supabase project.
+   - Create the RentCast account on the free Developer plan and put the key in Vercel as `RENTCAST_API_KEY`, in the **Production** environment only, never Preview or Development, and never in a local `.env`. The request log in the production database is the one counter. A preview or a local copy refuses to call the feed unless `RENTCAST_ALLOW_NONPROD=1`, which must only be set against the production database.
+   - Make sure `SUPABASE_SERVICE_ROLE_KEY` is set in Vercel.
+   - Run `node scripts/sync-block-readings.mjs <climate-inspection>/data/derived/places` with the service key in the shell, from a checkout of Climate Inspection's `listings/map` branch.
+   *Done when* "Show homes for sale here" on the home page loads pins for one ZIP code, and `feed_request_log` holds one row. The ceilings are fixed inside `take_feed_request` (45 in any 31 days, 10 in any day, one try per ZIP code per day) and tested in `src/lib/listings/budget.test.ts`. Until then the map says homes for sale are not connected. Before launch, ask RentCast where its listing data comes from (SPEC-LISTINGS.md §3).
 1. **Merge PR 26, then switch on one GitHub setting** (Settings, Actions, General, Workflow permissions, "Allow GitHub Actions to create and approve pull requests"). Run the "data refresh" job once by hand from the Actions tab to see it work. *Done when* a pull request titled "Data: copy of FEMA tables" appears.
 2. **Kyle's own test of the live site** (the list is in section 8). *Done when* anything wrong for a block he knows is written down and fixed or explained.
 3. **Protect the two open lookups.** `/api/geocode` and `/api/inspect` pass requests on to public agencies. Rate limiting only switches on if the Upstash settings exist in Vercel, and whether they do was not checked. *Done when* a burst from one visitor is refused before it reaches an agency.

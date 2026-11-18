@@ -95,6 +95,7 @@ Hosting is Vercel. Supabase holds accounts and contact messages. Resend sends em
 7. **Cards that arrive one by one.** Done for the place page (18 November 2026): the census answer and the site's own FEMA tables come first, and FEMA's flood map, ground height and land cover each fill their own card as they answer (`startPlace` and `finishPlace` in `src/lib/place/summary.ts`). The comparison page still waits for everything.
 8. **Terms, and a lawyer's read of the privacy page.**
 9. **HeatSim on a server,** then the heat shelf.
+10. **The free ground reading on place pages** (Kyle: "Yes, block centre"). Readings at the block centre, worked out on the workstation and stored for the site to read, then filled into the Ground row's On record shelf. *Done when* a place with a reading shows it with its screening label, and a refused or held one says so with no number. Needs the store described in section 6, and Kyle's yes on any paid storage.
 
 ## 6. What is wrong or unfinished
 
@@ -127,7 +128,7 @@ Hosting is Vercel. Supabase holds accounts and contact messages. Resend sends em
 
 **The paid path's request** goes through `/api/waitlist`, like the contact form, so it has the same open problems: untested on the live site, refused if a Turnstile secret is set, and one row per email address. It sends the rounded block and never the street address.
 
-**Ground movement follows Climate Inspection D38 and D39 (18 November 2026).** Every report gets two readings free: whether the ground the house stands on is sinking or rising (NASA's OPERA DISP-S1, labelled screening) and the USGS sinkhole-prone ground map. The rings, steady or new, the seasonal swing (labelled research), ten years ahead (no damage threshold) and the full processing run are paid. A held section reads "in review", and a refused reading shows no number and says why. The words "stable", "stopped" and "safe" are never used. Neither free reading is on the public place page yet. Whether the free rate may be shown there, for the block centre rather than a house, is Kyle's decision and has not been made.
+**Ground movement follows Climate Inspection D38 and D39 (18 November 2026).** Every report gets two readings free: whether the ground the house stands on is sinking or rising (NASA's OPERA DISP-S1, labelled screening) and the USGS sinkhole-prone ground map. The rings, steady or new, the seasonal swing (labelled research), ten years ahead (no damage threshold) and the full processing run are paid. A held section reads "in review", and a refused reading shows no number and says why. The words "stable", "stopped" and "safe" are never used. **Kyle, 18 November 2026: "Yes, block centre".** Place pages may show the free rate at the rounded block centre, worded as the block's ground and not a house, with no rings. Nothing is shown yet. The site cannot read DISP-S1 live: the product is a large file per radar frame, behind an Earthdata login. It needs readings worked out ahead of time on the workstation, stored where the site can read them, one small record per place (value, 95 % range, status, hold reasons, tier, vintage, source). That store is not built and may need paid storage, so ask Kyle first.
 
 ## 7. Decisions waiting on Kyle
 

@@ -574,10 +574,11 @@ export default async function PlacePage({ params }: Props) {
           <div className="shelf">
             <ShelfHead name="On record" state="coming" />
             <p className="shelf-empty">
-              Every report gets two readings free: whether the ground the house stands on is sinking or rising,
-              from NASA&apos;s OPERA ground-motion product and labelled screening, and the USGS map of ground prone to
-              sinkholes. Neither is shown on this page yet. Whether the free reading can be shown here, for the
-              block rather than a house, has not been decided.
+              This shelf will show, free, whether the ground at the centre of this block is sinking or rising,
+              from NASA&apos;s OPERA ground-motion product and labelled screening, beside the USGS map of ground prone
+              to sinkholes. It will be a reading of the block&apos;s ground, not of any house, and where the satellite
+              cannot give a reading the card will say so rather than show a number. Neither is shown yet: no
+              radar has been read for any place.
             </p>
           </div>
           <div className="shelf shelf-pair">

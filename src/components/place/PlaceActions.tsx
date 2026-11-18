@@ -38,7 +38,7 @@ export function PlaceActions({ slug, glance }: { slug: string; glance: Glance })
       <div className="place-actions-row">
         <button
           type="button"
-          className={mine ? "btn btn-primary" : "btn btn-accent"}
+          className={mine ? "btn btn-primary" : "btn"}
           aria-pressed={Boolean(mine)}
           onClick={() => (mine ? removePlace(slug) : savePlace(slug, glance))}
         >

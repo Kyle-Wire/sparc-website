@@ -114,40 +114,34 @@ export default function HomePage() {
 
       <HomeMap />
 
-      <section className="compact">
-        <div className="wrap place-examples">
-          <span>Or look at the record for:</span>
+      <div className="place-examples-strip">
+        <div className="wrap">
+          <span>Or look at the record for</span>
           {EXAMPLES.map((e) => (
             <Link key={e.slug} href={`/place/${e.slug}` as Route}>
               {e.label}
             </Link>
           ))}
         </div>
-      </section>
+      </div>
 
       <Section
         kicker="what you get"
         title="Three shelves for every hazard."
         lead="The first is open to everyone. The other two are our own models, and they are not on sale yet."
       >
-        <div className="grid-3" style={{ gap: 18 }}>
-          {SHELVES.map((s) => (
-            <div key={s.name} className="card" style={{ padding: 24 }}>
-              <div className="kicker">{s.state}</div>
-              <h3 style={{ margin: "10px 0 12px" }}>{s.name}</h3>
-              <p style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.6, margin: 0 }}>{s.body}</p>
-            </div>
-          ))}
-        </div>
-
-        <div className="table-scroll" style={{ marginTop: 32 }}>
-          <table className="plain-table">
+        <div className="table-scroll">
+          <table className="plain-table shelf-table">
             <thead>
               <tr>
                 <th>Hazard</th>
-                <th>On record · free</th>
-                <th>Modelled · paid</th>
-                <th>What if · paid</th>
+                {SHELVES.map((sh) => (
+                  <th key={sh.name}>
+                    {sh.state}
+                    <span className="shelf-th-name">{sh.name}</span>
+                    <span className="shelf-th-body">{sh.body}</span>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -182,7 +176,7 @@ export default function HomePage() {
         </div>
       </Section>
 
-      <section style={{ background: "var(--paper-2)", borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
+      <section className="band">
         <div className="wrap">
           <div className="section-head">
             <div>
@@ -206,27 +200,28 @@ export default function HomePage() {
       </section>
 
       <Section kicker="how it works" title="From an address to an answer." lead="Steps one and two work today. Three and four are being built.">
-        <div className="steps-row" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 0, borderTop: "1px solid var(--line)", borderBottom: "1px solid var(--line)" }}>
+        <div className="steps-grid">
           {STEPS.map((s, i) => (
-            <div key={s.no} className="steps-cell" style={{ padding: "26px 22px", borderRight: i < STEPS.length - 1 ? "1px solid var(--line)" : "none" }}>
-              <span className="mono" style={{ fontSize: 11, fontWeight: 700, padding: "2px 6px", borderRadius: 3, background: "var(--ink)", color: "#fff" }}>{s.no}</span>
-              <h4 style={{ fontSize: 17, fontWeight: 700, letterSpacing: "-0.015em", margin: "12px 0 10px" }}>{s.title}</h4>
-              <p style={{ fontSize: 13, color: "var(--ink-2)", margin: 0, lineHeight: 1.55 }}>{s.body}</p>
+            <div key={s.no} className="card" data-state={i < 2 ? "now" : "later"}>
+              <span className="step-no">{s.no}</span>
+              <h3>{s.title}</h3>
+              <p>{s.body}</p>
             </div>
           ))}
         </div>
-      </Section>
-
-      <section className="compact" style={{ borderTop: "1px solid var(--line)" }}>
-        <div className="wrap">
+        <div className="home-close">
           <p className="screening-note">
             <strong>A screening tool.</strong> It gives a buyer or a resident more to go on: what has
             happened around a place and what could. It is not an engineering study, an appraisal, an insurance
             quote or a home inspection, and it is not for engineering decisions. A home is a big purchase and
             this information is public; it should be easy to read.
           </p>
+          <div className="row">
+            <a href="#place-search-input" className="btn">Look up an address <span className="arrow">↑</span></a>
+            <Link href="/start" className="btn btn-accent">Ask for a report <span className="arrow">→</span></Link>
+          </div>
         </div>
-      </section>
+      </Section>
 
       <Footer />
     </>

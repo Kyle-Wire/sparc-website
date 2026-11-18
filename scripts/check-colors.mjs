@@ -63,6 +63,7 @@ const GROUNDS = {
   paper: token("paper"),
   "paper-2": token("paper-2"),
   "paper-3": token("paper-3"),
+  ink: token("ink"),
 };
 
 /* The contract per role. "text" is AA body text at 4.5:1; "boundary" is the
@@ -80,6 +81,9 @@ const ROLES = [
   { token: "wind", role: "text", min: 4.5, grounds: ["paper", "white"] },
   { token: "amber-ink", role: "white text on it", min: 4.5, grounds: ["white"], inverted: true },
   { token: "rule", role: "structural boundary", min: 3, grounds: ["white", "paper", "paper-2", "paper-3"] },
+  // The cabinet banner: the page inverted (docs/design/cabinet-frame.md).
+  { token: "ban-ink", role: "banner text", min: 4.5, grounds: ["ink"] },
+  { token: "ban-muted", role: "banner quiet text", min: 4.5, grounds: ["ink"] },
 ];
 
 /* Tokens that must NOT be given a text or boundary role. Listed so the

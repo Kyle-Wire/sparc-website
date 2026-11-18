@@ -214,8 +214,14 @@ function MapLegend(props: {
   onFema: (f: boolean) => void;
   femaVisible: boolean;
 }) {
+  // Open beside the map on a wide screen. On a phone the legend sits under the
+  // map at full length, so it starts closed there and opens on a tap.
+  const legendRef = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    if (legendRef.current && window.matchMedia("(max-width: 640px)").matches) legendRef.current.open = false;
+  }, []);
   return (
-    <details className="map-legend" open>
+    <details className="map-legend" open ref={legendRef}>
       <summary>Legend</summary>
       <div className="map-legend-body">
         <fieldset className="map-legend-group">

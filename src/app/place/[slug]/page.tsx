@@ -6,7 +6,7 @@ import { Nav, Footer } from "@/components/shell/Shell";
 import { Kicker } from "@/components/marketing/page-shell";
 import { PlaceActions } from "@/components/place/PlaceActions";
 import { PlaceMap, type TrackLine } from "@/components/place/PlaceMap";
-import { HeightBand, LockedShelf, MissingCard, PendingCard, RatingBar, RecordCard, ShareBars, ShelfHead } from "@/components/place/cards";
+import { HeightBand, MissingCard, PaidStrip, PendingCard, RatingBar, RecordCard, ShareBars, ShelfHead } from "@/components/place/cards";
 import { GlanceRow } from "@/components/place/glance";
 import { Questions } from "@/components/place/questions";
 import { KM_PER_MILE, parsePlaceSlug } from "@/lib/place/coords";
@@ -370,48 +370,57 @@ export default async function PlacePage({ params }: Props) {
 
       <section className="place-head">
         <div className="wrap">
-          <Kicker dot dotColor="var(--flood)">
-            on the public record{areas.ok ? ` · ${tractName}, ${countyName}` : ""}
-          </Kicker>
-          <h1>A block in {where}</h1>
-          <p className="lead">
-            What public registers hold about flood, storms, sea level and land cover around this place. The
-            page shows the neighbourhood, not a house, and its address carries the block only.
-          </p>
+          <div className="place-head-top">
+            <div>
+              <Kicker dot dotColor="var(--flood)">
+                on the public record{areas.ok ? ` · ${tractName}, ${countyName}` : ""}
+              </Kicker>
+              <h1>A block in {where}</h1>
+              <p className="lead">
+                What public registers hold about flood, storms, sea level and land cover around this place. The
+                page shows the neighbourhood, not a house, and its address carries the block only.
+              </p>
+            </div>
+          </div>
           <Suspense fallback={<GlanceRow glance={early} linked zonePending />}>
             <Later value={record}>
               {(r) => (
                 <>
-                  <PlaceActions slug={slug} glance={r.glance} />
                   <GlanceRow glance={r.glance} linked />
+                  <div className="place-head-actions">
+                    <PlaceActions slug={slug} glance={r.glance} />
+                    <div className="place-paid-cta">
+                      <span>
+                        <strong>What could happen here?</strong> Flood, heat, ground movement and wind, modelled
+                        for this neighbourhood. Paid, and not on sale yet.
+                      </span>
+                      <Link href={{ pathname: "/start", query: { place: slug } }} className="btn btn-accent btn-sm">
+                        Get a report or run it yourself <span className="arrow">→</span>
+                      </Link>
+                    </div>
+                  </div>
                 </>
               )}
             </Later>
           </Suspense>
-          <div className="place-paid-cta">
-            <span>
-              <strong>What could happen here?</strong> Flood, heat, ground movement and wind, modelled for this
-              neighbourhood. Paid, and not on sale yet.
-            </span>
-            <Link href={{ pathname: "/start", query: { place: slug } }} className="btn btn-accent btn-sm">
-              Get a report or run it yourself <span className="arrow">→</span>
-            </Link>
-          </div>
-          <div className="place-jump">
-            <span className="kicker">on this page</span>
-            <a href="#map">Map</a>
-            <a href="#flood">Flood and storms</a>
-            <a href="#heat">Heat</a>
-            <a href="#ground">Ground</a>
-            <a href="#wind">Wind</a>
-            <a href="#hazards">Every hazard</a>
-            <a href="#questions">Questions to take with you</a>
-            <a href="#sources">Sources</a>
-            <Link href="/glossary">What the words mean</Link>
-            <Link href="/">Look up another address</Link>
-          </div>
         </div>
       </section>
+
+      <nav className="place-jump" aria-label="On this page">
+        <div className="wrap">
+          <span className="kicker">on this page</span>
+          <a href="#map">Map</a>
+          <a href="#flood">Flood and storms</a>
+          <a href="#heat">Heat</a>
+          <a href="#hazards">Every hazard</a>
+          <a href="#ground">Ground</a>
+          <a href="#wind">Wind</a>
+          <a href="#questions">Questions to take with you</a>
+          <a href="#sources">Sources</a>
+          <Link href="/glossary">What the words mean</Link>
+          <Link className="place-jump-end" href="/">Look up another address</Link>
+        </div>
+      </nav>
 
       <section id="map" className="place-map-section">
         <div className="wrap-wide">
@@ -488,16 +497,14 @@ export default async function PlacePage({ params }: Props) {
             </div>
           </div>
 
-          <div className="shelf shelf-pair">
-            <div>
-              <ShelfHead name="Modelled" state="paid" />
-              <LockedShelf kind="flood-model" place={slug} />
-            </div>
-            <div>
-              <ShelfHead name="What if" state="paid" />
-              <LockedShelf kind="flood-whatif" place={slug} />
-            </div>
-          </div>
+          <PaidStrip
+            hazard="flood"
+            place={slug}
+            shelves={[
+              { name: "Modelled", kind: "flood-model" },
+              { name: "What if", kind: "flood-whatif" },
+            ]}
+          />
         </div>
       </section>
 
@@ -519,16 +526,14 @@ export default async function PlacePage({ params }: Props) {
             </div>
           </div>
 
-          <div className="shelf shelf-pair">
-            <div>
-              <ShelfHead name="Modelled" state="paid" />
-              <LockedShelf kind="heat-model" place={slug} />
-            </div>
-            <div>
-              <ShelfHead name="What if" state="paid" />
-              <LockedShelf kind="heat-whatif" place={slug} />
-            </div>
-          </div>
+          <PaidStrip
+            hazard="heat"
+            place={slug}
+            shelves={[
+              { name: "Modelled", kind: "heat-model" },
+              { name: "What if", kind: "heat-whatif" },
+            ]}
+          />
         </div>
       </section>
 
@@ -543,20 +548,6 @@ export default async function PlacePage({ params }: Props) {
               <RiskCard res={risk} tractName={tractName} />
             </div>
           </div>
-        </div>
-      </section>
-
-      <section id="questions" className="hazard-row">
-        <div className="wrap">
-          <Kicker>what to do with this</Kicker>
-          <h2>Questions to take with you</h2>
-          <p className="lead">
-            Chosen from what the record shows for this place. They are questions for people who can answer
-            them, not advice.
-          </p>
-          <Suspense fallback={<p className="shelf-empty">The questions are chosen once every source has answered.</p>}>
-            <Later value={record}>{(r) => <Questions record={r} />}</Later>
-          </Suspense>
         </div>
       </section>
 
@@ -581,16 +572,14 @@ export default async function PlacePage({ params }: Props) {
               radar has been read for any place.
             </p>
           </div>
-          <div className="shelf shelf-pair">
-            <div>
-              <ShelfHead name="Measured" state="paid" />
-              <LockedShelf kind="ground-model" place={slug} />
-            </div>
-            <div>
-              <ShelfHead name="What if" state="paid" />
-              <LockedShelf kind="ground-whatif" place={slug} />
-            </div>
-          </div>
+          <PaidStrip
+            hazard="ground"
+            place={slug}
+            shelves={[
+              { name: "Measured", kind: "ground-model" },
+              { name: "What if", kind: "ground-whatif" },
+            ]}
+          />
         </div>
       </section>
 
@@ -602,19 +591,28 @@ export default async function PlacePage({ params }: Props) {
             Wind
           </h2>
           <p className="lead">How wind moves through the neighbourhood across the seasons, as a map.</p>
-          <div className="shelf shelf-pair">
-            <div>
-              <ShelfHead name="On record" state="free" />
-              <p className="shelf-empty">
-                The hurricane and tropical storm tracks <a href="#flood">under Flood and storms</a> and on the map
-                are the part of wind that is on record here today.
-              </p>
-            </div>
-            <div>
-              <ShelfHead name="Modelled" state="paid" />
-              <LockedShelf kind="wind-model" place={slug} />
-            </div>
+          <div className="shelf">
+            <ShelfHead name="On record" state="free" />
+            <p className="shelf-empty">
+              The hurricane and tropical storm tracks <a href="#flood">under Flood and storms</a> and on the map
+              are the part of wind that is on record here today.
+            </p>
           </div>
+          <PaidStrip hazard="wind" place={slug} shelves={[{ name: "Modelled", kind: "wind-model" }]} />
+        </div>
+      </section>
+
+      <section id="questions" className="hazard-row">
+        <div className="wrap">
+          <Kicker>what to do with this</Kicker>
+          <h2>Questions to take with you</h2>
+          <p className="lead">
+            Chosen from what the record shows for this place. They are questions for people who can answer
+            them, not advice.
+          </p>
+          <Suspense fallback={<p className="shelf-empty">The questions are chosen once every source has answered.</p>}>
+            <Later value={record}>{(r) => <Questions record={r} />}</Later>
+          </Suspense>
         </div>
       </section>
 
@@ -628,69 +626,72 @@ export default async function PlacePage({ params }: Props) {
             incomplete. It is not an engineering study, an appraisal, an insurance quote or a home inspection,
             and it is not for engineering decisions.
           </p>
-          <div className="table-scroll" style={{ marginTop: 24 }}>
-            <table className="plain-table">
-              <thead>
-                <tr>
-                  <th>Record</th>
-                  <th>Publisher</th>
-                  <th>What area it describes</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Flood zones</td>
-                  <td>FEMA, National Flood Hazard Layer</td>
-                  <td>The block: a box about 180 m across around the middle of this place</td>
-                </tr>
-                <tr>
-                  <td>Flood insurance claims</td>
-                  <td>FEMA, OpenFEMA NFIP claims</td>
-                  <td>The census tract ({tractName})</td>
-                </tr>
-                <tr>
-                  <td>Disaster declarations</td>
-                  <td>FEMA, OpenFEMA declarations summaries</td>
-                  <td>The county ({countyName})</td>
-                </tr>
-                <tr>
-                  <td>Storm tracks</td>
-                  <td>NOAA National Hurricane Center, HURDAT2</td>
-                  <td>Within {storms.radiusKm} km of the place</td>
-                </tr>
-                <tr>
-                  <td>Hazard ratings</td>
-                  <td>FEMA, National Risk Index</td>
-                  <td>The census tract ({tractName})</td>
-                </tr>
-                <tr>
-                  <td>A spot you click</td>
-                  <td>FEMA flood map; USGS 3D Elevation Program; National Land Cover Database 2021</td>
-                  <td>That spot, and the land cover cell it falls in</td>
-                </tr>
-                <tr>
-                  <td>Sea level rise</td>
-                  <td>NOAA Office for Coastal Management</td>
-                  <td>Map layer</td>
-                </tr>
-                <tr>
-                  <td>Tree canopy, paving</td>
-                  <td>National Land Cover Database 2021 (MRLC)</td>
-                  <td>The block, and the square kilometre around it; also a map layer</td>
-                </tr>
-                <tr>
-                  <td>Ground height</td>
-                  <td>USGS, 3D Elevation Program</td>
-                  <td>The block, and the square kilometre around it</td>
-                </tr>
-                <tr>
-                  <td>Census areas, base map</td>
-                  <td>US Census Bureau; USGS The National Map</td>
-                  <td>Names of the tract and county; the map underneath</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <details className="sources-more">
+            <summary>Every record on this page, who publishes it, and what area it describes</summary>
+            <div className="table-scroll" style={{ marginTop: 12 }}>
+              <table className="plain-table">
+                <thead>
+                  <tr>
+                    <th>Record</th>
+                    <th>Publisher</th>
+                    <th>What area it describes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Flood zones</td>
+                    <td>FEMA, National Flood Hazard Layer</td>
+                    <td>The block: a box about 180 m across around the middle of this place</td>
+                  </tr>
+                  <tr>
+                    <td>Flood insurance claims</td>
+                    <td>FEMA, OpenFEMA NFIP claims</td>
+                    <td>The census tract ({tractName})</td>
+                  </tr>
+                  <tr>
+                    <td>Disaster declarations</td>
+                    <td>FEMA, OpenFEMA declarations summaries</td>
+                    <td>The county ({countyName})</td>
+                  </tr>
+                  <tr>
+                    <td>Storm tracks</td>
+                    <td>NOAA National Hurricane Center, HURDAT2</td>
+                    <td>Within {storms.radiusKm} km of the place</td>
+                  </tr>
+                  <tr>
+                    <td>Hazard ratings</td>
+                    <td>FEMA, National Risk Index</td>
+                    <td>The census tract ({tractName})</td>
+                  </tr>
+                  <tr>
+                    <td>A spot you click</td>
+                    <td>FEMA flood map; USGS 3D Elevation Program; National Land Cover Database 2021</td>
+                    <td>That spot, and the land cover cell it falls in</td>
+                  </tr>
+                  <tr>
+                    <td>Sea level rise</td>
+                    <td>NOAA Office for Coastal Management</td>
+                    <td>Map layer</td>
+                  </tr>
+                  <tr>
+                    <td>Tree canopy, paving</td>
+                    <td>National Land Cover Database 2021 (MRLC)</td>
+                    <td>The block, and the square kilometre around it; also a map layer</td>
+                  </tr>
+                  <tr>
+                    <td>Ground height</td>
+                    <td>USGS, 3D Elevation Program</td>
+                    <td>The block, and the square kilometre around it</td>
+                  </tr>
+                  <tr>
+                    <td>Census areas, base map</td>
+                    <td>US Census Bureau; USGS The National Map</td>
+                    <td>Names of the tract and county; the map underneath</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
           <p className="record-aside" style={{ marginTop: 16, maxWidth: 820 }}>
             Your address: if you searched for one, it was sent to the Census Bureau&apos;s geocoder to find this
             block and was not stored. The link to this page holds the block, so sharing it does not share a

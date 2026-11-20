@@ -93,7 +93,7 @@ export default function DataPage() {
     },
     {
       record: "Census tract and county",
-      publisher: "US Census Bureau geocoder",
+      publisher: "US Census Bureau geocoder; Esri World Geocoding Service when Census does not find an address",
       how: "Asked live",
       detail: "Kept for a month. An address you type is sent once to find the block and is not kept at all.",
     },

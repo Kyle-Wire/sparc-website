@@ -693,8 +693,8 @@ export default async function PlacePage({ params }: Props) {
             </div>
           </details>
           <p className="record-aside" style={{ marginTop: 16, maxWidth: 820 }}>
-            Your address: if you searched for one, it was sent to the Census Bureau&apos;s geocoder to find this
-            block and was not stored. The link to this page holds the block, so sharing it does not share a
+            Your address: if you searched for one, it was sent to the Census Bureau&apos;s geocoder (or, if that
+            did not find it, to Esri&apos;s) to find this block and was not stored. The link to this page holds the block, so sharing it does not share a
             house. Map tiles load in your browser straight from the agencies above. A spot you click is sent
             to those agencies to be read and is not stored. Saved places and notes stay in your browser.
           </p>

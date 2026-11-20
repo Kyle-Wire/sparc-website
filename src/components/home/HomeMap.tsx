@@ -6,10 +6,15 @@ import type { Route } from "next";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { Map as MlMap, GeoJSONSource, Marker } from "maplibre-gl";
 import { PlaceSearch, type FoundPlace } from "@/components/place/PlaceSearch";
+import { rememberPoint } from "@/components/place/place-point";
+import { placeSlug } from "@/lib/place/coords";
 import { BASE_STYLE, RASTERS, SpotList, needsTwoFingers, type Spot } from "@/components/place/PlaceMap";
 import FEMA_LEGEND from "@/data/fema-flood-zones-legend.json";
 import { DEFAULT_STORM, HAZARD_STATE_WORDS, floodSortName, type BlockReadings, type HazardState } from "@/lib/listings/blocks";
 import type { PublicListing } from "@/lib/listings/feed";
+
+/** Close enough in to tell one house from the next. */
+const PIN_ZOOM = 15;
 
 /**
  * The home page is a map (Climate Inspection D42, SPEC-LISTINGS.md §1).
@@ -263,6 +268,11 @@ export function HomeMap() {
   const [found, setFound] = useState<string | null>(null);
   const listingsRef = useRef<Listing[]>([]);
   const searchPin = useRef<Marker | null>(null);
+  // Drop a pin: the visitor marks the house themselves, when no search finds
+  // it or a search finds only the street. The point stays in this browser,
+  // as a searched one does (place-point.ts); only its block goes in the link.
+  const [pinMode, setPinMode] = useState(false);
+  const pinModeRef = useRef(false);
   const cardRef = useRef<HTMLDivElement | null>(null);
 
   const showPins = useCallback((listings: Listing[]) => {
@@ -317,7 +327,11 @@ export function HomeMap() {
         const pinEl = document.createElement("div");
         pinEl.className = "place-map-pin";
         pinEl.setAttribute("aria-hidden", "true");
-        searchPin.current = new maplibre.Marker({ element: pinEl });
+        searchPin.current = new maplibre.Marker({ element: pinEl, draggable: true });
+        searchPin.current.on("dragend", () => {
+          const at = searchPin.current?.getLngLat();
+          if (at) pinAt({ lat: at.lat, lon: at.lng });
+        });
         map.on("load", () => {
           if (dead || !map) return;
           const f = RASTERS.find((r) => r.id === "fema");
@@ -355,7 +369,14 @@ export function HomeMap() {
             if (l) setPicked(l);
           });
           map.on("mouseenter", "listings", () => map && (map.getCanvas().style.cursor = "pointer"));
-          map.on("mouseleave", "listings", () => map && (map.getCanvas().style.cursor = ""));
+          map.on("mouseleave", "listings", () => map && (map.getCanvas().style.cursor = pinModeRef.current ? "crosshair" : ""));
+          map.on("click", (e) => {
+            if (!pinModeRef.current || !map) return;
+            if (map.queryRenderedFeatures(e.point, { layers: ["listings"] }).length) return;
+            searchPin.current?.setLngLat(e.lngLat).addTo(map);
+            pinAt({ lat: e.lngLat.lat, lon: e.lngLat.lng });
+            choosePinMode(false);
+          });
         });
       } catch {
         if (!dead) setFailed(true);
@@ -378,6 +399,20 @@ export function HomeMap() {
     if (m?.getLayer("listings-picked")) m.setFilter("listings-picked", ["==", ["get", "key"], picked?.listing_key ?? ""]);
   }, [picked]);
 
+  /** The pin is where the visitor put it: that is the house, for this tab. */
+  function pinAt(p: { lat: number; lon: number }) {
+    const slug = placeSlug(p);
+    rememberPoint({ slug, ...p, matched: "the pin you dropped" });
+    setFound(slug);
+  }
+
+  function choosePinMode(on: boolean) {
+    pinModeRef.current = on;
+    setPinMode(on);
+    const canvas = mapRef.current?.getCanvas();
+    if (canvas) canvas.style.cursor = on ? "crosshair" : "";
+  }
+
   function flyToFound(f: FoundPlace) {
     const m = mapRef.current;
     // Only a house gets the pin and the block link. A street-level answer
@@ -387,6 +422,8 @@ export function HomeMap() {
     if (!m) return;
     if (house) searchPin.current?.setLngLat([f.point.lon, f.point.lat]).addTo(m);
     else searchPin.current?.remove();
+    // On the street but not the house: the next click on the map marks it.
+    choosePinMode(!house);
     m.flyTo({ center: [f.point.lon, f.point.lat], zoom: house ? 15 : 16 });
   }
 
@@ -448,6 +485,17 @@ export function HomeMap() {
                   <button type="button" className="btn btn-sm" onClick={goToMe}>
                     Go to where I am
                   </button>
+                  <button
+                    type="button"
+                    className="btn btn-sm"
+                    aria-pressed={pinMode}
+                    disabled={!pinMode && zoom < PIN_ZOOM}
+                    title={zoom < PIN_ZOOM ? "Zoom in to a street first" : undefined}
+                    onClick={() => choosePinMode(!pinMode)}
+                  >
+                    {pinMode ? "Cancel pin" : "Drop a pin"}
+                  </button>
+                  {pinMode && <span className="home-step-hint">Click the house on the map. You can drag the pin after.</span>}
                   {found && (
                     <Link href={`/place/${found}` as Route}>
                       The full public record for this block <span className="arrow">→</span>

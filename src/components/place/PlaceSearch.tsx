@@ -27,7 +27,7 @@ function foundNote(a: GeocodeAnswer): string | null {
   if (a.by !== "photon") return null;
   const credit = "Found with OpenStreetMap data, © OpenStreetMap contributors.";
   return a.precision === "street"
-    ? `Found the street (${a.matched}), not the house. The map is on that street; zoom in to find the house. ${credit}`
+    ? `Found the street (${a.matched}), not the house. Click the house on the map to drop a pin on it. ${credit}`
     : `${credit}`;
 }
 

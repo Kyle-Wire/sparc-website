@@ -10,7 +10,8 @@
    - **house:** the house number, the street and the state (when one was typed) all match. The point is the house, and the site treats it exactly like a Census match.
    - **street:** only the typed street matches, either a street or a crossing on it. The map moves to the street and says "Found the street, not the house". The point is not kept as the property, no pin is placed, and no block link is offered (**agent's call**: a point somewhere on a long street can be blocks away from the house).
    - anything else is refused, and the visitor is told neither search found the address.
-4. Wherever a place found by Photon is shown, the line under the search box credits "OpenStreetMap data, © OpenStreetMap contributors", as the ODbL asks.
+4. **Drop a pin** (Kyle: "maybe the user can just drop a pin as well?"). On the home map, once zoomed in to street level, the visitor can click the house to mark it, and drag the pin to adjust it. After a street-only answer this turns on by itself. The dropped point is treated like a found address: it stays in this browser tab (`place-point.ts`), only its rounded block goes in the link, and nothing is sent to a locator.
+5. Wherever a place found by Photon is shown, the line under the search box credits "OpenStreetMap data, © OpenStreetMap contributors", as the ODbL asks.
 
 The privacy rules are the same for both searches:
 - only the address is sent, from our server, not the visitor's browser;

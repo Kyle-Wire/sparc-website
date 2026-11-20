@@ -1,10 +1,10 @@
 // US Census Bureau geocoder: an address to a point, and a point to the census
 // areas around it. Public, no key. https://geocoding.geo.census.gov/geocoder/
 //
-// Privacy. geocodeAddress, and Esri's geocoder behind it when Census finds
-// nothing (arcgis.ts), are the only calls on this site that send something a
+// Privacy. geocodeAddress, and Photon behind it when Census finds nothing
+// (photon.ts), are the only calls on this site that send something a
 // visitor typed to an outside service. It is made from the server, so the
-// Census Bureau sees the address but not the visitor's browser; the answer is
+// Census Bureau (or Photon) sees the address but not the visitor's browser; the answer is
 // never cached and the address is never logged or stored by this code.
 // areasAt only ever receives a rounded place (see coords.ts).
 

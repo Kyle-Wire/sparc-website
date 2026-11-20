@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { Map as MlMap, GeoJSONSource, Marker } from "maplibre-gl";
-import { PlaceSearch } from "@/components/place/PlaceSearch";
+import { PlaceSearch, type FoundPlace } from "@/components/place/PlaceSearch";
 import { BASE_STYLE, RASTERS, SpotList, needsTwoFingers, type Spot } from "@/components/place/PlaceMap";
 import FEMA_LEGEND from "@/data/fema-flood-zones-legend.json";
 import { DEFAULT_STORM, HAZARD_STATE_WORDS, floodSortName, type BlockReadings, type HazardState } from "@/lib/listings/blocks";
@@ -378,12 +378,16 @@ export function HomeMap() {
     if (m?.getLayer("listings-picked")) m.setFilter("listings-picked", ["==", ["get", "key"], picked?.listing_key ?? ""]);
   }, [picked]);
 
-  function flyToFound(f: { slug: string; point: { lat: number; lon: number } }) {
+  function flyToFound(f: FoundPlace) {
     const m = mapRef.current;
-    setFound(f.slug);
+    // Only a house gets the pin and the block link. A street-level answer
+    // moves the map to the street, closer in, so the visitor can find the house.
+    const house = f.precision === "house";
+    setFound(house ? f.slug : null);
     if (!m) return;
-    searchPin.current?.setLngLat([f.point.lon, f.point.lat]).addTo(m);
-    m.flyTo({ center: [f.point.lon, f.point.lat], zoom: 15 });
+    if (house) searchPin.current?.setLngLat([f.point.lon, f.point.lat]).addTo(m);
+    else searchPin.current?.remove();
+    m.flyTo({ center: [f.point.lon, f.point.lat], zoom: house ? 15 : 16 });
   }
 
   async function loadHere() {

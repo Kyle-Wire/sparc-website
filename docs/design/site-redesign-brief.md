@@ -92,7 +92,7 @@ Run times seen so far, for scale only: on Kyle's GPU a 1-hour storm on a 1 m mod
 ## 8. Privacy
 
 - No account is needed to look a place up.
-- The typed address goes from the visitor to SPARC's server and from there to the US Census Bureau's geocoder. If Census does not find it, the server asks Esri's World Geocoding Service, with Esri's "not stored" setting (20 November 2026, [`address-locators.md`](address-locators.md)). It is not written to a database or a log by SPARC's code.
+- The typed address goes from the visitor to SPARC's server and from there to the US Census Bureau's geocoder. If Census does not find it, the server asks Photon, komoot's keyless search over OpenStreetMap (20 November 2026, [`address-locators.md`](address-locators.md)). It is not written to a database or a log by SPARC's code.
 - The page address holds the block, not the house.
 - Map tiles are fetched by the visitor's browser straight from USGS, FEMA, NOAA and MRLC, so those agencies see which map area is on screen.
 - A spot clicked on the map goes to SPARC's server and from there to FEMA, USGS and the land cover server. It is not stored.
@@ -167,7 +167,7 @@ Each was opened and queried on 17 November 2026 before being used.
 | What | Publisher | Service |
 |---|---|---|
 | Address to location and census tract | US Census Bureau | `geocoding.geo.census.gov/geocoder` |
-| Address to location, when Census finds nothing (added 20 November 2026) | Esri, World Geocoding Service | `geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates` |
+| Address to location, when Census finds nothing (added 20 November 2026) | Photon (komoot), OpenStreetMap data, ODbL | `photon.komoot.io/api/` |
 | Flood zones and map panel dates | FEMA, National Flood Hazard Layer | `hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer` (layers 28 and 3) |
 | Flood insurance claims | FEMA OpenFEMA, `NfipClaims` version 3 | `www.fema.gov/api/open/v3/NfipClaims` |
 | Disaster declarations | FEMA OpenFEMA, `DisasterDeclarationsSummaries` version 2 | `www.fema.gov/api/open/v2/DisasterDeclarationsSummaries` |

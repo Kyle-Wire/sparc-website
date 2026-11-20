@@ -50,7 +50,7 @@ export default function PrivacyPage() {
           <h2 style={h2}>An address you type</h2>
           <p>
             It goes to our server, and from there to the US Census Bureau&apos;s geocoder, which turns it into a
-            location. If the Census Bureau does not find it, our server asks Esri&apos;s geocoder instead. Only the
+            location. If the Census Bureau does not find it, our server asks Photon, a free search over OpenStreetMap run by komoot, instead. Only the
             address is sent, nothing else about you. We do not store it, log it or put it in a link. What comes back is rounded to about a
             block, and that block is what the page address carries.
           </p>
@@ -132,7 +132,7 @@ export default function PrivacyPage() {
             <li>Supabase: the database for contact messages and accounts.</li>
             <li>Resend: sends the email that tells us a contact message has arrived.</li>
             <li>US Census Bureau: receives an address you search for, from our server.</li>
-            <li>Esri: receives an address you search for, from our server, only when the Census Bureau does not find it.</li>
+            <li>komoot (Photon, OpenStreetMap search): receives an address you search for, from our server, only when the Census Bureau does not find it.</li>
             <li>FEMA, US Geological Survey, NOAA and the national land cover server (MRLC): the sources of the records and map layers, as described above.</li>
           </ul>
 

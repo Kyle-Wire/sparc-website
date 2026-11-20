@@ -1,44 +1,55 @@
 # Address locators
 
-**20 November 2026.** Written by the agent after Kyle reported a real address the search could not find and asked: "Can we use a different address locator?" Calls marked **agent's call** are open to Kyle.
+**20 November 2026.** Written by the agent after Kyle reported a real address the search could not find and asked: "Can we use a different address locator?" A first version used Esri, which needs a key. Kyle then asked for a keyless option ("Find keyless option"), and this page describes that one. Calls marked **agent's call** are open to Kyle.
 
 ## What the site does now
 
 1. It asks the US Census Bureau's geocoder, as before.
-2. If Census finds nothing, or does not answer, it asks **Esri's World Geocoding Service**. This step runs only when `ARCGIS_API_KEY` is set, server side. With no key, the site behaves as before.
-3. An Esri answer is taken only when it puts the point on a house or building (`PointAddress`, `Subaddress`, `StreetAddress`, `StreetAddressExt`, `BuildingName`) with a score of at least 90. A match to a street, a ZIP code or a town is refused, because the page is built around one block and a point in the middle of a long street or a town would pick the wrong one (**agent's call**).
+2. If Census finds nothing or does not answer, it asks **Photon** (`photon.komoot.io`), komoot's free search over OpenStreetMap. Photon needs no key and no account.
+3. Photon answers with the nearest thing it knows, so its answer is checked against what was typed (`src/lib/place/address-match.ts`):
+   - **house:** the house number, the street and the state (when one was typed) all match. The point is the house, and the site treats it exactly like a Census match.
+   - **street:** only the typed street matches, either a street or a crossing on it. The map moves to the street and says "Found the street, not the house". The point is not kept as the property, no pin is placed, and no block link is offered (**agent's call**: a point somewhere on a long street can be blocks away from the house).
+   - anything else is refused, and the visitor is told neither search found the address.
+4. Wherever a place found by Photon is shown, the line under the search box credits "OpenStreetMap data, © OpenStreetMap contributors", as the ODbL asks.
 
-The privacy rules are the same for both locators:
+The privacy rules are the same for both searches:
 - only the address is sent, from our server, not the visitor's browser;
-- nothing is cached, logged or stored;
-- Esri is asked with `forStorage=false`, its "not stored" use.
+- nothing is cached, logged or stored.
 
-The privacy page, the data page, the place page's note and [`site-redesign-brief.md`](site-redesign-brief.md) section 8 now name Esri.
+The privacy page, the data page, the place page's note and [`site-redesign-brief.md`](site-redesign-brief.md) section 8 name Photon.
 
-## Why a second locator, and why Esri
+## Why Photon
 
 Tested 20 November 2026 on public addresses: office buildings and landmarks, never a home.
 
-- **Census misses depend on coverage, not on typing.** The same address typed eight ways matched every time: with a unit number, "#2", no commas, a ZIP code alone, the state written out, and "USA" on the end. Addresses on streets that are new or missing from Census's street ranges failed however they were typed: 1 Apple Park Way, Cupertino; 2 Lincoln Memorial Cir NW, Washington; 4059 Mt Lee Dr, Los Angeles. Retrying Census with different wording would not help.
-- **Esri found all eight test addresses at house level.** Census found five.
-- **OpenStreetMap's Nominatim found the house for five**, and for the other three it returned only the street or a building with no house number. Its usage policy also asks sites not to send personal data and caps the whole site at one request a second ([policy](https://operations.osmfoundation.org/policies/nominatim/), read 20 November 2026). A buyer's address is arguably personal data. Not used.
+- **Census misses depend on coverage, not on typing.** The same address typed eight ways matched every time. Addresses on streets that are new or missing from Census's street ranges failed however they were typed: 1 Apple Park Way, Cupertino; 2 Lincoln Memorial Cir NW, Washington; 4059 Mt Lee Dr, Los Angeles. Retrying Census with different wording would not help.
+- **Photon, through the site's match check:**
 
-Esri's terms, read 20 November 2026:
-- A token is required ([find address candidates](https://developers.arcgis.com/rest/geocode/find-address-candidates/); [geocoding overview](https://developers.arcgis.com/documentation/mapping-and-location-services/geocoding/)). The service also answered without one during testing, but the site does not rely on that.
-- Results are "not stored" by default and may be shown on a map.
-- Esri's documentation lists geocodes that are not stored as 20,000 free, then $0.50 per 1,000. The pricing page itself did not load, so the free amount and its period are unconfirmed.
-- The same page asks that requests carry no personally identifiable information. The site sends a street address and nothing else: no name, no account and no visitor details.
+  | Address | Photon's answer |
+  |---|---|
+  | 1600 Amphitheatre Pkwy, Mountain View, CA | house |
+  | 600 Montgomery St, San Francisco, CA | house |
+  | 1401 Constitution Ave NW, Washington, DC | house |
+  | 100 Universal City Plaza, Universal City, CA | house |
+  | 1 Apple Park Way, Cupertino, CA | house (Census: none) |
+  | 2 Lincoln Memorial Cir NW, Washington, DC | street (Census: none) |
+  | 4059 Mt Lee Dr, Los Angeles, CA | street (Census: none) |
+  | 1 Main St, Springfield, IL | street: North Main Street, which Photon places in Springfield |
+  | 99999 Nowhere Rd, Boise, ID | none |
 
-## What Kyle needs to do
+  Before the match check, Photon offered a clinic on South 6th Street for "1 Main St, Springfield, IL". The check exists for that.
+- **Rejected:**
+  - Esri's World Geocoding Service found all eight at house level, but its documentation says a token is required ([find address candidates](https://developers.arcgis.com/rest/geocode/find-address-candidates/)).
+  - OpenStreetMap's Nominatim: its usage policy asks sites not to send personal data and caps a whole site at one request a second ([policy](https://operations.osmfoundation.org/policies/nominatim/)). A buyer's address is arguably personal data.
+  - The US National Address Database's public feature service took 5 to 55 seconds a query, failed on DC, was empty for New York and Philadelphia, and has no California data.
 
-1. Make an ArcGIS Location Platform account and an API key with the geocoding privilege.
-2. Set `ARCGIS_API_KEY` in Vercel's Production environment, and in `.env.local` for a local copy.
+## Photon's terms
 
-The key is never `NEXT_PUBLIC_` and never reaches a browser.
+Read on [photon.komoot.io](https://photon.komoot.io/), 20 November 2026: the API may be used for a project if use is fair; heavy use is throttled; availability is not guaranteed. The data is OpenStreetMap's, under the [ODbL](https://www.openstreetmap.org/copyright), which asks for the credit above.
+
+So Photon is a second try, not the main search. If the site's traffic grows to where komoot would throttle it, Photon can be run on our own server from the same open code and data. That needs a server with room for the US extract (**not set up**).
 
 ## Not checked
 
-- An Esri answer through the site end to end, which needs the key. The parts are tested separately:
-  - the match filter has unit tests (`src/lib/place/arcgis.test.ts`) and was checked against Esri's live answers for the eight test addresses, plus a bare street and a bare town;
-  - the route falls back to Census alone with no key, and reports that Esri did not answer when the key is wrong.
-- Whether Esri's figure of 20,000 free requests is per month.
+- A visitor's real address. Kyle's address that failed was not used in testing; trying it through the live search is the check that matters.
+- How often Photon throttles. The tests above were nine requests about a second apart.

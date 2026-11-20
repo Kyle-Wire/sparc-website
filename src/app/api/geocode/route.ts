@@ -1,11 +1,15 @@
-// POST /api/geocode  { address }  ->  { slug, point, matched }
+// POST /api/geocode  { address }  ->  { slug, point, matched, precision, by }
 //
 // Turns a typed address into a place. The address arrives in the request body,
 // never in a URL, so it is not written to an access log. It is passed to the
 // US Census Bureau's geocoder from here and, only if Census finds nothing or
-// does not answer, to Esri's geocoder (src/lib/place/arcgis.ts; off unless
-// ARCGIS_API_KEY is set). Then it is dropped: nothing in this route stores
-// it, caches it or prints it.
+// does not answer, to Photon, a keyless search over OpenStreetMap
+// (src/lib/place/photon.ts). Then it is dropped: nothing in this route
+// stores it, caches it or prints it.
+//
+// `precision` is "house" when the point is the address itself and "street"
+// when Photon knew the street but not the house: the point is then somewhere
+// on that street, and the search box says so instead of marking a house.
 //
 // The answer carries two things. `slug` is the block (coordinates rounded to
 // three decimals) and is what goes in the page address. `point` and `matched`
@@ -15,7 +19,7 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { geocodeAddress } from "@/lib/place/census";
-import { arcgisConfigured, geocodeAddressArcgis } from "@/lib/place/arcgis";
+import { geocodeAddressPhoton } from "@/lib/place/photon";
 import { inUsBounds, placeSlug } from "@/lib/place/coords";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { isSameOrigin } from "@/lib/require-same-origin";
@@ -47,36 +51,31 @@ export async function POST(req: NextRequest) {
     return fail(400, "Type a street address with its city and state.");
   }
 
-  // Census first; Esri when Census has no match or no answer.
-  let res = await geocodeAddress(address);
-  let by: "census" | "esri" = "census";
-  if (arcgisConfigured() && (!res.ok || !res.data)) {
-    const census = res;
-    const esri = await geocodeAddressArcgis(address);
-    if (esri.ok && esri.data) {
-      res = esri;
-      by = "esri";
-    } else if (!census.ok && !esri.ok) {
-      return fail(502, "Neither address locator answered. Try again in a minute.");
-    } else if (!esri.ok) {
-      return fail(502, "The Census Bureau's geocoder did not find that address, and Esri's did not answer. Try again in a minute.");
+  // Census first; Photon when Census has no match or no answer.
+  const census = await geocodeAddress(address);
+  let hit: { point: { lat: number; lon: number }; matched: string; precision: "house" | "street" } | null = null;
+  let by: "census" | "photon" = "census";
+  if (census.ok && census.data) {
+    hit = { ...census.data, precision: "house" };
+  } else {
+    const photon = await geocodeAddressPhoton(address);
+    if (photon.ok && photon.data) {
+      hit = photon.data;
+      by = "photon";
+    } else if (!census.ok && !photon.ok) {
+      return fail(502, "Neither address search answered. Try again in a minute.");
+    } else if (!photon.ok) {
+      return fail(502, "The Census Bureau's geocoder did not find that address, and the second search (OpenStreetMap) did not answer. Try again in a minute.");
+    } else if (!census.ok) {
+      return fail(404, "The Census Bureau's geocoder did not answer, and OpenStreetMap did not find that address. Try again in a minute, or find it on the map.");
     } else {
-      res = { ok: true, data: null };
+      return fail(404, "Neither the Census Bureau's geocoder nor OpenStreetMap found that address. Check the street number, city and state, or find it on the map.");
     }
   }
-  if (!res.ok) return fail(502, res.reason);
-  if (!res.data) {
-    return fail(
-      404,
-      arcgisConfigured()
-        ? "Neither the Census Bureau's geocoder nor Esri's found that address. Check the street number, city and state."
-        : "The Census Bureau's geocoder did not find that address. Check the street number, city and state.",
-    );
-  }
-  if (!inUsBounds(res.data.point)) return fail(404, "That address is outside the area this site covers.");
+  if (!inUsBounds(hit.point)) return fail(404, "That address is outside the area this site covers.");
 
   return NextResponse.json(
-    { slug: placeSlug(res.data.point), point: res.data.point, matched: res.data.matched, by },
+    { slug: placeSlug(hit.point), point: hit.point, matched: hit.matched, precision: hit.precision, by },
     { headers: NO_STORE },
   );
 }

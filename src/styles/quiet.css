@@ -1,0 +1,156 @@
+/* ============================================================
+   The quiet pass (docs/design/map-first-brief.md, 20 Nov 2026)
+
+   Kyle: "Tone it down" (the arcade look), "Mono plus one accent",
+   "Sans plus mono". This file loads after cabinet.css and turns it down
+   rather than deleting it, so the change reads, and reverts, in one place:
+
+     - frames are 1 px rules, not 2 px stepped sprite edges;
+     - labels are the mono face (JetBrains Mono), not the pixel font;
+     - the mist is gone from buttons, banners and links: it was the one
+       coloured decoration left, and the palette is now greys and one accent.
+
+   Then the map-first home: a full-screen map with the logo, one search bar
+   and a menu floating on it, chips that open panels, and the card a click
+   opens. On a phone the page stacks: search, map, then cards (brief s.4).
+   ============================================================ */
+
+:root {
+  --px: 1px;
+  --font-pixel: var(--font-mono);
+  --fs-pixel: 11px;
+  --float-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  --float-radius: 6px;
+}
+
+.kicker, .label, .pill, .shelf-state, .glance-item dt, .spot-row dt,
+.foot-grid h6, .foot-bottom, .plain-table th, .map-legend > summary,
+.dl dt, h6, .paid-strip-name, .step-no, .home-step-no {
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* No mist. */
+.btn:not(.btn-accent):not(.btn-primary):not(.btn-ghost):hover,
+.btn:not(.btn-accent):not(.btn-primary):not(.btn-ghost):focus-visible,
+.place-examples-strip a:hover, .place-examples-strip a:focus-visible {
+  background-image: none;
+  background-color: var(--paper-2);
+}
+.page-hero::after, .place-head::after { display: none; }
+.ramp-strip { display: none; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+/* ---------- the map is the page ---------- */
+
+.home-full { position: relative; height: 100vh; height: 100dvh; overflow: hidden; background: var(--paper-2); }
+.home-full .home-full-map { position: absolute; inset: 0; }
+
+.map-top {
+  position: absolute; top: 12px; left: 12px; right: 12px;
+  display: grid; grid-template-columns: auto minmax(0, 560px) auto; justify-content: space-between;
+  align-items: start; gap: 12px; pointer-events: none; z-index: 3;
+}
+.map-top > * { pointer-events: auto; }
+
+.map-logo {
+  display: inline-flex; align-items: center; padding: 6px 10px;
+  background: var(--bg-elevated); border: 1px solid var(--rule); border-radius: var(--float-radius); box-shadow: var(--float-shadow);
+}
+.map-logo img { display: block; height: 34px; width: auto; }
+
+.map-search { display: grid; gap: 8px; }
+.map-search .place-search {
+  padding: 8px; background: var(--bg-elevated); border: 1px solid var(--rule); border-radius: var(--float-radius); box-shadow: var(--float-shadow);
+}
+.map-search .place-search-help { margin: 6px 2px 0; font-size: 13px; }
+.map-search-note {
+  margin: 0; padding: 8px 10px; font-size: 13px; background: var(--bg-elevated);
+  border: 1px solid var(--rule); border-radius: var(--float-radius); box-shadow: var(--float-shadow);
+}
+
+.map-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.map-chip {
+  font: inherit; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em;
+  padding: 6px 11px; border: 1px solid var(--rule); border-radius: 999px;
+  background: var(--bg-elevated); color: var(--ink); cursor: pointer; box-shadow: var(--float-shadow);
+}
+.map-chip:hover { background: var(--paper-2); }
+.map-chip[aria-expanded="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.map-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.map-chip-round { width: 31px; padding: 6px 0; text-align: center; }
+
+.map-menu { position: relative; justify-self: end; }
+.map-menu > .map-chip { border-radius: var(--float-radius); padding: 9px 14px; }
+.map-menu-list {
+  position: absolute; right: 0; top: calc(100% + 6px); width: 240px; display: grid; padding: 8px;
+  background: var(--bg-elevated); border: 1px solid var(--rule); border-radius: var(--float-radius); box-shadow: var(--float-shadow);
+}
+.map-menu-list a { padding: 8px 10px; color: var(--ink); text-decoration: none; font-weight: 500; border-radius: 4px; }
+.map-menu-list a:hover, .map-menu-list a:focus-visible { background: var(--paper-2); }
+.map-menu-small { display: flex; flex-wrap: wrap; gap: 0 4px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
+.map-menu-small a { padding: 4px 6px; font-size: 12px; font-weight: 400; color: var(--muted); }
+
+.map-hint {
+  position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); margin: 0; z-index: 2;
+  padding: 7px 12px; font-family: var(--font-mono); font-size: 12px; color: var(--paper);
+  background: rgba(20, 20, 20, 0.82); border-radius: 999px; pointer-events: none; white-space: nowrap;
+}
+
+/* A panel from a chip, and the card a click opens: same box, left and right. */
+.map-panel, .spot-card, .home-full .listing-panel {
+  position: absolute; z-index: 2; top: 150px; bottom: 16px; width: min(380px, calc(100% - 24px));
+  overflow-y: auto; display: grid; align-content: start; gap: 12px; padding: 14px 16px;
+  background: var(--bg-elevated); border: 1px solid var(--rule); border-radius: var(--float-radius); box-shadow: var(--float-shadow);
+}
+.map-panel { left: 12px; }
+.spot-card, .home-full .listing-panel { right: 12px; bottom: auto; max-height: calc(100% - 166px); }
+.map-panel-body { display: grid; gap: 12px; font-size: 14px; }
+.map-panel-body .map-legend-group:first-child { border-top: 0; padding-top: 0; }
+.map-layer { display: grid; gap: 4px; }
+.map-legend-swatches { display: grid; gap: 4px; padding: 2px 0 0 22px; font-size: 12px; }
+.info-panel p { margin: 0; line-height: 1.55; }
+.spot-card-where { margin: 0; font-weight: 600; }
+.spot-card-links { display: grid; gap: 8px; font-size: 14px; }
+.spot-card-paid { font-size: 13px; color: var(--muted); }
+.home-full .home-map-sort { padding: 0; }
+.home-full .maplibregl-ctrl-bottom-right { margin-bottom: 6px; }
+.map-legend-dot { background: #141414; box-shadow: 0 0 0 2px #f5f5f4, 0 0 0 3px var(--rule); }
+
+/* Phone: stacked. Search on top, the map at a fixed height, cards below. */
+@media (max-width: 720px) {
+  .home-full { height: auto; overflow: visible; display: flex; flex-direction: column; }
+  .home-full .home-full-map { position: relative; inset: auto; height: 65vh; height: 65dvh; order: 1; }
+  .map-top { position: static; order: 0; grid-template-columns: auto 1fr; padding: 10px 12px; background: var(--bg-elevated); border-bottom: 1px solid var(--rule); }
+  .map-logo { box-shadow: none; padding: 4px 6px; }
+  .map-logo img { height: 28px; }
+  .map-search { grid-column: 1 / -1; grid-row: 2; }
+  .map-search .place-search, .map-chip, .map-menu > .map-chip, .map-search-note { box-shadow: none; }
+  .map-menu { grid-column: 2; grid-row: 1; }
+  .map-hint { position: static; order: 2; transform: none; margin: 10px 12px 0; white-space: normal; text-align: center; border-radius: 6px; }
+  .map-panel, .spot-card, .home-full .listing-panel {
+    position: static; order: 3; width: auto; max-height: none; margin: 12px; box-shadow: none;
+  }
+}
+
+/* ---------- place page: map plus verdicts (brief s.5) ---------- */
+
+.verdicts { border: 1px solid var(--rule); border-radius: var(--float-radius); background: var(--bg-elevated); padding: 14px 16px; display: grid; gap: 10px; }
+.verdicts ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.verdicts li { border-top: 1px solid var(--line); }
+.verdicts li:first-child { border-top: 0; }
+.verdicts li a { display: grid; grid-template-columns: 96px 1fr; gap: 10px; padding: 9px 0; color: var(--ink); text-decoration: none; font-size: 14px; line-height: 1.45; }
+.verdicts li a:hover span, .verdicts li a:focus-visible span { text-decoration: underline; }
+.verdicts li strong { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding-top: 2px; }
+.verdicts-foot { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.place-side { display: grid; gap: 14px; align-content: start; }
+.record-card[data-hazard="ground"] { border-left-color: var(--ground); }
+.record-card[data-hazard="wind"] { border-left-color: var(--wind); }

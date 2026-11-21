@@ -133,7 +133,7 @@ export default function PrivacyPage() {
             <li>Resend: sends the email that tells us a contact message has arrived.</li>
             <li>US Census Bureau: receives an address you search for, from our server.</li>
             <li>komoot (Photon, OpenStreetMap search): receives an address you search for, from our server, only when the Census Bureau does not find it.</li>
-            <li>FEMA, US Geological Survey, NOAA and the national land cover server (MRLC): the sources of the records and map layers, as described above.</li>
+            <li>FEMA, US Geological Survey, NOAA, the USDA soil survey (NRCS) and the national land cover server (MRLC): the sources of the records and map layers, as described above. A spot you click is sent to them, rounded to about a metre, and not stored.</li>
           </ul>
 
           <h2 id="cookies" style={{ ...h2, scrollMarginTop: 96 }}>Cookies and browser storage</h2>

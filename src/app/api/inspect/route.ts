@@ -1,8 +1,10 @@
 // POST /api/inspect  { lat, lon }  ->  what public sources say at that spot
 //
-// Called when a visitor clicks the place map. Four sources are asked from the
-// server: FEMA's flood zone at the point, USGS ground elevation, and the tree
-// canopy and paving of the land cover cell the point falls in.
+// Called when a visitor clicks a map. Sources asked from the server: FEMA's
+// flood zone at the point, USGS ground elevation, the tree canopy and paving
+// of the land cover cell, the nearest mapped fault and the landslides mapped
+// nearby (USGS), the soil survey (USDA NRCS), and how often FEMA counts wind
+// events in the tract (src/lib/place/ground.ts, wind.ts).
 //
 // The point arrives in the request body, is rounded to five decimals (about a
 // metre) and is not stored. Each answer stands alone: a source that is down
@@ -13,6 +15,8 @@ import { inUsBounds } from "@/lib/place/coords";
 import { floodZoneAtPoint } from "@/lib/place/fema";
 import type { Lookup } from "@/lib/place/lookup";
 import { canopyAt, elevationAt, pavingAt } from "@/lib/place/point";
+import { landslidesNear, nearestFault, soilAt } from "@/lib/place/ground";
+import { windFrequencyAt } from "@/lib/place/wind";
 import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 import { isSameOrigin } from "@/lib/require-same-origin";
 
@@ -43,15 +47,29 @@ export async function POST(req: NextRequest) {
   const point = { lat: Math.round(lat * 1e5) / 1e5, lon: Math.round(lon * 1e5) / 1e5 };
   if (!inUsBounds(point)) return fail(400, "That point is outside the area this site covers.");
 
-  const [zone, elevation, canopy, paving] = await Promise.all([
+  const [zone, elevation, canopy, paving, fault, slides, soil, wind] = await Promise.all([
     floodZoneAtPoint(point),
     elevationAt(point),
     canopyAt(point),
     pavingAt(point),
+    nearestFault(point),
+    landslidesNear(point),
+    soilAt(point),
+    windFrequencyAt(point),
   ]);
 
   return NextResponse.json(
-    { point, zone: item(zone), elevation: item(elevation), canopy: item(canopy), paving: item(paving) },
+    {
+      point,
+      zone: item(zone),
+      elevation: item(elevation),
+      canopy: item(canopy),
+      paving: item(paving),
+      fault: item(fault),
+      slides: item(slides),
+      soil: item(soil),
+      wind: item(wind),
+    },
     { headers: NO_STORE },
   );
 }

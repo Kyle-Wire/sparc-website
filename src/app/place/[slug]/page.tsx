@@ -7,7 +7,9 @@ import { Kicker } from "@/components/marketing/page-shell";
 import { PlaceActions } from "@/components/place/PlaceActions";
 import { PlaceMap, type TrackLine } from "@/components/place/PlaceMap";
 import { HeightBand, MissingCard, PaidStrip, PendingCard, RatingBar, RecordCard, ShareBars, ShelfHead } from "@/components/place/cards";
-import { GlanceRow } from "@/components/place/glance";
+import { GroundCards, Verdicts, VerdictsPending, WindCard } from "@/components/place/verdicts";
+import { landslidesNear, nearestFault, soilAt } from "@/lib/place/ground";
+import { windFrequencyAt } from "@/lib/place/wind";
 import { Questions } from "@/components/place/questions";
 import { KM_PER_MILE, parsePlaceSlug } from "@/lib/place/coords";
 import type { NearbyStorm } from "@/lib/place/hurricanes";
@@ -358,6 +360,16 @@ export default async function PlacePage({ params }: Props) {
   const tractName = areas.ok ? areas.data.tractName : "this census tract";
   const countyName = areas.ok ? areas.data.countyName : "this county";
 
+  // Ground and wind records for the middle of the block (brief s.6). Each
+  // fills its own place when it answers; one being down costs one line.
+  const groundRec = Promise.all([nearestFault(place), landslidesNear(place), soilAt(place)]).then(([fault, slides, soil]) => ({
+    fault,
+    slides,
+    soil,
+  }));
+  const windRec = windFrequencyAt(place);
+  const verdicts = Promise.all([record, start.cover, groundRec, windRec]);
+
   const tracks: TrackLine[] = storms.storms.map((s) => ({
     id: s.id,
     label: s.name ? `${s.name} ${s.year}` : `Unnamed ${s.year}`,
@@ -377,32 +389,33 @@ export default async function PlacePage({ params }: Props) {
               </Kicker>
               <h1>A block in {where}</h1>
               <p className="lead">
-                What public registers hold about flood, storms, sea level and land cover around this place. The
+                What public registers hold about flood, heat, ground and wind around this place. The
                 page shows the neighbourhood, not a house, and its address carries the block only.
               </p>
             </div>
           </div>
-          <Suspense fallback={<GlanceRow glance={early} linked zonePending />}>
-            <Later value={record}>
-              {(r) => (
-                <>
-                  <GlanceRow glance={r.glance} linked />
-                  <div className="place-head-actions">
-                    <PlaceActions slug={slug} glance={r.glance} />
-                    <div className="place-paid-cta">
-                      <span>
-                        <strong>What could happen here?</strong> Flood, heat, ground movement and wind, modelled
-                        for this neighbourhood. Paid, and not on sale yet.
-                      </span>
-                      <Link href={{ pathname: "/start", query: { place: slug } }} className="btn btn-accent btn-sm">
-                        Get a report or run it yourself <span className="arrow">→</span>
-                      </Link>
-                    </div>
-                  </div>
-                </>
-              )}
-            </Later>
-          </Suspense>
+          <div className="place-head-actions">
+            <Suspense fallback={<PlaceActions slug={slug} glance={early} />}>
+              <Later value={record}>{(r) => <PlaceActions slug={slug} glance={r.glance} />}</Later>
+            </Suspense>
+          </div>
+        </div>
+      </section>
+
+      <section id="map" className="place-map-section">
+        <div className="wrap-wide">
+          <PlaceMap
+            slug={slug}
+            place={place}
+            tracks={tracks}
+            aside={
+              <Suspense fallback={<VerdictsPending />}>
+                <Later value={verdicts}>
+                  {([r, cover, ground, wind]) => <Verdicts slug={slug} glance={r.glance} cover={cover} ground={ground} wind={wind} />}
+                </Later>
+              </Suspense>
+            }
+          />
         </div>
       </section>
 
@@ -422,11 +435,6 @@ export default async function PlacePage({ params }: Props) {
         </div>
       </nav>
 
-      <section id="map" className="place-map-section">
-        <div className="wrap-wide">
-          <PlaceMap slug={slug} place={place} tracks={tracks} />
-        </div>
-      </section>
 
       <section id="flood" className="hazard-row">
         <div className="wrap">
@@ -553,24 +561,22 @@ export default async function PlacePage({ params }: Props) {
 
       <section id="ground" className="hazard-row">
         <div className="wrap">
-          <Kicker>hazard · coming</Kicker>
+          <Kicker>hazard</Kicker>
           <h2>
             <span className="hazard-mark" data-hazard="ground" aria-hidden />
-            Ground movement
+            Ground
           </h2>
           <p className="lead">
-            Whether the ground is sinking or rising, measured from satellite radar over years, and where it is
-            heading over ten years against its surroundings.
+            Faults, landslides and the soil around the block, from USGS and the USDA soil survey. Whether the ground is
+            sinking or rising, measured from satellite radar, is in the house report.
           </p>
           <div className="shelf">
-            <ShelfHead name="On record" state="coming" />
-            <p className="shelf-empty">
-              This shelf will show, free, whether the ground at the centre of this block is sinking or rising,
-              from NASA&apos;s OPERA ground-motion product and labelled screening, beside the USGS map of ground prone
-              to sinkholes. It will be a reading of the block&apos;s ground, not of any house, and where the satellite
-              cannot give a reading the card will say so rather than show a number. Neither is shown yet: no
-              radar has been read for any place.
-            </p>
+            <ShelfHead name="On record" state="free" />
+            <div className="shelf-cards">
+              <Suspense fallback={<PendingCard hazard="ground" about="Faults, landslides and soil" who="USGS and the soil survey" source="USGS; USDA NRCS" />}>
+                <Later value={groundRec}>{(g) => <GroundCards r={g} />}</Later>
+              </Suspense>
+            </div>
           </div>
           <PaidStrip
             hazard="ground"
@@ -585,18 +591,19 @@ export default async function PlacePage({ params }: Props) {
 
       <section id="wind" className="hazard-row">
         <div className="wrap">
-          <Kicker>hazard · coming</Kicker>
+          <Kicker>hazard</Kicker>
           <h2>
             <span className="hazard-mark" data-hazard="wind" aria-hidden />
             Wind
           </h2>
-          <p className="lead">How wind moves through the neighbourhood across the seasons, as a map.</p>
+          <p className="lead">How often FEMA counts wind storms in this census tract. The hurricane tracks are under Flood and storms.</p>
           <div className="shelf">
             <ShelfHead name="On record" state="free" />
-            <p className="shelf-empty">
-              The hurricane and tropical storm tracks <a href="#flood">under Flood and storms</a> and on the map
-              are the part of wind that is on record here today.
-            </p>
+            <div className="shelf-cards">
+              <Suspense fallback={<PendingCard hazard="wind" about="Wind events in the tract" who="FEMA" source="FEMA, National Risk Index" />}>
+                <Later value={windRec}>{(w) => <WindCard w={w} />}</Later>
+              </Suspense>
+            </div>
           </div>
           <PaidStrip hazard="wind" place={slug} shelves={[{ name: "Modelled", kind: "wind-model" }]} />
         </div>

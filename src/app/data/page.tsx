@@ -92,6 +92,36 @@ export default function DataPage() {
       detail: "The survey is the 2021 edition. An answer is kept for half a year.",
     },
     {
+      record: "Nearest mapped fault",
+      publisher: "USGS, Quaternary Fault and Fold Database (2020 release)",
+      how: "Asked live",
+      detail: "Asked for the block and for a spot you click; kept for a month. The faults layer loads in your browser.",
+    },
+    {
+      record: "Landslides mapped nearby",
+      publisher: "USGS, U.S. Landslide Inventory, version 3",
+      how: "Asked live",
+      detail: "Counted within 1 km; kept for a month.",
+    },
+    {
+      record: "Landslide susceptibility",
+      publisher: "USGS, Mirus et al. 2024 (data release DOI 10.5066/P13KAGU3)",
+      how: "Map layer",
+      detail: "Loaded by your browser straight from USGS while the layer is on.",
+    },
+    {
+      record: "Soil",
+      publisher: "USDA NRCS, Soil Survey Geographic Database (SSURGO), through Soil Data Access",
+      how: "Asked live",
+      detail: "Kept for a month. The service is often slow; when it does not answer within 8 seconds, the page says so.",
+    },
+    {
+      record: "Wind events a year, by census tract",
+      publisher: "FEMA, National Risk Index",
+      how: "Asked live",
+      detail: "FEMA's annualized frequency for tornado, strong wind and hurricane; kept for a month.",
+    },
+    {
       record: "Census tract and county",
       publisher: "US Census Bureau geocoder; Photon (OpenStreetMap data, © OpenStreetMap contributors) when Census does not find an address",
       how: "Asked live",

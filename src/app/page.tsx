@@ -1,229 +1,37 @@
-import Link from "next/link";
-import type { Route } from "next";
-import { Nav, Footer } from "@/components/shell/Shell";
-import { Kicker, Section } from "@/components/marketing/page-shell";
-import { HomeMap } from "@/components/home/HomeMap";
-import { LockedShelf } from "@/components/place/cards";
+import { headers } from "next/headers";
+import { HomeMap, US_VIEW, type StartView } from "@/components/home/HomeMap";
+import { inUsBounds } from "@/lib/place/coords";
 
-// The home page is a map with the search box on it (Climate Inspection D42,
-// SPEC-LISTINGS.md §1). Homes for sale load on the map when a visitor asks
-// for an area. Everything under it explains what the search returns and what
-// paying would add.
+// The home page is the map and nothing else (docs/design/map-first-brief.md
+// s.3, Kyle: "Nothing: map only"). The explainer that used to sit under the
+// map is in the map's "?" panel and on the About page.
 //
-// Claims on this page, and what each rests on:
-//   "free, no account"           the place page needs neither (src/app/place).
-//   homes for sale               RentCast's listings, shown as it gives them
-//                                (src/components/home/HomeMap.tsx).
-//   the list of public records   each is fetched live on a place page; sources
-//                                are in docs/design/site-redesign-brief.md s.11.
-//   the paid shelves             described as not on sale, and drawn with the
-//                                placeholder register so they carry no numbers.
-// Do not add a figure, a customer, a city or a validation claim here.
+// Where the map opens. Vercel adds the visitor's rough location, from their
+// internet address, to each request (x-vercel-ip-latitude / -longitude:
+// https://vercel.com/docs/headers/request-headers, read 20 Nov 2026). The map
+// opens there at town zoom, so the first thing a visitor sees is somewhere
+// they know. Nothing is asked of the visitor's browser, no outside service is
+// called, and the location is not stored: it only picks the starting view.
+// Outside the US, or with no headers (a local copy), it opens on the lower 48.
+//
+// Claims on this page and what each rests on: see the map component
+// (src/components/home/HomeMap.tsx). Do not add a figure, a customer, a city
+// or a validation claim here.
 
-// City halls and capitols: public buildings, rounded to the block like every
-// other place on the site. They are examples of where to look, not studies.
-const EXAMPLES: { label: string; slug: string }[] = [
-  { label: "Charleston, SC", slug: "32.776,-79.931" },
-  { label: "Houston, TX", slug: "29.760,-95.369" },
-  { label: "Sacramento, CA", slug: "38.577,-121.494" },
-  { label: "Miami Beach, FL", slug: "25.791,-80.132" },
-];
+export const dynamic = "force-dynamic";
 
-const SHELVES: { name: string; state: string; body: string }[] = [
-  {
-    name: "On record",
-    state: "Free · no account",
-    body: "What public agencies already hold about the place: FEMA flood zones, flood insurance claims nearby, disaster declarations, past hurricane tracks, sea level rise, FEMA's rating of eighteen hazards, tree canopy and paving. Click anywhere on the map to read a spot.",
-  },
-  {
-    name: "Modelled",
-    state: "Paid · not on sale yet",
-    body: "Our own flood and heat models, run for the neighbourhood around the property: where storm water goes street by street, and how warm the air is by day and by night.",
-  },
-  {
-    name: "What if",
-    state: "Paid · not on sale yet",
-    body: "Try a project in the model before paying for it: a rain garden, a French drain, less paving, more trees. You see what it is likely to change, with the margins. Not a promise.",
-  },
-];
+const NEAR_ZOOM = 10.5;
 
-const HAZARDS: { name: string; record: string; model: string; whatIf: string; live: boolean }[] = [
-  {
-    name: "Flood",
-    record: "FEMA flood zones, insurance claims, disaster declarations, hurricane tracks, sea level rise, ground elevation",
-    model: "Storm water through the neighbourhood: preset storms, your own storm, live radar",
-    whatIf: "Rain garden, French drain, paving removed, rain barrels",
-    live: true,
-  },
-  {
-    name: "Heat",
-    record: "Tree canopy and paving",
-    model: "Surface temperature, street air temperature, outdoor comfort in sun and shade",
-    whatIf: "Trees, paving removed, cool roofs, cool pavement",
-    live: true,
-  },
-  {
-    name: "Everything else",
-    record: "FEMA's rating of eighteen hazards for the area: wildfire, earthquake, tornado and the rest",
-    model: "Not planned",
-    whatIf: "Not planned",
-    live: true,
-  },
-  {
-    name: "Ground",
-    record: "Free with a report: sinking or rising, and ground prone to sinkholes",
-    model: "Ground movement measured from satellite radar",
-    whatIf: "Ten years ahead, against the wide surroundings",
-    live: false,
-  },
-  {
-    name: "Wind",
-    record: "Hurricane tracks",
-    model: "How wind moves through the seasons",
-    whatIf: "To be decided",
-    live: false,
-  },
-];
+async function startView(): Promise<StartView> {
+  const h = await headers();
+  const lat = Number(h.get("x-vercel-ip-latitude"));
+  const lon = Number(h.get("x-vercel-ip-longitude"));
+  if (h.get("x-vercel-ip-latitude") && h.get("x-vercel-ip-longitude") && inUsBounds({ lat, lon })) {
+    return { center: [lon, lat], zoom: NEAR_ZOOM, from: "near" };
+  }
+  return { center: US_VIEW.center, zoom: US_VIEW.zoom, from: "us" };
+}
 
-const KEEP: { title: string; body: string }[] = [
-  {
-    title: "Questions to take with you",
-    body: "Each place page ends with a list for the seller, the inspector and the insurer, chosen from what the record shows there. Print it and bring it to the viewing.",
-  },
-  {
-    title: "Save a place, with your note",
-    body: "A saved place keeps your note and a snapshot of what the record said that day. It stays in your browser: no account, and nothing is sent to us.",
-  },
-  {
-    title: "Compare the homes you are weighing up",
-    body: "Put up to four places side by side, record by record, with each row saying whether it describes the block, the census tract or the county.",
-  },
-];
-
-const STEPS = [
-  { no: "01", title: "Find a place", body: "Type any US address. The site finds the block and drops the address." },
-  { no: "02", title: "Read the record", body: "A large map of the neighbourhood with public layers, a card for each record with its source and date, and a click anywhere to read that spot." },
-  { no: "03", title: "Run the models", body: "Paid, and not on sale yet. Flood and heat for the neighbourhood, with the property in the middle." },
-  { no: "04", title: "Try a project, or take the report", body: "Test what you could do about it, or take a report for one property and be done." },
-];
-
-export default function HomePage() {
-  return (
-    <>
-      <Nav active="home" />
-
-      <HomeMap />
-
-      <div className="place-examples-strip">
-        <div className="wrap">
-          <span>Or look at the record for</span>
-          {EXAMPLES.map((e) => (
-            <Link key={e.slug} href={`/place/${e.slug}` as Route}>
-              {e.label}
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      <Section
-        kicker="what you get"
-        title="Three shelves for every hazard."
-        lead="The first is open to everyone. The other two are our own models, and they are not on sale yet."
-      >
-        <div className="table-scroll">
-          <table className="plain-table shelf-table">
-            <thead>
-              <tr>
-                <th>Hazard</th>
-                {SHELVES.map((sh) => (
-                  <th key={sh.name}>
-                    {sh.state}
-                    <span className="shelf-th-name">{sh.name}</span>
-                    <span className="shelf-th-body">{sh.body}</span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {HAZARDS.map((h) => (
-                <tr key={h.name}>
-                  <td>
-                    {h.name}
-                    {!h.live && <span className="record-aside"> · coming</span>}
-                  </td>
-                  <td>{h.record}</td>
-                  <td>{h.model}</td>
-                  <td>{h.whatIf}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Section>
-
-      <Section
-        kicker="keep hold of it"
-        title="Buying a home is a lot to carry. Put some of it down here."
-        action={<Link href="/places" className="btn">Your places <span className="arrow">→</span></Link>}
-      >
-        <div className="grid-3" style={{ gap: 18 }}>
-          {KEEP.map((k) => (
-            <div key={k.title} className="card" style={{ padding: 24 }}>
-              <h3 style={{ margin: "0 0 10px" }}>{k.title}</h3>
-              <p style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.6, margin: 0 }}>{k.body}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      <section className="band">
-        <div className="wrap">
-          <div className="section-head">
-            <div>
-              <Kicker>the paid shelves · layout only</Kicker>
-              <h2 style={{ marginTop: 8 }}>What a model run will add.</h2>
-            </div>
-            <p className="lead">
-              These panels show the shape of a result. They hold no numbers, because no run stands behind
-              them. For now a report is run by hand on request.
-            </p>
-          </div>
-          <div className="shelf-pair">
-            <LockedShelf kind="flood-model" cta={false} />
-            <LockedShelf kind="heat-whatif" cta={false} />
-          </div>
-          <div className="row" style={{ marginTop: 24, gap: 10 }}>
-            <Link href="/models" className="btn">How the models work <span className="arrow">→</span></Link>
-            <Link href="/start" className="btn btn-accent">Ask for a report <span className="arrow">→</span></Link>
-          </div>
-        </div>
-      </section>
-
-      <Section kicker="how it works" title="From an address to an answer." lead="Steps one and two work today. Three and four are being built.">
-        <div className="steps-grid">
-          {STEPS.map((s, i) => (
-            <div key={s.no} className="card" data-state={i < 2 ? "now" : "later"}>
-              <span className="step-no">{s.no}</span>
-              <h3>{s.title}</h3>
-              <p>{s.body}</p>
-            </div>
-          ))}
-        </div>
-        <div className="home-close">
-          <p className="screening-note">
-            <strong>A screening tool.</strong> It gives a buyer or a resident more to go on: what has
-            happened around a place and what could. It is not an engineering study, an appraisal, an insurance
-            quote or a home inspection, and it is not for engineering decisions. A home is a big purchase and
-            this information is public; it should be easy to read.
-          </p>
-          <div className="row">
-            <a href="#place-search-input" className="btn">Look up an address <span className="arrow">↑</span></a>
-            <Link href="/start" className="btn btn-accent">Ask for a report <span className="arrow">→</span></Link>
-          </div>
-        </div>
-      </Section>
-
-      <Footer />
-    </>
-  );
+export default async function Home() {
+  return <HomeMap start={await startView()} />;
 }

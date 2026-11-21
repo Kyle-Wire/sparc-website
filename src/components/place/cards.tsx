@@ -20,7 +20,7 @@ import { RetryButton } from "./RetryButton";
  * See docs/design/site-redesign-brief.md, section 5.
  */
 
-export type Hazard = "flood" | "heat" | "storm";
+export type Hazard = "flood" | "heat" | "storm" | "ground" | "wind";
 
 export function RecordCard({
   hazard,

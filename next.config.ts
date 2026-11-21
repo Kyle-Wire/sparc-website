@@ -17,7 +17,8 @@ const CSP = [
   // host here only for a published public layer; see the source table in
   // docs/design/site-redesign-brief.md.
   "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.lemonsqueezy.com " +
-    "https://basemap.nationalmap.gov https://hazards.fema.gov https://coast.noaa.gov https://www.mrlc.gov",
+    "https://basemap.nationalmap.gov https://hazards.fema.gov https://coast.noaa.gov https://www.mrlc.gov " +
+    "https://tiles.arcgis.com https://earthquake.usgs.gov",
   // The map library runs its tile worker from a blob it builds itself.
   "worker-src 'self' blob:",
   "frame-ancestors 'none'",

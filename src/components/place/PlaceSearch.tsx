@@ -19,6 +19,8 @@ export interface FoundPlace {
   slug: string;
   point: { lat: number; lon: number };
   precision: "house" | "street";
+  /** The address as the locator wrote it. */
+  matched: string;
 }
 
 /** What to say once an address is found by the second search. OpenStreetMap's
@@ -38,10 +40,14 @@ function foundNote(a: GeocodeAnswer): string | null {
  */
 export function PlaceSearch({
   compact,
+  bare,
   onFound,
   help,
 }: {
   compact?: boolean;
+  /** For the floating bar on the home map: the label is read by screen
+   *  readers only, and the line under the box shows only an error or a note. */
+  bare?: boolean;
   /** When given, a found address is handed back (the home map flies to it)
    *  instead of opening its place page. */
   onFound?: (found: FoundPlace) => void;
@@ -82,7 +88,7 @@ export function PlaceSearch({
       if (onFound) {
         // A point on the street is not the house: it is not kept as the property.
         if (precision === "house") rememberPoint({ slug: answer.slug, ...answer.point, matched: answer.matched ?? "" });
-        onFound({ slug: answer.slug, point: answer.point, precision });
+        onFound({ slug: answer.slug, point: answer.point, precision, matched: answer.matched ?? "" });
         setBusy(false);
         return;
       }
@@ -99,8 +105,8 @@ export function PlaceSearch({
   }
 
   return (
-    <form onSubmit={onSubmit} className="place-search" data-compact={compact ? "true" : undefined}>
-      <label className="label" htmlFor="place-search-input">
+    <form onSubmit={onSubmit} className="place-search" data-compact={compact ? "true" : undefined} data-bare={bare ? "true" : undefined}>
+      <label className={bare ? "visually-hidden" : "label"} htmlFor="place-search-input">
         Street address, city, state
       </label>
       <div className="place-search-row">
@@ -120,12 +126,14 @@ export function PlaceSearch({
           {busy ? "Looking…" : "Look it up"} <span className="arrow">→</span>
         </button>
       </div>
-      <p id="place-search-help" className="place-search-help" role={error ? "alert" : undefined}>
-        {error ??
-          note ??
-          help ??
-          "Free, no account. The address is used to find the block and is not stored; the page you land on shows the neighbourhood, not the house."}
-      </p>
+      {(!bare || error || note) && (
+        <p id="place-search-help" className="place-search-help" role={error ? "alert" : undefined}>
+          {error ??
+            note ??
+            help ??
+            "Free, no account. The address is used to find the block and is not stored; the page you land on shows the neighbourhood, not the house."}
+        </p>
+      )}
     </form>
   );
 }

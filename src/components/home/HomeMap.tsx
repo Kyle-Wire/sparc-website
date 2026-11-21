@@ -13,11 +13,12 @@ import FEMA_LEGEND from "@/data/fema-flood-zones-legend.json";
 import { DEFAULT_STORM, HAZARD_STATE_WORDS, floodSortName, type BlockReadings, type HazardState } from "@/lib/listings/blocks";
 import type { PublicListing } from "@/lib/listings/feed";
 
-/** Close enough in to tell one house from the next. */
-const PIN_ZOOM = 15;
-
 /**
- * The home page is a map (Climate Inspection D42, SPEC-LISTINGS.md §1).
+ * The home page is a map, and only a map (Climate Inspection D42,
+ * SPEC-LISTINGS.md §1; docs/design/map-first-brief.md s.3). It fills the
+ * screen. The logo, one search bar and the menu float on it; layers, homes
+ * for sale and a short explainer open from chips. A click drops a pin and
+ * opens a card of what public records say at that spot.
  *
  * Homes for sale are loaded only when a visitor asks for an area, because
  * each new ZIP code area spends one of the month's few feed requests. A
@@ -49,7 +50,7 @@ interface BlockAnswer {
 
 type Load<T> = { status: "idle" } | { status: "loading" } | { status: "failed"; reason: string } | { status: "done"; data: T };
 
-const US_VIEW = { center: [-98.35, 39.5] as [number, number], zoom: 3.4 };
+export const US_VIEW = { center: [-98.35, 39.5] as [number, number], zoom: 3.4 };
 /** Below this the map shows too wide an area to be one ZIP code. */
 const LISTINGS_ZOOM = 12;
 const HAZARD_NAMES: Record<string, string> = { flood: "Flood", heat: "Heat", ground: "Ground movement", wind: "Wind" };
@@ -209,71 +210,206 @@ function BlockModels({ answer }: { answer: BlockAnswer }) {
   );
 }
 
-/** What every mark on the map means, and the FEMA switch. */
-function MapLegend(props: {
-  fema: boolean;
-  onFema: (f: boolean) => void;
-  femaVisible: boolean;
-}) {
-  // Open beside the map on a wide screen. On a phone the legend sits under the
-  // map at full length, so it starts closed there and opens on a tap.
-  const legendRef = useRef<HTMLDetailsElement>(null);
-  useEffect(() => {
-    if (legendRef.current && window.matchMedia("(max-width: 640px)").matches) legendRef.current.open = false;
-  }, []);
+type LayerId = "fema" | "landslide" | "faults";
+
+/** The layers a visitor can switch on, and what each says it is. FEMA's
+ *  zones are on at start; the rest wait to be asked for (brief s.3). */
+const LAYERS: { id: LayerId; name: string; note: string; group: "Flood" | "Ground" }[] = [
+  { id: "fema", name: "FEMA flood zones", note: "FEMA's map for insurance and building rules. Not a forecast.", group: "Flood" },
+  {
+    id: "landslide",
+    name: "Landslide susceptibility",
+    note: "USGS, 2024: how prone the slopes are, from yellow (lower) to red (higher), at 90 m. About the area, not the lot.",
+    group: "Ground",
+  },
+  {
+    id: "faults",
+    name: "Faults",
+    note: "USGS: faults that have moved in the last 1.6 million years. Shown from state zoom.",
+    group: "Ground",
+  },
+];
+
+function LayersPanel(props: { on: Record<LayerId, boolean>; onToggle: (id: LayerId, v: boolean) => void; zoom: number }) {
+  const femaMin = RASTERS.find((r) => r.id === "fema")?.minzoom ?? 11;
   return (
-    <details className="map-legend" open ref={legendRef}>
-      <summary>Legend</summary>
-      <div className="map-legend-body">
-        <div className="map-legend-group">
-          <div className="map-legend-title">Homes for sale</div>
-          <div className="map-legend-row">
-            <span className="map-legend-dot" aria-hidden /> A listing, where its feed places it
-          </div>
-          <div className="map-legend-row">
-            <span className="map-legend-dot map-legend-dot-picked" aria-hidden /> The listing you opened
-          </div>
-          <div className="map-legend-row">
-            <span className="map-legend-ring" aria-hidden /> The address you searched
-          </div>
-        </div>
-        <div className="map-legend-group">
-          <label className="map-legend-check map-legend-title">
-            <input type="checkbox" checked={props.fema} onChange={(e) => props.onFema(e.target.checked)} /> FEMA flood zones
-          </label>
-          {!props.femaVisible && props.fema && <p className="map-legend-note">Shown once you zoom in to a town.</p>}
-          {FEMA_LEGEND.items.map((it) => (
-            <div key={it.label} className="map-legend-row">
-              {/* FEMA's own swatch, copied from its legend by scripts/fetch-fema-legend.mjs. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={it.image} alt="" width={20} height={20} />
-              {it.label}
+    <div className="map-panel-body">
+      {(["Flood", "Ground"] as const).map((g) => (
+        <div key={g} className="map-legend-group">
+          <div className="kicker">{g}</div>
+          {LAYERS.filter((l) => l.group === g).map((l) => (
+            <div key={l.id} className="map-layer">
+              <label className="map-legend-check map-legend-title">
+                <input type="checkbox" checked={props.on[l.id]} onChange={(e) => props.onToggle(l.id, e.target.checked)} /> {l.name}
+              </label>
+              <p className="map-legend-note">
+                {l.note}
+                {props.on[l.id] && l.id === "fema" && props.zoom < femaMin && " Zoom in to a town to see it."}
+              </p>
+              {l.id === "fema" && props.on.fema && (
+                <div className="map-legend-swatches">
+                  {FEMA_LEGEND.items.map((it) => (
+                    <div key={it.label} className="map-legend-row">
+                      {/* FEMA's own swatch, copied from its legend by scripts/fetch-fema-legend.mjs. */}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={it.image} alt="" width={16} height={16} />
+                      {it.label}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           ))}
-          <p className="map-legend-note">FEMA&apos;s map for insurance and building rules, read {FEMA_LEGEND.read}. Not a forecast.</p>
+        </div>
+      ))}
+      <div className="map-legend-group">
+        <div className="kicker">On the map</div>
+        <div className="map-legend-row">
+          <span className="map-legend-ring" aria-hidden /> Your pin. Drag it to move it.
+        </div>
+        <div className="map-legend-row">
+          <span className="map-legend-dot" aria-hidden /> A home for sale, where its listing places it
         </div>
       </div>
-    </details>
+      <p className="map-legend-note">
+        Soil and wind are read where you click: the soil survey&apos;s map unit at that spot, and how often FEMA counts
+        tornadoes, strong wind and hurricanes in that census tract.
+      </p>
+    </div>
   );
 }
 
-export function HomeMap() {
+function InfoPanel() {
+  return (
+    <div className="map-panel-body info-panel">
+      <p>
+        <strong>Click anywhere</strong> to drop a pin and see what public records say about that spot: flood zone, ground
+        height, faults and landslides nearby, the soil, and how often wind storms reach the area.
+      </p>
+      <p>
+        <strong>Free, no account.</strong> All of it comes from public agencies (FEMA, USGS, USDA, NOAA), read as they publish
+        it. It describes the area around your pin, not the house itself.
+      </p>
+      <p>
+        <strong>The house report</strong> is the paid part: our own flood, heat, ground movement and wind models, worked out
+        for one house. <Link href="/report/sample">See a sample</Link>.
+      </p>
+      <p>
+        <Link href="/about">How it works, and who we are</Link> · <Link href="/data">Every source</Link>
+      </p>
+    </div>
+  );
+}
+
+type SpotLoad = { status: "loading" } | { status: "failed"; reason: string } | { status: "done"; spot: Spot };
+
+/** What is on record where the pin is, with the block link and one quiet report link. */
+function SpotCard({ slug, matched, spot, onClose }: { slug: string; matched: string; spot: SpotLoad; onClose: () => void }) {
+  return (
+    <aside className="spot-card" aria-live="polite" aria-label="What is on record at your pin">
+      <div className="listing-panel-head">
+        <span className="kicker">at your pin · free</span>
+        <button type="button" className="btn btn-sm btn-ghost" onClick={onClose} aria-label="Close">
+          ✕
+        </button>
+      </div>
+      {matched && <p className="spot-card-where">{matched}</p>}
+      {spot.status === "loading" && <p className="spot-hint">Asking FEMA, USGS, the soil survey and the land cover survey…</p>}
+      {spot.status === "failed" && <p className="spot-hint">{spot.reason}</p>}
+      {spot.status === "done" && <SpotList spot={spot.spot} />}
+      <p className="listing-note">
+        These records describe the area around the pin. They can&apos;t say how this house itself fares in a storm or a heat
+        wave; the house report models that.
+      </p>
+      <div className="spot-card-links">
+        <Link href={`/place/${slug}` as Route}>
+          The full public record for this block <span className="arrow">→</span>
+        </Link>
+        <span className="spot-card-paid">
+          <Link href={{ pathname: "/start", query: { place: slug } }}>Get the house report</Link> ·{" "}
+          <Link href="/report/sample">see a sample</Link>
+        </span>
+      </div>
+    </aside>
+  );
+}
+
+const MENU: { href: Route; label: string }[] = [
+  { href: "/places", label: "Your places" },
+  { href: "/models", label: "The models" },
+  { href: "/pricing", label: "Pricing and the report" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
+const MENU_SMALL: { href: Route; label: string }[] = [
+  { href: "/data", label: "Data sources" },
+  { href: "/glossary", label: "Glossary" },
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+];
+
+function MapMenu() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: MouseEvent) => ref.current && !ref.current.contains(e.target as Node) && setOpen(false);
+    const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("mousedown", away);
+    document.addEventListener("keydown", esc);
+    return () => {
+      document.removeEventListener("mousedown", away);
+      document.removeEventListener("keydown", esc);
+    };
+  }, [open]);
+  return (
+    <div className="map-menu" ref={ref}>
+      <button type="button" className="map-chip" aria-expanded={open} aria-controls="map-menu-list" onClick={() => setOpen(!open)}>
+        Menu
+      </button>
+      {open && (
+        <nav id="map-menu-list" className="map-menu-list" aria-label="Site">
+          {MENU.map((m) => (
+            <Link key={m.href} href={m.href}>
+              {m.label}
+            </Link>
+          ))}
+          <div className="map-menu-small">
+            {MENU_SMALL.map((m) => (
+              <Link key={m.href} href={m.href}>
+                {m.label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      )}
+    </div>
+  );
+}
+
+type Panel = "layers" | "homes" | "info" | null;
+
+export interface StartView {
+  center: [number, number];
+  zoom: number;
+  /** "near" when it came from the visitor's rough location. */
+  from: "near" | "us";
+}
+
+export function HomeMap({ start }: { start: StartView }) {
   const boxRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MlMap | null>(null);
   const [failed, setFailed] = useState(false);
-  const [zoom, setZoom] = useState(US_VIEW.zoom);
+  const [zoom, setZoom] = useState(start.zoom);
   const [area, setArea] = useState<Load<AreaAnswer>>({ status: "idle" });
   const [picked, setPicked] = useState<Listing | null>(null);
-  const [fema, setFema] = useState(true);
-  const [found, setFound] = useState<string | null>(null);
+  const [layers, setLayers] = useState<Record<LayerId, boolean>>({ fema: true, landslide: false, faults: false });
+  const [panel, setPanel] = useState<Panel>(null);
+  const [pin, setPin] = useState<{ slug: string; matched: string; spot: SpotLoad } | null>(null);
+  const [searchNote, setSearchNote] = useState(false);
   const listingsRef = useRef<Listing[]>([]);
   const searchPin = useRef<Marker | null>(null);
-  // Drop a pin: the visitor marks the house themselves, when no search finds
-  // it or a search finds only the street. The point stays in this browser,
-  // as a searched one does (place-point.ts); only its block goes in the link.
-  const [pinMode, setPinMode] = useState(false);
-  const pinModeRef = useRef(false);
-  const cardRef = useRef<HTMLDivElement | null>(null);
+  const askId = useRef(0);
 
   const showPins = useCallback((listings: Listing[]) => {
     listingsRef.current = listings;
@@ -286,6 +422,27 @@ export function HomeMap() {
         geometry: { type: "Point", coordinates: [l.Longitude as number, l.Latitude as number] },
       })),
     });
+  }, []);
+
+  /** The pin is where the visitor put it: that is the house, for this tab.
+   *  Its exact point stays in this browser (place-point.ts); the spot is read
+   *  from public sources through /api/inspect and not stored. */
+  const pinAt = useCallback((p: { lat: number; lon: number }, matched = "") => {
+    const slug = placeSlug(p);
+    rememberPoint({ slug, ...p, matched: matched || "the pin you dropped" });
+    const id = ++askId.current;
+    setPicked(null);
+    setPanel(null);
+    setPin({ slug, matched, spot: { status: "loading" } });
+    fetch("/api/inspect", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) })
+      .then(async (r) => ({ ok: r.ok, body: await r.json() }))
+      .then((r) => {
+        if (id !== askId.current) return;
+        setPin((cur) =>
+          cur && { ...cur, spot: r.ok ? { status: "done", spot: r.body as Spot } : { status: "failed", reason: r.body.error ?? "No answer." } },
+        );
+      })
+      .catch(() => id === askId.current && setPin((cur) => cur && { ...cur, spot: { status: "failed", reason: "Check your connection." } }));
   }, []);
 
   useEffect(() => {
@@ -301,29 +458,17 @@ export function HomeMap() {
         map = new maplibre.Map({
           container: box,
           style: BASE_STYLE,
-          center: US_VIEW.center,
-          zoom: US_VIEW.zoom,
+          center: start.center,
+          zoom: start.zoom,
           minZoom: 3,
           maxZoom: 17,
           cooperativeGestures: needsTwoFingers(),
           attributionControl: { compact: true },
         });
         mapRef.current = map;
-        map.addControl(new maplibre.NavigationControl({ showCompass: false }), "top-right");
+        map.addControl(new maplibre.NavigationControl({ showCompass: false }), "bottom-right");
         map.addControl(new maplibre.ScaleControl({ unit: "imperial" }), "bottom-left");
         map.on("zoomend", () => map && setZoom(map.getZoom()));
-        // On a wide screen the card and the legend sit over the map, so the
-        // map's centre (where a search lands, and where "Show homes for sale
-        // here" looks) is the open part between them.
-        const pad = () => {
-          if (!map) return;
-          const wide = window.innerWidth > 640;
-          const card = cardRef.current?.offsetWidth ?? 0;
-          map.setPadding(wide ? { left: card + 32, right: 312, top: 0, bottom: 0 } : { left: 0, right: 0, top: 0, bottom: 0 });
-        };
-        pad();
-        window.addEventListener("resize", pad);
-        map.once("remove", () => window.removeEventListener("resize", pad));
         const pinEl = document.createElement("div");
         pinEl.className = "place-map-pin";
         pinEl.setAttribute("aria-hidden", "true");
@@ -334,10 +479,12 @@ export function HomeMap() {
         });
         map.on("load", () => {
           if (dead || !map) return;
-          const f = RASTERS.find((r) => r.id === "fema");
-          if (f) {
-            map.addSource("fema", { type: "raster", tiles: [f.tiles], tileSize: f.tileSize, minzoom: f.minzoom, attribution: f.attribution });
-            map.addLayer({ id: "fema", type: "raster", source: "fema", paint: { "raster-opacity": f.opacity } });
+          // Under FEMA's zones, so the zones stay readable where they overlap.
+          for (const id of ["landslide", "faults", "fema"] as const) {
+            const r = RASTERS.find((x) => x.id === id);
+            if (!r) continue;
+            map.addSource(id, { type: "raster", tiles: [r.tiles], tileSize: r.tileSize, minzoom: r.minzoom, maxzoom: r.maxzoom, attribution: r.attribution });
+            map.addLayer({ id, type: "raster", source: id, paint: { "raster-opacity": r.opacity }, layout: { visibility: id === "fema" ? "visible" : "none" } });
           }
           map.addSource("listings", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
           map.addLayer({
@@ -346,8 +493,8 @@ export function HomeMap() {
             source: "listings",
             paint: {
               "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 4, 16, 8],
-              "circle-color": "#1a1416",
-              "circle-stroke-color": "#f7f4ee",
+              "circle-color": "#141414",
+              "circle-stroke-color": "#f5f5f4",
               "circle-stroke-width": 2,
             },
           });
@@ -359,23 +506,26 @@ export function HomeMap() {
             paint: {
               "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 7, 16, 12],
               "circle-color": "rgba(0,0,0,0)",
-              "circle-stroke-color": "#1a1416",
+              "circle-stroke-color": "#141414",
               "circle-stroke-width": 3,
             },
           });
           map.on("click", "listings", (e) => {
             const key = e.features?.[0]?.properties?.key;
             const l = listingsRef.current.find((x) => x.listing_key === key);
-            if (l) setPicked(l);
+            if (l) {
+              setPin(null);
+              setPicked(l);
+            }
           });
           map.on("mouseenter", "listings", () => map && (map.getCanvas().style.cursor = "pointer"));
-          map.on("mouseleave", "listings", () => map && (map.getCanvas().style.cursor = pinModeRef.current ? "crosshair" : ""));
+          map.on("mouseleave", "listings", () => map && (map.getCanvas().style.cursor = ""));
+          // Any other click drops the pin there ("Both, pin first", brief s.3).
           map.on("click", (e) => {
-            if (!pinModeRef.current || !map) return;
-            if (map.queryRenderedFeatures(e.point, { layers: ["listings"] }).length) return;
+            if (!map || map.queryRenderedFeatures(e.point, { layers: ["listings"] }).length) return;
             searchPin.current?.setLngLat(e.lngLat).addTo(map);
+            setSearchNote(false);
             pinAt({ lat: e.lngLat.lat, lon: e.lngLat.lng });
-            choosePinMode(false);
           });
         });
       } catch {
@@ -387,44 +537,38 @@ export function HomeMap() {
       map?.remove();
       mapRef.current = null;
     };
-  }, []);
+    // The start view is read once, when the map is made.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pinAt]);
 
   useEffect(() => {
     const m = mapRef.current;
-    if (m?.getLayer("fema")) m.setLayoutProperty("fema", "visibility", fema ? "visible" : "none");
-  }, [fema]);
+    if (!m) return;
+    for (const [id, on] of Object.entries(layers)) {
+      if (m.getLayer(id)) m.setLayoutProperty(id, "visibility", on ? "visible" : "none");
+    }
+  }, [layers]);
 
   useEffect(() => {
     const m = mapRef.current;
     if (m?.getLayer("listings-picked")) m.setFilter("listings-picked", ["==", ["get", "key"], picked?.listing_key ?? ""]);
   }, [picked]);
 
-  /** The pin is where the visitor put it: that is the house, for this tab. */
-  function pinAt(p: { lat: number; lon: number }) {
-    const slug = placeSlug(p);
-    rememberPoint({ slug, ...p, matched: "the pin you dropped" });
-    setFound(slug);
-  }
-
-  function choosePinMode(on: boolean) {
-    pinModeRef.current = on;
-    setPinMode(on);
-    const canvas = mapRef.current?.getCanvas();
-    if (canvas) canvas.style.cursor = on ? "crosshair" : "";
-  }
-
   function flyToFound(f: FoundPlace) {
     const m = mapRef.current;
-    // Only a house gets the pin and the block link. A street-level answer
-    // moves the map to the street, closer in, so the visitor can find the house.
+    // Only a house gets the pin and the card. A street-level answer moves the
+    // map to the street, closer in; the next click marks the house.
     const house = f.precision === "house";
-    setFound(house ? f.slug : null);
+    setSearchNote(!house);
     if (!m) return;
-    if (house) searchPin.current?.setLngLat([f.point.lon, f.point.lat]).addTo(m);
-    else searchPin.current?.remove();
-    // On the street but not the house: the next click on the map marks it.
-    choosePinMode(!house);
-    m.flyTo({ center: [f.point.lon, f.point.lat], zoom: house ? 15 : 16 });
+    if (house) {
+      searchPin.current?.setLngLat([f.point.lon, f.point.lat]).addTo(m);
+      pinAt(f.point, f.matched);
+    } else {
+      searchPin.current?.remove();
+      setPin(null);
+    }
+    m.flyTo({ center: [f.point.lon, f.point.lat], zoom: house ? 16 : 16 });
   }
 
   async function loadHere() {
@@ -453,7 +597,7 @@ export function HomeMap() {
 
   function goToMe() {
     navigator.geolocation?.getCurrentPosition(
-      (p) => mapRef.current?.flyTo({ center: [p.coords.longitude, p.coords.latitude], zoom: 13 }),
+      (p) => mapRef.current?.flyTo({ center: [p.coords.longitude, p.coords.latitude], zoom: 14 }),
       () => undefined,
       { maximumAge: 600_000, timeout: 10_000 },
     );
@@ -466,112 +610,120 @@ export function HomeMap() {
           .map((o) => ({ ...o, listing: area.data.listings.find((l) => l.listing_key === o.key) }))
           .filter((o) => o.listing)
       : null;
+  const toggle = (p: Exclude<Panel, null>) => setPanel(panel === p ? null : p);
 
   return (
-    <section className="home-map-section" aria-label="Map">
-      <div className="home-map-frame">
-        <div ref={boxRef} className="home-map" />
-        {failed && <p className="home-map-failed">The map could not start in this browser. The search still works.</p>}
-        <div className="home-map-card" ref={cardRef}>
-          <span className="kicker">environmental screening · any US address</span>
-          <h1>See what is on record before you buy.</h1>
-          <ol className="home-steps">
-            <li data-state={near ? "done" : "now"}>
-              <span className="home-step-no" aria-hidden>1</span>
-              <div>
-                <strong>Find an area.</strong> Search an address, or zoom the map.
-                <PlaceSearch compact onFound={flyToFound} help="Free, no account. The address moves the map and is not stored." />
-                <div className="home-map-tools">
-                  <button type="button" className="btn btn-sm" onClick={goToMe}>
-                    Go to where I am
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-sm"
-                    aria-pressed={pinMode}
-                    disabled={!pinMode && zoom < PIN_ZOOM}
-                    title={zoom < PIN_ZOOM ? "Zoom in to a street first" : undefined}
-                    onClick={() => choosePinMode(!pinMode)}
-                  >
-                    {pinMode ? "Cancel pin" : "Drop a pin"}
-                  </button>
-                  {pinMode && <span className="home-step-hint">Click the house on the map. You can drag the pin after.</span>}
-                  {found && (
-                    <Link href={`/place/${found}` as Route}>
-                      The full public record for this block <span className="arrow">→</span>
-                    </Link>
+    <main className="home-full" aria-label="Map">
+      <div ref={boxRef} className="home-full-map" />
+      {failed && <p className="home-map-failed">The map could not start in this browser. The search still works.</p>}
+
+      <header className="map-top">
+        <Link className="map-logo" href="/" aria-label="SPARC Labs, home">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/sparclabs-logo.png" alt="" height={34} />
+        </Link>
+        <div className="map-search">
+          <h1 className="visually-hidden">See what is on public record about any US address</h1>
+          <PlaceSearch compact bare onFound={flyToFound} />
+          {searchNote && <p className="map-search-note">Click the house on the map to drop your pin on it.</p>}
+          <div className="map-chips">
+            <button type="button" className="map-chip" aria-expanded={panel === "layers"} onClick={() => toggle("layers")}>
+              Layers
+            </button>
+            <button type="button" className="map-chip" aria-expanded={panel === "homes"} onClick={() => toggle("homes")}>
+              Homes for sale
+            </button>
+            <button type="button" className="map-chip" onClick={goToMe}>
+              Near me
+            </button>
+            <button type="button" className="map-chip map-chip-round" aria-label="What is this?" aria-expanded={panel === "info"} onClick={() => toggle("info")}>
+              ?
+            </button>
+          </div>
+        </div>
+        <MapMenu />
+      </header>
+
+      {!pin && !picked && !panel && (
+        <p className="map-hint" aria-hidden>
+          {start.from === "near" ? "Roughly where you are. " : ""}Click anywhere to see what is on record there.
+        </p>
+      )}
+
+      {panel && (
+        <section className="map-panel" aria-label={panel === "layers" ? "Layers" : panel === "homes" ? "Homes for sale" : "About this map"}>
+          <div className="listing-panel-head">
+            <span className="kicker">{panel === "layers" ? "layers" : panel === "homes" ? "homes for sale" : "what this is"}</span>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={() => setPanel(null)} aria-label="Close">
+              ✕
+            </button>
+          </div>
+          {panel === "layers" && <LayersPanel on={layers} onToggle={(id, v) => setLayers({ ...layers, [id]: v })} zoom={zoom} />}
+          {panel === "info" && <InfoPanel />}
+          {panel === "homes" && (
+            <div className="map-panel-body">
+              {near ? (
+                <button type="button" className="btn btn-accent btn-sm" onClick={loadHere} disabled={area.status === "loading"}>
+                  {area.status === "loading" ? "Loading…" : "Show homes for sale here"}
+                </button>
+              ) : (
+                <p className="spot-hint">Zoom in to a neighbourhood first.</p>
+              )}
+              {area.status === "done" && <p className="spot-hint">{areaLine(area.data)}</p>}
+              {area.status === "failed" && <p className="spot-hint">{area.reason}</p>}
+              {area.status === "done" && area.data.listings.length > 0 && (
+                <div className="home-map-sort">
+                  {sorted ? (
+                    <>
+                      <h2>{area.data.sort?.name}</h2>
+                      <p className="listing-note">
+                        Exploratory model output, deepest 5 % of each block&apos;s open ground at the peak.{" "}
+                        {area.data.sort?.leftOut
+                          ? `${area.data.sort.leftOut} of ${area.data.listings.length} listings left out: their blocks have no modelled reading yet.`
+                          : "No listing was left out."}
+                      </p>
+                      <ol>
+                        {sorted.map((o) => (
+                          <li key={o.key}>
+                            <button type="button" className="listing-sort-row" onClick={() => o.listing && setPicked(o.listing)}>
+                              <span>{o.listing?.UnparsedAddress}</span>
+                              <span>
+                                {o.depth_cm} cm{o.spread_cm ? ` (${o.spread_cm[0]} to ${o.spread_cm[1]})` : ""}
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                      </ol>
+                    </>
+                  ) : (
+                    <p className="listing-note">
+                      Click a dot to open a listing. Subscribers can sort these by the{" "}
+                      {floodSortName(DEFAULT_STORM).toLowerCase()} where our models have run. Not on sale yet.
+                    </p>
                   )}
                 </div>
-              </div>
-            </li>
-            <li data-state={!near ? "later" : area.status === "done" ? "done" : "now"}>
-              <span className="home-step-no" aria-hidden>2</span>
-              <div>
-                <strong>Show homes for sale.</strong>{" "}
-                {near ? (
-                  <button type="button" className="btn btn-accent btn-sm" onClick={loadHere} disabled={area.status === "loading"}>
-                    {area.status === "loading" ? "Loading…" : "Show homes for sale here"}
-                  </button>
-                ) : (
-                  <span className="home-step-hint">Zoom in to a neighbourhood first.</span>
-                )}
-                {area.status === "done" && <p className="home-step-hint">{areaLine(area.data)}</p>}
-                {area.status === "failed" && <p className="home-step-hint">{area.reason}</p>}
-              </div>
-            </li>
-            <li data-state={picked ? "done" : area.status === "done" && area.data.listings.length ? "now" : "later"}>
-              <span className="home-step-no" aria-hidden>3</span>
-              <div>
-                <strong>Click a home.</strong> See the listing, the public record for its block, and its report.
-              </div>
-            </li>
-          </ol>
-        </div>
-        <MapLegend
-          fema={fema}
-          onFema={setFema}
-          femaVisible={zoom >= (RASTERS.find((r) => r.id === "fema")?.minzoom ?? 11)}
-        />
-        {picked && <ListingPanel key={picked.listing_key} listing={picked} onClose={() => setPicked(null)} />}
-      </div>
-
-      <p className="wrap home-map-credit">
-        Listings from RentCast, shown as it gives them. A pin sits where the feed puts it; what we show for each is
-        about its block, not the house.
-      </p>
-
-      {area.status === "done" && area.data.listings.length > 0 && (
-        <div className="wrap home-map-sort">
-          {sorted ? (
-            <>
-              <h2>{area.data.sort?.name}</h2>
+              )}
               <p className="listing-note">
-                Exploratory model output, deepest 5 % of each block&apos;s open ground at the peak.{" "}
-                {area.data.sort?.leftOut
-                  ? `${area.data.sort.leftOut} of ${area.data.listings.length} listings left out: their blocks have no modelled reading yet.`
-                  : "No listing was left out."}
+                Listings from RentCast, shown as it gives them. A dot sits where the listing puts it; what we show for each is
+                about its block, not the house.
               </p>
-              <ol>
-                {sorted.map((o) => (
-                  <li key={o.key}>
-                    <button type="button" className="listing-sort-row" onClick={() => o.listing && setPicked(o.listing)}>
-                      <span>{o.listing?.UnparsedAddress}</span>
-                      <span>
-                        {o.depth_cm} cm{o.spread_cm ? ` (${o.spread_cm[0]} to ${o.spread_cm[1]})` : ""}
-                      </span>
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            </>
-          ) : (
-            <p className="listing-note">
-              Subscribers can sort these by the {floodSortName(DEFAULT_STORM).toLowerCase()}, with each value&apos;s
-              spread, where our models have run. Not on sale yet.
-            </p>
+            </div>
           )}
-        </div>
+        </section>
       )}
-    </section>
+
+      {pin && !picked && (
+        <SpotCard
+          slug={pin.slug}
+          matched={pin.matched}
+          spot={pin.spot}
+          onClose={() => {
+            setPin(null);
+            searchPin.current?.remove();
+          }}
+        />
+      )}
+      {picked && <ListingPanel key={picked.listing_key} listing={picked} onClose={() => setPicked(null)} />}
+    </main>
   );
 }

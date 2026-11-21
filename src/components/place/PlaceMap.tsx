@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { Map as MlMap, Marker, GeoJSONSource, StyleSpecification } from "maplibre-gl";
 import type { LatLon } from "@/lib/place/coords";
 import { recallPoint, type PlacePoint } from "./place-point";
+import { FAULT_SEARCH_KM, SLIDE_RADIUS_KM, perYear } from "@/lib/place/readings";
 
 /**
  * The neighbourhood map: the place at the centre, public layers on top, and
@@ -33,7 +34,7 @@ function wms(layer: string): string {
   );
 }
 
-type RasterId = "fema" | "slr1" | "slr3" | "slr6" | "canopy" | "paving";
+type RasterId = "fema" | "slr1" | "slr3" | "slr6" | "canopy" | "paving" | "landslide" | "faults";
 
 interface RasterDef {
   id: RasterId;
@@ -81,6 +82,29 @@ export const RASTERS: RasterDef[] = [
     opacity: 0.6,
     attribution: "Flood zones, FEMA National Flood Hazard Layer",
   },
+  {
+    // USGS landslide susceptibility, Mirus et al. 2024, 90 m; cached tiles to
+    // level 12, drawn larger past that. Found through USGS's own viewer
+    // (docs/design/map-first-brief.md s.6). CC0.
+    id: "landslide",
+    tiles: "https://tiles.arcgis.com/tiles/v01gqwM5QqNysAAi/arcgis/rest/services/US_Landslide_Susceptibility/MapServer/tile/{z}/{y}/{x}",
+    tileSize: 256,
+    maxzoom: 12,
+    opacity: 0.55,
+    attribution: "Landslide susceptibility, USGS (Mirus et al. 2024)",
+  },
+  {
+    // USGS Quaternary Fault and Fold Database, 2020 release: the national
+    // layer (21) and fault areas (22).
+    id: "faults",
+    tiles:
+      "https://earthquake.usgs.gov/arcgis/rest/services/haz/Qfaults/MapServer/export?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857" +
+      "&size=512,512&layers=show:21,22&format=png32&transparent=true&f=image",
+    tileSize: 512,
+    minzoom: 6,
+    opacity: 0.9,
+    attribution: "Quaternary faults, USGS",
+  },
 ];
 
 const USGS = "https://basemap.nationalmap.gov/arcgis/rest/services";
@@ -119,8 +143,8 @@ const RING_METRES = 500;
 
 // Ink and paper, as in src/styles/tokens.css. A map paint property cannot read
 // a CSS variable, so the two values are repeated here.
-const INK = "#1a1416";
-const PAPER = "#f7f4ee";
+const INK = "#141414";
+const PAPER = "#f5f5f4";
 
 function ring(centre: LatLon, metres: number): GeoJSON.Feature<GeoJSON.LineString> {
   const pts: [number, number][] = [];
@@ -155,6 +179,11 @@ export interface Spot {
   elevation: Item<{ feet: number; metres: number; resolutionM: number | null; surveyYear: number | null }>;
   canopy: Item<number | null>;
   paving: Item<number | null>;
+  /** Added with the map-first home (docs/design/map-first-brief.md s.6). */
+  fault?: Item<{ name: string; age: string; km: number; url: string | null } | null>;
+  slides?: Item<number>;
+  soil?: Item<{ name: string; drainage: string | null; hydroGroup: string | null; flooding: string | null; hydricPct: number | null } | null>;
+  wind?: Item<{ tract: string; tornado: number | null; strongWind: number | null; hurricane: number | null; version: string | null } | null>;
 }
 type SpotState =
   | { status: "idle" }
@@ -224,6 +253,58 @@ export function SpotList({ spot }: { spot: Spot }) {
             ? "Not mapped here"
             : `${spot.paving.value}% of the land cover cell`}
       </SpotRow>
+      {spot.fault && (
+        <SpotRow label="Nearest mapped fault" source="USGS Quaternary Fault and Fold Database, 2020">
+          {"error" in spot.fault
+            ? missing(spot.fault.error)
+            : spot.fault.value === null
+              ? `None mapped within ${FAULT_SEARCH_KM} km`
+              : `${spot.fault.value.name}, ${spot.fault.value.km < 1 ? "under 1" : spot.fault.value.km.toFixed(1)} km away${spot.fault.value.age ? ` · last moved: ${spot.fault.value.age}` : ""}`}
+        </SpotRow>
+      )}
+      {spot.slides && (
+        <SpotRow label="Landslides mapped nearby" source="USGS U.S. Landslide Inventory, version 3">
+          {"error" in spot.slides
+            ? missing(spot.slides.error)
+            : spot.slides.value === 0
+              ? `None within ${SLIDE_RADIUS_KM} km`
+              : `${spot.slides.value} within ${SLIDE_RADIUS_KM} km`}
+        </SpotRow>
+      )}
+      {spot.soil && (
+        <SpotRow label="Soil" source="USDA NRCS soil survey (SSURGO)">
+          {"error" in spot.soil
+            ? missing(spot.soil.error)
+            : spot.soil.value === null
+              ? "Not surveyed here"
+              : [
+                  spot.soil.value.name,
+                  spot.soil.value.drainage && spot.soil.value.drainage.toLowerCase(),
+                  spot.soil.value.hydroGroup && `water soaks in: group ${spot.soil.value.hydroGroup} (A fast, D slow)`,
+                  spot.soil.value.flooding && spot.soil.value.flooding !== "None" && `floods: ${spot.soil.value.flooding.toLowerCase()}`,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+        </SpotRow>
+      )}
+      {spot.wind && (
+        <SpotRow
+          label="Wind events, this census tract"
+          source={`FEMA National Risk Index${"error" in spot.wind || !spot.wind.value?.version ? "" : `, ${spot.wind.value.version}`}; counts for the whole tract`}
+        >
+          {"error" in spot.wind
+            ? missing(spot.wind.error)
+            : spot.wind.value === null
+              ? "No tract found"
+              : [
+                  ["Tornado", spot.wind.value.tornado],
+                  ["Strong wind", spot.wind.value.strongWind],
+                  ["Hurricane", spot.wind.value.hurricane],
+                ]
+                  .map(([name, f]) => `${name}: ${perYear(f as number | null) ?? "not rated"}`)
+                  .join(" · ")}
+        </SpotRow>
+      )}
     </dl>
   );
 }
@@ -238,7 +319,7 @@ function SpotPanel({ state, onCentre }: { state: SpotState; onCentre: () => void
           canopy and the paving at that spot.
         </p>
       )}
-      {state.status === "loading" && <p className="spot-hint">Asking FEMA, USGS and the land cover survey…</p>}
+      {state.status === "loading" && <p className="spot-hint">Asking FEMA, USGS, the soil survey and the land cover survey…</p>}
       {state.status === "failed" && <p className="spot-hint">{state.reason}</p>}
       {state.status === "done" && (
         <SpotList spot={state.spot} />
@@ -253,7 +334,18 @@ function SpotPanel({ state, onCentre }: { state: SpotState; onCentre: () => void
   );
 }
 
-export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon; tracks: TrackLine[] }) {
+export function PlaceMap({
+  slug,
+  place,
+  tracks,
+  aside,
+}: {
+  slug: string;
+  place: LatLon;
+  tracks: TrackLine[];
+  /** Shown at the top of the column beside the map: the place page's one line per hazard. */
+  aside?: ReactNode;
+}) {
   const boxRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MlMap | null>(null);
   const pinRef = useRef<Marker | null>(null);
@@ -269,6 +361,8 @@ export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon;
   const [canopy, setCanopy] = useState(false);
   const [paving, setPaving] = useState(false);
   const [showTracks, setShowTracks] = useState(false);
+  const [landslide, setLandslide] = useState(false);
+  const [faults, setFaults] = useState(false);
 
   /** Ask the server about one spot. Only the newest question's answer is shown. */
   const inspect = useCallback(async (p: LatLon) => {
@@ -427,7 +521,9 @@ export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon;
     show("slr3", slr === "slr3");
     show("slr6", slr === "slr6");
     show("tracks", showTracks);
-  }, [ready, fema, canopy, paving, slr, showTracks]);
+    show("landslide", landslide);
+    show("faults", faults);
+  }, [ready, fema, canopy, paving, slr, showTracks, landslide, faults]);
 
   // Storm tracks are a regional picture; the other layers are a neighbourhood one.
   useEffect(() => {
@@ -462,6 +558,7 @@ export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon;
       </div>
 
       <aside className="place-side">
+        {aside}
         <SpotPanel state={spot} onCentre={readCentre} />
 
         <section className="place-layers">
@@ -516,6 +613,20 @@ export function PlaceMap({ slug, place, tracks }: { slug: string; place: LatLon;
             <span>
               <strong>Paving and buildings</strong>
               <small>Share of ground that sheds water, national land cover survey, 2021. Lower 48 states.</small>
+            </span>
+          </label>
+          <label className="place-layer">
+            <input type="checkbox" checked={landslide} onChange={(e) => setLandslide(e.target.checked)} />
+            <span>
+              <strong>Landslide susceptibility</strong>
+              <small>USGS, 2024: how prone the slopes are, yellow (lower) to red (higher), at 90 m.</small>
+            </span>
+          </label>
+          <label className="place-layer">
+            <input type="checkbox" checked={faults} onChange={(e) => setFaults(e.target.checked)} />
+            <span>
+              <strong>Faults</strong>
+              <small>USGS: faults that have moved in the last 1.6 million years.</small>
             </span>
           </label>
 

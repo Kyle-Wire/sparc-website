@@ -32,7 +32,7 @@ Consider a neighborhood where lots of trees and low temperatures tend to co-occu
 
 But what if trees and low temperatures co-occur because wealthy neighborhoods have both — trees from deliberate planting, and lower temperatures because of lower-density housing and more green space? In that case, the model has learned a confounded relationship. If you add trees to a dense, poor neighborhood without changing the housing density, you might not see the same cooling effect the model predicts — because the cooling in the training data wasn't entirely caused by trees.
 
-This is why SPARC runs the causal validation stage before scenarios. The scenario predictions use causal effect estimates — the portion of the temperature-canopy relationship that's attributable to canopy itself, after removing the influence of shared causes — not raw correlations. The difference between these two quantities can be enormous.
+This is why SPARC runs the causal estimation stage before scenarios (a step in the method, not a validation against measurements). The scenario predictions use causal effect estimates — the portion of the temperature-canopy relationship that's attributable to canopy itself, after removing the influence of shared causes — not raw correlations. The difference between these two quantities can be enormous.
 
 ---
 

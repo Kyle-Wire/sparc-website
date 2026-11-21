@@ -89,7 +89,7 @@ export const ENGINES: Engine[] = [
     runsOn: "your-gpu",
     where: "On your own computer's graphics card, in Chrome or Edge. Nothing heavy runs on our side.",
     summary:
-      "Builds a model of the neighbourhood at one-metre detail from public data (the terrain survey, building outlines, streets, land cover, soils and the official rainfall statistics) and follows the water through it, street by street.",
+      "Builds a model of the neighbourhood at one-metre detail from public data (the terrain survey, building outlines, streets, land cover, soils and the official rainfall statistics) and follows the water through it, street by street. One metre is the detail of the map, not its accuracy: against measured flood levels in other places FloodSim was off by 0.6 to 0.85 m, so every result is labelled exploratory.",
     findings: [
       "Whether water reaches the outside of the house",
       "How deep it stands beside the house and in the street",
@@ -106,7 +106,7 @@ export const ENGINES: Engine[] = [
     ],
     whatIf: ["Rain garden", "French drain", "Paving taken up", "Rain barrels", "Permeable paving"],
     whatIfNote:
-      "Things one owner can do. The model runs again with the project in place and shows what it is likely to change, with its margins. It is not a design and not a promise.",
+      "Things one owner can do. The model runs again with the project in place and shows what changes in the model, with the spread across its test runs. It is not a measurement, a design or a promise.",
     never: [
       "Water above the first floor, unless the floor's height is known from a survey",
       "Anything about the basement",
@@ -123,12 +123,12 @@ export const ENGINES: Engine[] = [
     runsOn: "our-server",
     where: "On our server. You choose the run; it is queued and you are told when it is ready.",
     summary:
-      "Estimates street-level air temperature hour by hour, and how hot it feels outdoors in sun, in building shade and in tree shade. Surface temperature measured by satellite sits on the same shelf, as a measurement rather than a model.",
+      "Models street-level air temperature hour by hour, and PET, an outdoor comfort index, in sun, in building shade and in tree shade. The air temperature has been checked against street sensors in other cities, not yet in Philadelphia; PET has not been checked against any measurement. Surface temperature measured by satellite sits on the same shelf, as a measurement rather than a model.",
     findings: [
       "Surface temperature of the block against the neighbourhood, measured from above",
       "Street air temperature in the afternoon",
       "Street air temperature at night",
-      "Outdoor comfort in sun against shade",
+      "Outdoor comfort (PET) in sun against shade, modelled",
     ],
     choices: ["A recent hot spell", "A typical summer month", "Day and night shown apart"],
     whatIf: ["Trees planted", "Paving taken up", "Cool roof", "Cool pavement"],
@@ -151,9 +151,9 @@ export const ENGINES: Engine[] = [
     where:
       "On our workstation. The radar for the place is gathered and processed for you; you then read and explore the result.",
     summary:
-      "Measures how the ground has moved over years from satellite radar, which passes over the same ground every twelve days, through cloud and at night. Each reading describes the ground the house stands on, averaged over about a hundred metres around it, not the house itself.",
+      "Reads how the ground has moved over years from satellite radar, which passes over the same ground every twelve days, through cloud and at night. Each reading describes the ground the house stands on, averaged over about a hundred metres around it, not the house itself. Readings are along the satellite's line of sight, not straight up and down, and have not yet been checked against a GNSS station at any place we report on.",
     free: [
-      "Whether the ground the house stands on is sinking or rising, from NASA's OPERA ground-motion product, labelled screening",
+      "Whether the ground the house stands on moves toward or away from the satellite, against the ground around it, from NASA's OPERA ground-motion product, labelled exploratory",
       "The USGS map of ground prone to sinkholes",
     ],
     findings: [
@@ -189,8 +189,8 @@ export const ENGINES: Engine[] = [
       "Works out how wind moves between the buildings and over the roofs of the neighbourhood, and puts that together with the local wind record to show how it moves through the seasons.",
     findings: [
       "How wind moves through the neighbourhood, season by season",
-      "Where buildings funnel it and speed it up",
-      "Gusts at street level and at roof level",
+      "Where buildings may funnel it and speed it up, once the street model passes its wind-tunnel test (it does not yet)",
+      "Gusts at street level and at roof level, once checked against airport wind records",
       "Past storm tracks nearby, from the public record",
     ],
     choices: ["A season", "Street level or roof level", "A named past storm, later"],

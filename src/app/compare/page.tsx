@@ -154,7 +154,7 @@ const ROWS: Row[] = [
     ),
   },
   {
-    label: "FEMA risk rating, all hazards",
+    label: "FEMA National Risk Index rating, all hazards",
     area: "the census tract",
     cell: (r) => (!r.risk.ok ? DASH : <strong>{r.risk.data.overall.rating}</strong>),
   },
@@ -241,7 +241,7 @@ export default async function ComparePage({ searchParams }: Props) {
               </div>
               <p className="screening-note" style={{ marginTop: 24 }}>
                 <strong>A comparison of records, not a ranking.</strong> Nothing here says which place is safer.
-                Two blocks in the same census tract show the same claims and the same FEMA risk rating, and a
+                Two blocks in the same census tract show the same claims and the same FEMA National Risk Index rating, and a
                 county&apos;s declarations cover the whole county. Open each place for the full record, its
                 sources and its map. A screening tool; not for engineering decisions.
               </p>

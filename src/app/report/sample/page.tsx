@@ -39,14 +39,14 @@ const SECTIONS: { title: string; what: string; cards: string[]; plot?: string; c
   },
   {
     title: "Ground movement",
-    what: "Free: whether the ground the house stands on is sinking or rising, and the map of ground prone to sinkholes. Paid: whether it moves with its surroundings or on its own, whether the rate is steady or new, the seasonal swing, and ten years ahead. A held section says it is in review; a refused reading shows no number and says why. Added once it has evidence records and labels.",
+    what: "Free: whether the ground the house stands on moves toward or away from the satellite against the ground around it, labelled exploratory, and the map of ground prone to sinkholes. Paid: whether it moves with its surroundings or on its own, whether the rate is steady or new, the seasonal swing, and ten years ahead. A held section says it is in review; a refused reading shows no number and says why. Added once it has evidence records and labels.",
     cards: ["Ground at the house, free", "Sinkhole-prone ground, free", "With its surroundings or on its own", "Steady or new", "Seasonal swing", "Ten years ahead"],
     coming: true,
   },
   {
     title: "Wind",
     what: "How wind moves through the neighbourhood across the seasons, as a map. Added once it has a method, evidence records and labels.",
-    cards: ["By season", "Where buildings funnel it"],
+    cards: ["By season", "Where buildings may funnel it"],
     coming: true,
   },
   {

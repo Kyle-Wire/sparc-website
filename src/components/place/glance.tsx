@@ -33,7 +33,7 @@ export function glanceItems(g: Glance, zonePending = false): GlanceItem[] {
     { key: "claims", label: "Flood insurance claims", value: n(g.claims), sub: "in the census tract", anchor: "#flood" },
     { key: "declarations", label: "Disaster declarations", value: n(g.declarations), sub: "for the county", anchor: "#flood" },
     { key: "storms", label: "Storm tracks nearby", value: n(g.storms), sub: "within 100 km", anchor: "#flood" },
-    { key: "risk", label: "FEMA risk rating", value: g.risk ?? "—", sub: "all hazards, for the tract", anchor: "#hazards" },
+    { key: "risk", label: "FEMA National Risk Index rating", value: g.risk ?? "—", sub: "all hazards, for the tract", anchor: "#hazards" },
   ];
 }
 

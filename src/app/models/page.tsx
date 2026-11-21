@@ -96,7 +96,7 @@ export default function ModelsPage() {
             <p>
               The projects on offer are ones a home owner can do: a rain garden, a French drain, taking up
               paving, rain barrels, planting trees, a lighter roof. You pick one, the model runs again, and
-              you see what it is likely to change.
+              you see what it changes in the model.
             </p>
             <p>Every what-if result will say three things beside the number:</p>
             <ul>

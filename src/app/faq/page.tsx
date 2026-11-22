@@ -44,9 +44,10 @@ export default function FaqPage() {
       a: (
         <>
           <p>
-            Our own flood, heat and ground movement models, run for the streets around one house, written up as a
-            PDF. Findings come first. Each one says, in words, how much evidence stands behind it. The reasons, the
-            limits and every source are at the back.
+            Our own flood and heat models, run for the streets around one house, written up as a PDF. Findings come
+            first. Each one says, in words, how much evidence stands behind it. The reasons, the limits and every
+            source are at the back. Ground movement and wind are not in reports yet; each joins once it passes the
+            checks the report names.
           </p>
           <p>
             <Link href="/report/sample">See how a report is laid out</Link>.
@@ -60,7 +61,7 @@ export default function FaqPage() {
         <p>
           Your inspector checks the house: the roof, the wiring, the foundation they can see. We look at what happens
           around it: where water runs and stands in the streets in a heavy storm, how hot the block&apos;s air and
-          surfaces get, and whether the ground under the block moves differently from the ground around it. It does
+          surfaces get, and how that compares with the neighbourhood. It does
           not replace an inspection. It covers what an inspection does not.
         </p>
       ),

@@ -20,7 +20,7 @@
     "security:audit": "npm audit --omit=dev --audit-level=high",
     "email:dev": "email dev --dir src/emails --port 3001",
     "email:build": "tsx scripts/render-emails.ts",
-    "test": "tsx --test src/lib/*.test.ts src/lib/place/*.test.ts src/lib/listings/*.test.ts"
+    "test": "tsx --test src/lib/*.test.ts src/lib/place/*.test.ts src/lib/listings/*.test.ts src/lib/payments/*.test.ts"
   },
   "dependencies": {
     "@lemonsqueezy/lemonsqueezy.js": "^4.0.0",

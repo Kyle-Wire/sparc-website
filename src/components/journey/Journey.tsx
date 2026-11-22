@@ -58,7 +58,16 @@ function Step({ n, title, children, done }: { n: number; title: string; children
   );
 }
 
-export function Journey({ slug, initialHazards }: { slug: string | null; initialHazards: EngineId[] }) {
+export function Journey({
+  slug,
+  initialHazards,
+  reportOnSale = false,
+}: {
+  slug: string | null;
+  initialHazards: EngineId[];
+  /** True when checkout is switched on: a report is then bought on /report/buy, not requested. */
+  reportOnSale?: boolean;
+}) {
   const [mode, setMode] = React.useState<Mode | null>(null);
   const [picked, setPicked] = React.useState<Set<EngineId>>(
     () => new Set(initialHazards.length ? initialHazards : (["flood", "heat"] as EngineId[])),
@@ -243,6 +252,17 @@ export function Journey({ slug, initialHazards }: { slug: string | null; initial
         )}
       </Step>
 
+      {reportOnSale && mode === "report" ? (
+        <Step n={++n} title="Order it">
+          <p>
+            The house report can be ordered now. You pay once, and it lands in your account.{" "}
+            <Link href="/report/sample">See how a report is laid out</Link> first if you like.
+          </p>
+          <Link className="btn btn-accent" href={slug ? `/report/buy?place=${slug}` : "/report/buy"}>
+            Order the house report <span className="arrow">→</span>
+          </Link>
+        </Step>
+      ) : (
       <Step n={++n} title="Send the request">
         <p className="screening-note">
           <strong>Nothing is on sale yet, and nothing is charged here.</strong> For now each report is run by hand.
@@ -286,6 +306,7 @@ export function Journey({ slug, initialHazards }: { slug: string | null; initial
           </form>
         )}
       </Step>
+      )}
     </div>
   );
 }

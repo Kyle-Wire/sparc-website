@@ -4,6 +4,7 @@ import { PageHero } from "@/components/marketing/page-shell";
 import { Journey } from "@/components/journey/Journey";
 import { parsePlaceSlug, placeSlug } from "@/lib/place/coords";
 import { ENGINES, type EngineId } from "@/lib/engines";
+import { checkoutEnabled } from "@/lib/payments";
 
 export const metadata: Metadata = {
   title: "Get a report or run it yourself",
@@ -24,13 +25,13 @@ export default async function StartPage({ searchParams }: Props) {
     <>
       <Nav active="models" />
       <PageHero
-        kicker="the models · paid · not on sale yet"
+        kicker={checkoutEnabled() ? "the models · paid" : "the models · paid · not on sale yet"}
         title="Get a report, or run the models yourself."
         lead="Flood, heat, ground movement and wind, for the neighbourhood around one home. Pick what you want and we will tell you what can be done at your place. Nothing is charged on this page."
         accent="var(--flood)"
       />
       <div className="wrap-narrow" style={{ padding: "40px var(--wrap-pad) 72px" }}>
-        <Journey slug={slug} initialHazards={hazards} />
+        <Journey slug={slug} initialHazards={hazards} reportOnSale={checkoutEnabled()} />
       </div>
       <Footer />
     </>

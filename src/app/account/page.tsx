@@ -1,5 +1,7 @@
+import type { Route } from "next";
 import Link from "next/link";
-import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { checkoutEnabled } from "@/lib/payments";
 
 export const dynamic = "force-dynamic";
 
@@ -8,51 +10,44 @@ export default async function AccountOverview() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  let sub: { tier: string | null; status: string | null; renews_at: string | null } | null = null;
+  let counts = { open: 0, ready: 0 };
   try {
-    const admin = createSupabaseAdminClient();
-    const { data } = await admin
-      .from("subscriptions")
-      .select("tier,status,renews_at")
-      .eq("user_id", user.id)
-      .order("updated_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    sub = data;
-  } catch { /* table may not exist yet in dev */ }
+    const { data } = await supabase.from("report_orders").select("status").limit(200);
+    for (const o of data ?? []) {
+      if (o.status === "delivered") counts.ready++;
+      else if (o.status === "paid" || o.status === "in_progress") counts.open++;
+    }
+  } catch {
+    counts = { open: 0, ready: 0 };
+  }
+  const onSale = checkoutEnabled();
 
   return (
     <div style={{ display: "grid", gap: 18 }}>
       <div className="card" style={{ padding: 24 }}>
-        <div className="kicker">welcome back</div>
+        <div className="kicker">welcome</div>
         <h2 style={{ fontSize: 24, fontWeight: 800, letterSpacing: "-0.02em", margin: "8px 0 0" }}>
-          {user.user_metadata?.full_name ?? user.email}
+          {user.user_metadata?.full_name || user.email}
         </h2>
-        <p style={{ color: "var(--ink-2)", margin: "8px 0 0", fontSize: 14 }}>
-          Manage your subscription, license keys, and the desktop client from this dashboard.
+        <p style={{ color: "var(--ink-2)", margin: "8px 0 0", fontSize: 14, lineHeight: 1.6 }}>
+          Your house reports live here. The public record for any place stays free, with or without an account.
         </p>
       </div>
 
       <div className="grid-2" style={{ gap: 14 }}>
-        <Link href="/account/subscription" className="card" style={{ padding: 22, textDecoration: "none", color: "inherit" }}>
-          <div className="kicker">subscription</div>
-          <div style={{ fontSize: 22, fontWeight: 700, marginTop: 6, textTransform: "capitalize" }}>{sub?.tier ?? "Wander (free)"}</div>
-          <div className="mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>{sub?.status ?? "no active paid plan"}</div>
+        <Link href="/account/reports" className="card" style={{ padding: 22, textDecoration: "none", color: "inherit" }}>
+          <div className="kicker">your reports</div>
+          <div style={{ fontSize: 22, fontWeight: 700, marginTop: 6 }}>
+            {counts.ready ? `${counts.ready} ready` : counts.open ? `${counts.open} on the way` : "None yet"}
+          </div>
+          <div className="mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>
+            {counts.ready && counts.open ? `${counts.open} more on the way` : "orders, progress and downloads"}
+          </div>
         </Link>
-        <Link href="/account/downloads" className="card" style={{ padding: 22, textDecoration: "none", color: "inherit" }}>
-          <div className="kicker">desktop client</div>
-          <div style={{ fontSize: 22, fontWeight: 700, marginTop: 6 }}>Download SPARC</div>
-          <div className="mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>macOS · Windows · Linux</div>
-        </Link>
-        <Link href="/account/api-keys" className="card" style={{ padding: 22, textDecoration: "none", color: "inherit" }}>
-          <div className="kicker">byok api keys</div>
-          <div style={{ fontSize: 22, fontWeight: 700, marginTop: 6 }}>Manage</div>
-          <div className="mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>Anthropic · OpenAI · Mistral</div>
-        </Link>
-        <Link href="/account/usage" className="card" style={{ padding: 22, textDecoration: "none", color: "inherit" }}>
-          <div className="kicker">usage</div>
-          <div style={{ fontSize: 22, fontWeight: 700, marginTop: 6 }}>This month</div>
-          <div className="mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>runs · scenarios · tokens</div>
+        <Link href={(onSale ? "/report/buy" : "/start") as Route} className="card" style={{ padding: 22, textDecoration: "none", color: "inherit" }}>
+          <div className="kicker">{onSale ? "a new report" : "ask for a report"}</div>
+          <div style={{ fontSize: 22, fontWeight: 700, marginTop: 6 }}>{onSale ? "Order one" : "Ask us"}</div>
+          <div className="mono" style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>flood and heat, for one house</div>
         </Link>
       </div>
     </div>

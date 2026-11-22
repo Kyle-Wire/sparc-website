@@ -1,10 +1,13 @@
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 import { COMPANY, COMPANY_LEGAL, EMAIL_PRIMARY, OFFICE_FULL, COPYRIGHT_YEAR } from "@/lib/brand";
+import { REPORT, checkoutEnabled, formatPrice } from "@/lib/payments";
 
 export const metadata = { title: "Terms of Service" };
+export const dynamic = "force-dynamic";
 
 export default function TermsPage() {
+  const onSale = checkoutEnabled();
   return (
     <>
       <Nav />
@@ -19,9 +22,28 @@ export default function TermsPage() {
               self-serve purchase flow that is now switched off. Billing terms get
               republished here only alongside prices we can stand behind — and before
               any charge is taken, not after. */}
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Subscriptions and billing</h2>
-          <p>{COMPANY_LEGAL} is not currently selling subscriptions. Self-serve checkout is switched off and no tier prices are published. Any paid licence at this stage is agreed directly with us in writing, and the billing, cancellation and refund terms that apply are the ones set out in that agreement.</p>
-          <p>If self-serve purchasing is reintroduced, the terms governing it — including cancellation and refunds — will be published on this page before any charge is taken. Questions in the meantime: <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a>.</p>
+          {onSale ? (
+            <>
+              {/* DRAFT for Kyle's sign-off (22 November 2026), shown only when
+                  CHECKOUT_ENABLED is on. Not yet read by a lawyer. Every figure
+                  is read from src/lib/payments/catalog.ts. */}
+              <h2 id="reports" style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>The house report: billing and refunds</h2>
+              <p><strong>Price.</strong> {REPORT.name} costs {formatPrice(REPORT.priceCents)} for one property, charged once when you order. There is no subscription and nothing renews. Payment is taken by our payment provider, which acts as the merchant of record and adds any sales tax that applies at checkout.</p>
+              <p><strong>What you get.</strong> A screening report for the property you name: {REPORT.includes.map((x) => x.charAt(0).toLowerCase() + x.slice(1)).join("; ")}. Before we start, we check what our models can cover at that place. If a section cannot be made there, we tell you and the report says so.</p>
+              <p><strong>When.</strong> The report is placed in your account within {REPORT.deliveryDays} working days of payment. If it is not, you may ask for a full refund, and we will give it.</p>
+              <p><strong>Refunds.</strong> You get a full refund if you ask before we start work on your report, if we cannot make the report for your property, or if it is late as above. Once a report is delivered, it is not refundable unless it is materially wrong about what it says it describes; tell us at <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a> and we will look at it with you.</p>
+              <p><strong>Your address.</strong> To make a report we keep the property address you give us, with your order. Only you and the person making your report can see it. See the <a href="/privacy">privacy page</a>.</p>
+              <p><strong>Use of the report.</strong> The report is for you and the people you share it with in deciding about the property. It is a screening report and carries the limits in the warranty section below.</p>
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Subscriptions</h2>
+              <p>{COMPANY_LEGAL} is not selling subscriptions. Any other paid licence is agreed directly with us in writing, on the terms set out in that agreement.</p>
+            </>
+          ) : (
+            <>
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Subscriptions and billing</h2>
+              <p>{COMPANY_LEGAL} is not currently selling subscriptions. Self-serve checkout is switched off and no tier prices are published. Any paid licence at this stage is agreed directly with us in writing, and the billing, cancellation and refund terms that apply are the ones set out in that agreement.</p>
+              <p>If self-serve purchasing is reintroduced, the terms governing it — including cancellation and refunds — will be published on this page before any charge is taken. Questions in the meantime: <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a>.</p>
+            </>
+          )}
 
           <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Acceptable use</h2>
           <p>Don&apos;t use SPARC to harm people. Don&apos;t use it to misrepresent uncertainty in ways a court would call fraud. Don&apos;t scrape our marketing site.</p>

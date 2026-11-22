@@ -1,10 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
-import { verifyWebhookSignature, type LemonSqueezyEvent } from "@/lib/lemonsqueezy";
+import { type LemonSqueezyEvent } from "@/lib/lemonsqueezy";
+import { lemonSqueezy, type LemonSqueezyEnv } from "@/lib/payments/lemonsqueezy";
+import { decide, type WebhookEnv } from "@/lib/payments/webhook";
+import { notifyReportEvent } from "@/lib/payments/notify";
+import type { PaymentEvent } from "@/lib/payments/provider";
 import { sendEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
+// One endpoint for every Lemon Squeezy event (the URL already configured in
+// the store: https://sparclabs.co/api/lemonsqueezy/webhook).
+//
+//   * House report orders carry our report_orders id in custom_data.order_id.
+//     They go through src/lib/payments/webhook.ts and the SQL state machine
+//     (apply_payment_event, migration 0007), which applies a payment once.
+//   * Anything else is the older subscription handling below, unchanged
+//     except that a failed write no longer leaves its delivery marked as seen
+//     (it used to, so the provider's retry was dropped as a duplicate).
 interface LSWebhook {
   meta: {
     event_name: LemonSqueezyEvent;
@@ -30,42 +43,76 @@ interface LSWebhook {
 
 export async function POST(req: NextRequest) {
   const raw = await req.text();
-  const sig = req.headers.get("x-signature");
-  if (!verifyWebhookSignature(raw, sig)) {
+  const ls = lemonSqueezy(process.env as LemonSqueezyEnv);
+  const event = ls.verifyAndParse(raw, req.headers);
+  if (!event) {
     return NextResponse.json({ error: "invalid signature" }, { status: 401 });
   }
 
+  if (event.orderId) return reportOrder(event, ls);
+
   let payload: LSWebhook;
   try { payload = JSON.parse(raw); } catch { return NextResponse.json({ error: "bad json" }, { status: 400 }); }
+  return legacy(payload);
+}
 
+async function reportOrder(event: PaymentEvent, ls: ReturnType<typeof lemonSqueezy>) {
+  const admin = createSupabaseAdminClient();
+  const d = await decide(event, ls, async ({ provider, event: e }) => {
+    const { data, error } = await admin.rpc("apply_payment_event", {
+      p_provider: provider,
+      p_event_key: e.eventKey,
+      p_event_name: e.eventName,
+      p_kind: e.kind,
+      p_order_id: e.orderId,
+      p_user_id: e.userId,
+      p_provider_order_id: e.providerOrderId,
+      p_provider_order_number: e.providerOrderNumber,
+      p_amount_cents: e.amountCents,
+      p_currency: e.currency,
+      p_test_mode: e.testMode,
+      p_receipt_url: e.receiptUrl,
+    });
+    if (error) throw error;
+    return String(data);
+  }, process.env as WebhookEnv);
+
+  console.info(`[payments] ${event.eventKey} order=${event.orderId} -> ${d.outcome}`);
+  if (d.notify && event.orderId) {
+    // Never fail the webhook on an email: the order has already moved.
+    await notifyReportEvent(admin, event.orderId, d.notify).catch((e) => console.warn("[payments] notify failed:", e));
+  }
+  return NextResponse.json({ ok: d.status === 200, outcome: d.outcome }, { status: d.status });
+}
+
+async function legacy(payload: LSWebhook) {
   const event = payload.meta.event_name;
   const userId = payload.meta.custom_data?.user_id;
   const tier = payload.meta.custom_data?.tier;
   const attr = payload.data.attributes;
 
   if (!userId) {
-    // Order without user_id (e.g. one-off) — log but ack so LS doesn't retry forever.
     console.warn("[lemonsqueezy] event without user_id:", event);
     return NextResponse.json({ ok: true });
   }
 
   const admin = createSupabaseAdminClient();
 
-  // Idempotency: short-circuit replays. Table created in migration 0004.
-  // Use the LS event id header (set per delivery) as the dedup key.
-  const eventId = req.headers.get("x-event-id") ?? `${event}:${payload.data.id}`;
+  // Idempotency: Lemon Squeezy sends no event id, so the key is event name and object id.
+  const eventId = `${event}:${payload.data.id}`;
+  let marked = false;
   try {
     const { error: dupErr } = await admin
       .from("lemonsqueezy_events")
       .insert({ event_id: eventId, event_name: event });
     if (dupErr) {
-      // 23505 = unique_violation → we've seen this delivery before.
       const code = (dupErr as { code?: string }).code;
       if (code === "23505") {
         return NextResponse.json({ ok: true, deduped: true });
       }
-      // Table may not exist yet (migration not applied) — log and continue.
       console.warn("[lemonsqueezy] dedup insert failed (continuing):", dupErr);
+    } else {
+      marked = true;
     }
   } catch (err) {
     console.warn("[lemonsqueezy] dedup check error (continuing):", err);
@@ -74,7 +121,7 @@ export async function POST(req: NextRequest) {
   try {
     if (event.startsWith("subscription_")) {
       const status = attr.status ?? (event === "subscription_cancelled" ? "cancelled" : event === "subscription_expired" ? "expired" : "active");
-      await admin.from("subscriptions").upsert({
+      const { error: subErr } = await admin.from("subscriptions").upsert({
         user_id: userId,
         tier: tier ?? null,
         ls_subscription_id: payload.data.id,
@@ -89,6 +136,7 @@ export async function POST(req: NextRequest) {
         raw: attr,
         updated_at: new Date().toISOString(),
       }, { onConflict: "ls_subscription_id" });
+      if (subErr) throw subErr;
 
       // Transactional emails — fire-and-forget so a Resend hiccup never fails the webhook.
       void notifySubscription(admin, event, userId, tier ?? null, attr).catch((e) =>
@@ -109,6 +157,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("[lemonsqueezy] persist failed:", event, err);
+    // Un-mark the delivery so the provider's retry is processed, not dropped.
+    if (marked) await admin.from("lemonsqueezy_events").delete().eq("event_id", eventId);
     return NextResponse.json({ error: "persist failed" }, { status: 500 });
   }
 }

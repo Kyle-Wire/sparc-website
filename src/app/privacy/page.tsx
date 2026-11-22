@@ -2,8 +2,10 @@ import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 import { COMPANY, COMPANY_LEGAL, EMAIL_PRIMARY, OFFICE_FULL, COPYRIGHT_YEAR } from "@/lib/brand";
+import { checkoutEnabled } from "@/lib/payments";
 
 export const metadata = { title: "Privacy" };
+export const dynamic = "force-dynamic";
 
 // Rewritten 2026-11-18 for the site as it now runs.
 //
@@ -36,6 +38,7 @@ export const metadata = { title: "Privacy" };
 const h2 = { fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: "10px 0 0" } as const;
 
 export default function PrivacyPage() {
+  const onSale = checkoutEnabled();
   return (
     <>
       <Nav />
@@ -96,6 +99,28 @@ export default function PrivacyPage() {
             agreed in writing for that piece of work.
           </p>
 
+          {onSale && (
+            <>
+              <h2 id="reports" style={h2}>Ordering a house report</h2>
+              <p>
+                A report is about one house, so this is the one place the site keeps a street address. When you order,
+                we store the address you give, your note, your account and the order&apos;s progress in our database.
+                Only you (signed in) and the person making your report can read it. It is not put in any link.
+              </p>
+              <p>
+                Payment is taken by our payment provider, Lemon Squeezy, which receives your email and the payment
+                details you enter on its checkout page. We never see your card. It tells us the order is paid, the
+                amount and a receipt link. The finished report is stored privately and is downloaded through your
+                account with a link that lasts a few minutes.
+              </p>
+              <p>
+                We keep your order and report while you have an account, so you can download it again. Ask us at{" "}
+                <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a> to delete them sooner; payment records the law
+                requires us to keep are kept for as long as it requires.
+              </p>
+            </>
+          )}
+
           <h2 style={h2}>Counting visits</h2>
           <p>
             The site uses Vercel Web Analytics to count page views and Vercel Speed Insights to measure how
@@ -115,10 +140,17 @@ export default function PrivacyPage() {
           </p>
 
           <h2 style={h2}>Accounts</h2>
-          <p>
-            Nothing on the site needs an account today. If you have one from before, we hold the email you
-            signed up with and anything else you entered then, such as a name and organization.
-          </p>
+          {onSale ? (
+            <p>
+              An account is needed only to order a house report, so the report has somewhere to live. We hold the email
+              you sign up with, a password managed by Supabase (we never see it), a name if you give one, and your orders.
+            </p>
+          ) : (
+            <p>
+              Nothing on the site needs an account today. If you have one from before, we hold the email you
+              signed up with and anything else you entered then, such as a name and organization.
+            </p>
+          )}
 
           <h2 style={h2}>Your rights</h2>
           <p>
@@ -130,7 +162,8 @@ export default function PrivacyPage() {
           <ul>
             <li>Vercel: hosts the website, and receives your internet address with each page you load, as any host does. Also the visit counting above.</li>
             <li>Supabase: the database for contact messages and accounts.</li>
-            <li>Resend: sends the email that tells us a contact message has arrived.</li>
+            <li>Resend: sends the email that tells us a contact message has arrived{onSale ? ", and the emails about a report order" : ""}.</li>
+            {onSale && <li>Lemon Squeezy: takes payment for a report as the merchant of record, and receives your email and payment details on its checkout page.</li>}
             <li>US Census Bureau: receives an address you search for, from our server.</li>
             <li>komoot (Photon, OpenStreetMap search): receives an address you search for, from our server, only when the Census Bureau does not find it.</li>
             <li>FEMA, US Geological Survey, NOAA, the USDA soil survey (NRCS) and the national land cover server (MRLC): the sources of the records and map layers, as described above. A spot you click is sent to them, rounded to about a metre, and not stored.</li>

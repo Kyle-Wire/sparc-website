@@ -4,7 +4,8 @@
 // pages live here, so the copy can be rewritten without touching layout.
 // Owner: the writer (project thread "Write website copy with honest voice").
 // First draft by the branding thread, 22 Nov 2026, to the brief in
-// docs/design/brand-and-conversion.md.
+// docs/design/brand-and-conversion.md. Writer pass the same day, to
+// docs/copy/VOICE.md (PR 37): limit first, then the flex.
 //
 // Rules every line here keeps (climate-home-inspection
 // docs/validation/VALIDATION-STATUS.md s.3.1, and docs/design/map-first-brief.md s.7):
@@ -29,8 +30,8 @@ export const REMEMBERS = {
   kicker: "what your block remembers",
   title: "Every block has a past. Most people never get to read it.",
   lead:
-    "It's all public. It's just scattered across a dozen agency websites that weren't built for people buying a house. " +
-    "We put it on one page.",
+    "It's all public. It's just scattered across agency websites that were never built for someone buying a house. " +
+    "We put it on one page, lowkey the way it always should have been.",
   items: [
     { q: "Is it in a FEMA flood zone?", src: "FEMA · National Flood Hazard Layer", hazard: "flood" },
     { q: "Have people nearby made flood insurance claims?", src: "FEMA · OpenFEMA claims, by census tract", hazard: "flood" },
@@ -63,8 +64,8 @@ export const TWO_QUESTIONS = {
     tag: "paid · one house",
     question: "What do our models say about this house?",
     points: [
-      "Our flood, heat, ground movement and wind models, run for the neighbourhood with your house in the middle.",
-      "Findings first, with a label on each saying how much evidence stands behind it.",
+      "Our flood, heat and ground movement models, run for the neighbourhood with your house in the middle. Wind joins once it passes its checks.",
+      "Findings first, each labelled with how much evidence stands behind it. Today that label mostly says exploratory, and we print it at full size.",
       "What to check at the house, and the limits of every finding, one click away.",
     ],
     cta: "See a sample report",
@@ -77,7 +78,7 @@ export const STEPS = {
   items: [
     { n: "01", t: "Type an address", b: "Any address in the US. We find the block and forget the house number." },
     { n: "02", t: "Read the record", b: "Flood, heat, ground and wind, as the agencies publish them, each with where it came from." },
-    { n: "03", t: "Ask the models, if you want", b: "The house report runs our own models around one property. Look at the sample before you decide." },
+    { n: "03", t: "Ask the models, if you want", b: "The house report runs our own models around one property. Read the sample, and the receipts, before you decide." },
   ],
 };
 
@@ -93,7 +94,7 @@ export const NEVER = {
   kicker: "the fine print, in big print",
   title: "Things we will never tell you.",
   items: [
-    { t: "That a house is safe.", b: "No model can promise that. Anyone who does is selling something." },
+    { t: "That a house is safe.", b: "No model can promise that, ours included. We tell you what the model showed in the storms we ran." },
     { t: "A dollar figure for a disaster.", b: "No expected losses, no premiums, no payback. We show what happened and what the models show." },
     { t: "A risk score we made up.", b: "FEMA's ratings are shown as FEMA's. We don't invent a number and paint it red." },
     { t: "That a result is validated before it's measured.", b: "Every model result says how much evidence stands behind it." },
@@ -103,7 +104,7 @@ export const NEVER = {
 
 export const CLOSER = {
   title: "Go on. Look up the place you've been wondering about.",
-  lead: "Your street, the house you're about to offer on, the place you grew up. A first look takes a few seconds.",
+  lead: "Your street, the house you're about to offer on, the place you grew up. No account, no card, no catch.",
   cta: "Look up an address",
 };
 
@@ -111,9 +112,9 @@ export const CLOSER = {
  *  what the record cannot say, and that the report models it
  *  (docs/design/map-first-brief.md s.7 rule 3). */
 export const OPEN_QUESTION: Record<"flood" | "heat" | "ground" | "wind", string> = {
-  flood: "The flood map shows the zone. It can't say how deep water gets beside this house in a hard storm. The house report models that.",
-  heat: "Land cover shows trees and pavement. It can't say how hot the air gets on this street on a summer night. The house report models that.",
-  ground: "Fault and landslide maps show what's nearby. They can't say whether the ground under this house is moving. The house report reads that from satellite radar.",
+  flood: "The flood map shows the zone. It can't say where water goes around this house in a hard storm. The house report models that, labelled exploratory.",
+  heat: "Land cover shows trees and pavement. It can't say how warm the street air stays here on a summer night. The house report models that, labelled exploratory.",
+  ground: "Fault and landslide maps show what's nearby. They can't say whether the ground under this block moves differently from the ground around it. The house report reads that from satellite radar, labelled exploratory.",
   wind: "FEMA counts storms for the whole tract. It can't say how wind moves between these buildings. The house report will model that once our wind model passes its checks.",
 };
 

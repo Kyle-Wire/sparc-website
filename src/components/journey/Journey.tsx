@@ -255,7 +255,7 @@ export function Journey({
       {reportOnSale && mode === "report" ? (
         <Step n={++n} title="Order it">
           <p>
-            The house report can be ordered now. You pay once, and it lands in your account.{" "}
+            The house report can be ordered now. You pay once, when it is ready, and it lands in your account.{" "}
             <Link href="/report/sample">See how a report is laid out</Link> first if you like.
           </p>
           <Link className="btn btn-accent" href={slug ? `/report/buy?place=${slug}` : "/report/buy"}>

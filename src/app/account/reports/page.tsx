@@ -17,38 +17,62 @@ interface Order {
   receipt_url: string | null;
   test_mode: boolean | null;
   status_note: string | null;
+  charge_error: string | null;
   created_at: string;
   paid_at: string | null;
   delivered_at: string | null;
 }
 
-const STEPS = ["Ordered", "Paid", "Being modelled", "Ready"] as const;
+// The card is charged when the report is ready (Kyle, 22 November 2026), so
+// "Paid" comes last, together with "Ready".
+const STEPS = ["Ordered", "Being modelled", "Paid and ready"] as const;
 const REACHED: Record<string, number> = {
-  awaiting_payment: 0,
-  abandoned: 0,
-  paid: 1,
-  in_progress: 2,
-  delivered: 3,
-  cannot_model: 2,
-  refunded: 1,
+  awaiting_card: -1,
+  abandoned: -1,
+  card_saved: 0,
+  in_progress: 1,
+  charging: 1,
+  payment_failed: 1,
+  cannot_model: 0,
+  cancelled: 0,
+  delivered: 2,
+  refunded: 2,
+};
+const LABEL: Record<string, string> = {
+  awaiting_card: "not ordered",
+  card_saved: "ordered",
+  in_progress: "being modelled",
+  charging: "finishing",
+  payment_failed: "ready to pay",
+  delivered: "ready",
+  cannot_model: "could not model",
+  cancelled: "cancelled",
+  refunded: "refunded",
 };
 
-function words(o: Order, justPaid: boolean): string {
+function words(o: Order, justOrdered: boolean, justPaid: boolean): string {
+  const price = formatPrice(o.price_cents, o.currency);
   switch (o.status) {
-    case "awaiting_payment":
+    case "awaiting_card":
+      return justOrdered
+        ? "Your card is being confirmed. This usually takes a few seconds: refresh the page."
+        : "Not ordered: the card was not saved. Nothing was charged. You can order again any time.";
+    case "card_saved":
+      return `Ordered. Nothing has been charged. A person checks what can be modelled at this place next. When the report is ready, within ${REPORT.deliveryDays} working days, we charge your card ${price} plus any sales tax and the report opens here. If we cannot make it, we charge nothing.`;
+    case "in_progress":
+      return `We are running the models for this place. Nothing has been charged yet.`;
+    case "charging":
+      return "Your report is finished and your card is being charged. This takes a few seconds: refresh the page.";
+    case "payment_failed":
       return justPaid
         ? "Your payment is being confirmed. This usually takes a few seconds: refresh the page."
-        : "Not paid. Nothing was charged. You can order again any time.";
-    case "abandoned":
-      return "The checkout did not open, so nothing was charged.";
-    case "paid":
-      return `Paid. A person checks what can be modelled at this place next. Your report arrives within ${REPORT.deliveryDays} working days of payment, or your money back.`;
-    case "in_progress":
-      return "We are running the models for this place.";
+        : `Your report is finished, but the card you saved did not go through${o.charge_error ? ` (your bank said: “${o.charge_error}”)` : ""}. Pay ${price} plus any sales tax below, with this card or another, and the report opens straight away.`;
     case "delivered":
       return "Your report is ready.";
     case "cannot_model":
-      return "We could not make this report, so your payment is being refunded in full.";
+      return "We could not make this report, so nothing was charged, and the saved card has been removed.";
+    case "cancelled":
+      return "Cancelled. Nothing was charged, and the saved card has been removed.";
     case "refunded":
       return "Refunded in full.";
     default:
@@ -59,8 +83,12 @@ function words(o: Order, justPaid: boolean): string {
 const date = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : "";
 
-export default async function ReportsPage({ searchParams }: { searchParams: Promise<{ paid?: string }> }) {
-  const { paid } = await searchParams;
+export default async function ReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ordered?: string; paying?: string; error?: string }>;
+}) {
+  const { ordered, paying, error: payError } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
@@ -70,12 +98,12 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   try {
     const { data, error } = await supabase
       .from("report_orders")
-      .select("id,status,address,place_slug,price_cents,amount_paid_cents,currency,receipt_url,test_mode,status_note,created_at,paid_at,delivered_at")
+      .select("id,status,address,place_slug,price_cents,amount_paid_cents,currency,receipt_url,test_mode,status_note,charge_error,created_at,paid_at,delivered_at")
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) throw error;
-    // An order whose checkout was never finished is shown only right after checkout, never as clutter.
-    orders = (data ?? []).filter((o: Order) => o.status !== "abandoned" && (o.status !== "awaiting_payment" || o.id === paid));
+    // An order whose card was never saved is shown only right after checkout, never as clutter.
+    orders = (data ?? []).filter((o: Order) => o.status !== "abandoned" && (o.status !== "awaiting_card" || o.id === ordered));
   } catch {
     failed = true;
   }
@@ -94,6 +122,11 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
             <Link href="/report/sample">see how a report is laid out</Link>.
           </p>
         )}
+        {payError === "pay" && (
+          <p className="journey-error" role="alert">
+            The payment page did not open. Nothing was charged; please try again in a minute.
+          </p>
+        )}
         {failed && (
           <p className="journey-error" role="alert">
             We could not load your orders just now. Nothing about them has changed; please refresh in a minute.
@@ -104,6 +137,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
       {orders.map((o) => {
         const reached = REACHED[o.status] ?? 0;
         const amount = formatPrice(o.amount_paid_cents ?? o.price_cents, o.currency);
+        const off = ["refunded", "cannot_model", "cancelled"].includes(o.status);
         return (
           <article key={o.id} className="card order" aria-label={`Report for ${o.address}`}>
             <div className="order-head">
@@ -111,10 +145,12 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
               <span className="row" style={{ gap: 8 }}>
                 {o.test_mode && (
                   <span className="pill" data-state="test">
-                    test mode · no money moved
+                    test mode · no real money
                   </span>
                 )}
-                <span className="pill">{o.status.replace("_", " ")}</span>
+                <span className="pill" data-state={o.status === "payment_failed" ? "attention" : undefined}>
+                  {LABEL[o.status] ?? o.status.replace("_", " ")}
+                </span>
               </span>
             </div>
             <div className="order-meta mono">
@@ -124,14 +160,21 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
             </div>
             <ol className="order-steps" aria-label="Progress">
               {STEPS.map((s, i) => (
-                <li key={s} data-on={i <= reached && o.status !== "refunded" ? "true" : undefined}>
+                <li key={s} data-on={i <= reached && !off ? "true" : undefined}>
                   {s}
                 </li>
               ))}
             </ol>
-            <p className="order-note">{words(o, o.id === paid)}</p>
+            <p className="order-note">{words(o, o.id === ordered, o.id === paying)}</p>
             {o.status_note && <p className="order-note">{o.status_note}</p>}
             <div className="order-actions">
+              {o.status === "payment_failed" && (
+                <form method="post" action={`/api/reports/${o.id}/pay`}>
+                  <button type="submit" className="btn btn-accent">
+                    Pay and open the report <span className="arrow">→</span>
+                  </button>
+                </form>
+              )}
               {o.status === "delivered" && (
                 <a className="btn btn-accent" href={`/api/reports/${o.id}/download`}>
                   Download the report <span className="arrow">→</span>

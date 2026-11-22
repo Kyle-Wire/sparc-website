@@ -15,7 +15,7 @@ export default async function AccountOverview() {
     const { data } = await supabase.from("report_orders").select("status").limit(200);
     for (const o of data ?? []) {
       if (o.status === "delivered") counts.ready++;
-      else if (o.status === "paid" || o.status === "in_progress") counts.open++;
+      else if (["card_saved", "in_progress", "charging", "payment_failed"].includes(o.status)) counts.open++;
     }
   } catch {
     counts = { open: 0, ready: 0 };

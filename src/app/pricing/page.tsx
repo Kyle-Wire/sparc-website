@@ -118,7 +118,7 @@ function OnSale() {
             <h3 style={{ margin: 0 }}>{REPORT.name}</h3>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
               <span style={{ fontSize: 36, fontWeight: 800, letterSpacing: "-0.03em", color: "var(--ink)" }}>{formatPrice(REPORT.priceCents)}</span>
-              <span style={{ fontSize: 14, color: "var(--muted)" }}>once</span>
+              <span style={{ fontSize: 14, color: "var(--muted)" }}>once, plus any sales tax</span>
             </div>
             <ul style={{ margin: "4px 0 0", paddingLeft: 18, fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6 }}>
               {REPORT.includes.map((w) => (
@@ -126,8 +126,9 @@ function OnSale() {
               ))}
             </ul>
             <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6, margin: "4px 0 0" }}>
-              <strong style={{ color: "var(--ink)" }}>Within {REPORT.deliveryDays} working days, or your money back.</strong>{" "}
-              If we cannot model your place, you get a full refund.
+              <strong style={{ color: "var(--ink)" }}>You pay when it is ready.</strong> Nothing is charged when you
+              order. If we cannot model your place, or it is not ready within {REPORT.deliveryDays} working days and
+              you cancel, you pay nothing.
             </p>
             <div className="row" style={{ marginTop: "auto", paddingTop: 10, gap: 10, flexWrap: "wrap" }}>
               <Link href="/report/buy" className="btn btn-accent">Order the house report <span className="arrow">→</span></Link>

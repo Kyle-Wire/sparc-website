@@ -123,7 +123,7 @@ export default function FaqPage() {
         <p>
           The free block record works for any US address. For a report, we first check what our models can cover at
           that place. If a section cannot be made there, we tell you and the report says so. If we cannot make the
-          report at all, you get a full refund.
+          report at all, we charge nothing.
         </p>
       ) : (
         <p>
@@ -139,8 +139,9 @@ export default function FaqPage() {
       q: "How much is it, and how long does it take?",
       a: onSale ? (
         <p>
-          {formatPrice(REPORT.priceCents)} for one property, charged once. Nothing renews. Your report is in your
-          account within {REPORT.deliveryDays} working days of payment, or you can ask for a full refund.
+          {formatPrice(REPORT.priceCents)} for one property, plus any sales tax. You save a card when you order and
+          we charge it once, when the report is ready. Nothing renews. We aim to finish within{" "}
+          {REPORT.deliveryDays} working days of your order; if we have not, you can cancel and pay nothing.
         </p>
       ) : (
         <p>
@@ -164,8 +165,9 @@ export default function FaqPage() {
       q: "What if I change my mind?",
       a: onSale ? (
         <p>
-          You get a full refund if you ask before we start, if we cannot make the report for your property, or if it
-          is late. Once delivered, it is not refundable unless it is materially wrong about what it says it describes.
+          Cancel any time before the report is ready and nothing is charged. If we cannot make the report for your
+          property, nothing is charged either. Once it is ready and paid for, it is not refundable unless it is
+          materially wrong about what it says it describes.
           The full wording is in the <Link href="/terms#reports">Terms</Link>.
         </p>
       ) : (

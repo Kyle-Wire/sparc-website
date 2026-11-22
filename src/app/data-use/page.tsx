@@ -1,6 +1,7 @@
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
-import { COMPANY, EMAIL_PRIMARY } from "@/lib/brand";
+import Link from "next/link";
+import { EMAIL_PRIMARY } from "@/lib/brand";
 
 export const metadata = { title: "Data Use" };
 
@@ -26,11 +27,19 @@ export const metadata = { title: "Data Use" };
 //     installer, there are no signing keys to send, and the tier names were
 //     retired on 29 Oct.
 //
+// Rewritten again on 22 November 2026: the 30 October text said "There is no
+// advertising, analytics or third-party tracking", but the layout loads Vercel
+// Web Analytics and Speed Insights (the privacy page already says so). It also
+// described software and studies, not the house report the site now sells.
+// The privacy page is the detailed statement; this page is the short version
+// and must never say more than it does.
+//
 // A data-handling statement must name the delivery mode it applies to. Do not
 // put one in a philosophy tile, a hero lead or a badge, where it reads as a
 // property of the company and cannot carry its own scope.
 
 export default function DataUsePage() {
+  const h2 = { fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 } as const;
   return (
     <>
       <Nav />
@@ -38,46 +47,45 @@ export default function DataUsePage() {
       <Section>
         <article style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 18, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
           <p>
-            {COMPANY} is not selling or distributing software today, so there is no
-            installed application sending us anything. This page says what is
-            actually true right now rather than describing a product that does not
-            exist yet. It will be replaced with a real statement, per delivery
-            mode, before anyone receives software or commissions a study.
+            The short version, by what you are doing. The <Link href="/privacy">privacy page</Link> has every
+            detail and every company involved; where the two differ, the privacy page is right and this page is
+            a mistake we will fix.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>This website</h2>
+          <h2 style={h2}>Looking up a place</h2>
           <p>
-            If you contact us through this site, we receive what you type and your
-            email address, and we use it to reply. The site sets a session cookie
-            only if you sign in. There is no advertising, analytics or third-party
-            tracking. Hosting is Vercel; transactional email is Resend.
+            An address you type is used to find the block and is not kept. The page you land on is named by a
+            rounded point for the block, not the house. Saved places and notes stay in your browser and never
+            reach us. Page views are counted without advertising or tracking cookies (Vercel Web Analytics).
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>If we run a study for you</h2>
+          <h2 style={h2}>If you order a house report</h2>
           <p>
-            This is the route we can actually offer today, and it is important to
-            be plain about it: <strong>your inputs leave your machine.</strong> You
-            send us an area and the data you want used, we process it on our own
-            workstation, and we send back a signed-off package. We have not yet
-            published how long we keep that material, who can see it, or how it is
-            deleted — so if you are considering an engagement, ask us and we will
-            answer in writing as part of the agreement rather than by website copy.
+            A report is about one house, so this is the one time we keep a street address. It is stored with your
+            order, and only you and the person making your report can see it. We run our models for that place on
+            our own computers and put the finished report in your account. Payment is handled by Stripe; we never
+            see your card.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Local compute, when there is software to install</h2>
+          <h2 style={h2}>What we never do</h2>
+          <ul>
+            <li>Sell, rent or share addresses, places looked up or reports.</li>
+            <li>Pass you to agents, lenders or insurers.</li>
+            <li>Train any model on what you send us.</li>
+            <li>Advertise, or run advertising trackers.</li>
+          </ul>
+
+          <h2 style={h2}>Deleting it</h2>
           <p>
-            Our models are built to run on the machine of whoever is using them —
-            that is a deliberate design choice and the reason municipal data never
-            has to be uploaded to us. It is a property of the software, not a
-            promise about a study we run for you, and the two should never be
-            quoted interchangeably.
+            Email <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a> and we will export or delete what we
+            hold about you, including an order and its report, within 30 days. Payment records the law requires us
+            to keep are kept as long as it requires.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>Questions</h2>
+          <h2 style={h2}>Studies and software</h2>
           <p>
-            Email <a href={`mailto:${EMAIL_PRIMARY}`}>{EMAIL_PRIMARY}</a>. If a
-            procurement process needs a data-handling schedule, say so and we will
-            write one for the specific engagement.
+            If we run a study for an organization, or one day ship software, how its data is handled is written into
+            that agreement, not into this page.
           </p>
         </article>
       </Section>

@@ -45,8 +45,8 @@ const SECTIONS: { title: string; what: string; cards: string[]; plot?: string; c
   },
   {
     title: "Wind",
-    what: "How wind moves through the neighbourhood across the seasons, as a map. Added once it has a method, evidence records and labels.",
-    cards: ["By season", "Where buildings may funnel it"],
+    what: "Wind is being built and is not in reports. Storm gusts for the area come first, once that check is merged; wind between the buildings only after the street model passes its wind-tunnel benchmark.",
+    cards: ["Storm gusts for the area", "Wind between the buildings"],
     coming: true,
   },
   {

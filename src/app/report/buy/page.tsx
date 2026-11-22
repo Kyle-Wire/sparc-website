@@ -5,7 +5,8 @@ import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero } from "@/components/marketing/page-shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { parsePlaceSlug, placeSlug } from "@/lib/place/coords";
-import { REPORT, checkoutEnabled, formatPrice } from "@/lib/payments";
+import { REPORT, checkoutEnabled, formatPrice, mayOrder, salesMode } from "@/lib/payments";
+import { EMAIL_PRIMARY } from "@/lib/brand";
 import { ORDER_ERRORS } from "@/lib/payments/order-input";
 import "@/components/commerce/commerce.css";
 
@@ -37,6 +38,8 @@ export default async function BuyReportPage({ searchParams }: Props) {
       email = null;
     }
   }
+  const inviteOnly = salesMode() === "invite";
+  const allowed = mayOrder(email);
   const error = sp.error ? ORDER_ERRORS[sp.error] ?? ORDER_ERRORS.checkout : null;
 
   return (
@@ -68,7 +71,23 @@ export default async function BuyReportPage({ searchParams }: Props) {
                   {error}
                 </p>
               )}
-              {!email ? (
+              {inviteOnly && (
+                <p className="buy-hint" style={{ marginTop: 0 }}>
+                  Open by invitation for now: a first few buyers, each report run and read by hand, before anyone can
+                  order.
+                </p>
+              )}
+              {email && !allowed ? (
+                <div className="buy-signin">
+                  <p>
+                    This account ({email}) is not on the invitation list yet. Write to{" "}
+                    <a href={`mailto:${EMAIL_PRIMARY}?subject=${encodeURIComponent("House report invitation")}`}>{EMAIL_PRIMARY}</a>{" "}
+                    with the property you are deciding on, or{" "}
+                    <Link href={slug ? `/start?place=${slug}` : "/start"}>ask for a report</Link>, and a person will reply.
+                    Nothing is charged.
+                  </p>
+                </div>
+              ) : !email ? (
                 <div className="buy-signin">
                   <p>
                     Your report lives in your account, so you can come back to it, download it again and see where your

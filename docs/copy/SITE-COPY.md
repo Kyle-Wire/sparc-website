@@ -60,28 +60,28 @@ It's a screening tool. It gives you more to go on before you talk to an inspecto
 
 Builds a 1 m model of the neighbourhood from public data (terrain survey, building outlines, streets, land cover, soils, official rainfall statistics) and follows the water through it street by street, on your own graphics card. One metre is the detail of the map, not its accuracy.
 
-**Passed:** 88 of 94 of the UK Environment Agency's 2D flood benchmark checks against the spread of the professional packages; 22 of 22 exact pipe-and-street cases; within a centimetre of HEC-RAS (the US Army Corps model) on four of the same benchmark tests.
+**Passed:** 88 of 94 of the UK Environment Agency's 2D flood benchmark checks against the spread of the professional packages; 22 of 22 exact pipe-and-street cases; a median difference under a centimetre from HEC-RAS (the US Army Corps model) on four of the same benchmark tests.
 **Not yet:** against measured flood levels in real storms elsewhere, mostly beside rivers, it was off by 0.6 to 0.85 m, and its own bar is 0.15 m. In a Louisiana test tract it put water against almost no house where FEMA paid rain claims. Nothing has been measured at any house we report on, so every result is labelled exploratory.
 
 ### HeatSim (heat)
 
 Models street air temperature hour by hour, and PET, an outdoor comfort index, in sun, building shade and tree shade. Surface temperature measured by satellite sits beside it as a measurement, not a model.
 
-**Passed:** at night, street air within about 1.46 K (2.6 °F) hour by hour across 13 temperate cities, each held out whole, against 1.86 K for the nearest weather station alone. Those street sensors also helped develop the model, so treat it as a development score.
-**Not yet:** by day it does no better than the weather station alone. It hasn't been checked against a street sensor in Philadelphia. PET has never been compared with a measurement. Indoor temperature isn't modelled at all.
+**Passed:** at night, street air had an hourly error of about 1.46 K (2.6 °F) across 13 temperate cities, none in Philadelphia, each held out whole, against 1.86 K for the weather station alone. Those street sensors also helped develop the model, so treat it as a development score.
+**Not yet:** in the afternoon it does no better than the weather station alone. It hasn't been checked against a street sensor in Philadelphia. PET has never been compared with a measurement. Indoor temperature isn't modelled at all.
 
 ### SPARC InSAR (ground movement)
 
-Reads how the ground under a block has moved over years from NASA's OPERA satellite radar product, which passes every twelve days through cloud and at night. A reading covers about a hundred metres around the house, along the satellite's slanted line of sight, compared with the ground around it.
+Reads how the ground under a block has moved over years from NASA's OPERA satellite radar product, which passes over on a regular repeat schedule, through cloud and at night. A reading covers about a hundred metres around the house, along the satellite's slanted line of sight, compared with the ground around it.
 
-**Passed:** the engine's own check against 7 GNSS stations around Houston (about 3 mm a year).
+**Passed:** the engine's own record shows a pass against 7 GNSS stations around Houston (about 3 mm a year); the result files behind it are being restored.
 **Not yet:** its checks against GNSS in Oklahoma, California and an Australian mine did not pass. At our places no GNSS check has been run, and a planted-movement test passed at one of three. The tools for the GNSS check are built and tested on made-up data, not yet on real radar. Exploratory throughout.
 
 ### WindSim (wind)
 
 Two layers. **Layer 1** carries a storm's gusts in from the airport anemometers around a place, through the land cover upwind. **Layer 2** is a computational fluid dynamics model of wind between the buildings.
 
-**Passed [ships when WindSim's Layer 1 branch merges]:** for ordinary storms (not thunderstorms), gusts carried in to an airport left out of the set landed within 25 % of what it measured for 87 to 98 % of storms, at six places with enough stations. Thunderstorm gusts passed at Miami only. This run came after two rule fixes, so a blind re-check is next.
+**Passed [ships when WindSim's Layer 1 branch merges]:** for ordinary storms (not thunderstorms), gusts carried in to an airport left out of the set landed within 25 % of what it measured for 87 to 98 % of storm-and-airport pairs, at six places with enough stations. Thunderstorm gusts passed at Miami only. This run came after two rule fixes, so a blind re-check is next.
 **Not yet:** the step from an airport into a city street hasn't been tested, because that needs an anemometer in a city. The street model (Layer 2) passes the one-building wind-tunnel case and fails every case with more than one building, so it stays out of reports. Nothing about wind at a house is in a report yet.
 
 ### Said plainly (replaces the current list)
@@ -92,7 +92,7 @@ Two layers. **Layer 1** carries a storm's gusts in from the airport anemometers 
 - **No dollar figures.** No expected loss, no premium, no payback.
 - **Methods paper: coming.** A plain write-up of each model, what it was tested against and its margins. Until it's out, treat every result as a first look.
 
-**What-if paragraph (replaces the one with "likely").** For heat, a project shows as a change across the neighbourhood with its range, not a promise about one street. We're not promising an outcome. We're giving you a way to see the problem and what each option changes in the model.
+**What-if paragraph (replaces the one with "likely").** For heat, a project shows as a change across the neighbourhood, not a promise about one street. We're not promising an outcome. We're giving you a way to see the problem and what each option changes in the model.
 
 ---
 
@@ -122,10 +122,10 @@ Two layers. **Layer 1** carries a storm's gusts in from the airport anemometers 
 ## FAQ
 
 **Is this validated?**
-Not at your house, and we won't say it is. Each model passes its solver tests, and some have real-world checks elsewhere (the receipts are on the Models page). "Validated" only shows up as "validated at this place", after a measurement there.
+Not at your house, and we won't say it is. Flood, heat and ground pass their solver tests; the wind street model doesn't yet. Some have real-world checks elsewhere (the receipts are on the Models page). "Validated" only shows up as "validated at this place", after a measurement there.
 
 **So what's the point?**
-A flood-zone letter tells you about the insurance map. This tells you, in the model, which side of the house water reaches in a hundred-year storm, how warm the street air stays at night next to the rest of the city, and whether the block's ground moves on its own. That's a better set of questions to bring to an inspector.
+A flood-zone letter tells you about the insurance map. This tells you, in the model, which side of the house water reaches in the model's hundred-year design storm, how warm the street air stays at night next to the rest of the city, and whether the block's ground moves on its own. That's a better set of questions to bring to an inspector.
 
 **Will my house flood?**
 We can't tell you that, and anyone who says they can without a survey is guessing. We can tell you what water did around it in every storm we modelled.
@@ -160,7 +160,7 @@ Coming. Regional storm gusts are close; the between-the-buildings model is still
 |---|---|
 | FloodSim 88 of 94 EA checks | VS §1.1; `FloodSim/benchmarks/ea/results/score.txt`; total stated in `FloodSim/docs/METHODS.md:995` |
 | 22 of 22 coupled cases | VS §1.1; `FloodSim/benchmarks/gatec/coupled/score.md` |
-| Within a centimetre of HEC-RAS (median 0.1 to 0.8 cm) | VS §1.1; `FloodSim/benchmarks/gatec/results/hecras-ea.json` |
+| Median difference under a centimetre from HEC-RAS (0.1 to 0.8 cm) | VS §1.1; `FloodSim/benchmarks/gatec/results/hecras-ea.json` |
 | Off by 0.6 to 0.85 m against measured levels; bar 0.15 m | VS §1.1; `FloodSim/docs/ACCEPTANCE.md:49`, `benchmarks/validation/history.json` |
 | Louisiana miss | VS §1.1; `docs/validation/THIRD-PLACE-NATIONAL.md:64` (CHI) |
 | HeatSim night 1.46 K vs 1.86 K, 13 cities, development numbers | VS §1.3; `HeatSim/validation/results/rescore/b_0.5.0_hybrid_absolute.json`; `HeatSim/docs/model_card.md:39-41` |
@@ -171,3 +171,6 @@ Coming. Regional storm gusts are close; the between-the-buildings model is still
 | Layer 1 87 to 98 % within 25 %, non-thunderstorm; Miami-only thunderstorm; calibration; city step untested | WindSim branch `claude/project-thread-fnbdyl`, `docs/validation.md` "Layer 1: run 4" (not merged) |
 | Street CFD passes Case A only | VS §1.4; WindSim `CLAUDE.md` |
 | Three test places | CHI `CLAUDE.md` |
+| Founded 2024 | `src/lib/brand.ts` `FOUNDED_YEAR` (Kyle to confirm) |
+| Address found, then dropped | existing About copy; `src/lib/place/coords.ts`, `src/app/api/geocode/route.ts` (to re-check against the code path) |
+| "No run, no numbers" checked by the build | `npm run check:placeholders` (`scripts/check-placeholders.mjs`) |

@@ -105,7 +105,7 @@ export default function ModelsPage() {
               <li>The margin: how far off the model has been where it could be checked.</li>
             </ul>
             <p>
-              For heat, a project is shown as a change across the neighbourhood with its range, not as a
+              For heat, a project is shown as a change across the neighbourhood, not as a
               promise about one street. We are not promising an outcome. We are giving you a way to
               see the problem and what each option changes in the model.
             </p>

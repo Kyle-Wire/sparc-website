@@ -110,7 +110,7 @@ export const ENGINES: Engine[] = [
     ],
     whatIf: ["Rain garden", "French drain", "Paving taken up", "Rain barrels", "Permeable paving"],
     whatIfNote:
-      "Things one owner can do. The model runs again with the project in place and shows what changes in the model, with the spread across its test runs. It is not a measurement, a design or a promise.",
+      "Things one owner can do. The model runs again with the project in place and shows what changes in the model. It is not a measurement, a design or a promise.",
     never: [
       "Water above the first floor, unless the floor's height is known from a survey",
       "Anything about the basement",
@@ -137,7 +137,7 @@ export const ENGINES: Engine[] = [
     choices: ["A recent hot spell", "A typical summer month", "Day and night shown apart"],
     whatIf: ["Trees planted", "Paving taken up", "Cool roof", "Cool pavement"],
     whatIfNote:
-      "Shown as a change across the neighbourhood with its range, not as a promise about one street. The model's own card rules out saying a measure cools a street by a set amount.",
+      "Shown as a change across the neighbourhood, not as a promise about one street. The model's own card rules out saying a measure cools a street by a set amount.",
     never: [
       "A count of hot days",
       "Indoor temperature",
@@ -155,7 +155,7 @@ export const ENGINES: Engine[] = [
     where:
       "On our workstation. The radar for the place is gathered and processed for you; you then read and explore the result.",
     summary:
-      "Reads how the ground has moved over years from satellite radar, which passes over the same ground every twelve days, through cloud and at night. Each reading describes the ground the house stands on, averaged over about a hundred metres around it, not the house itself. Readings are along the satellite's line of sight, not straight up and down, and have not yet been checked against a GNSS station at any place we report on.",
+      "Reads how the ground has moved over years from satellite radar, which passes over the same ground on a regular repeat schedule, through cloud and at night. Each reading describes the ground the house stands on, averaged over about a hundred metres around it, not the house itself. Readings are along the satellite's line of sight, not straight up and down, and have not yet been checked against a GNSS station at any place we report on.",
     free: [
       "Whether the ground the house stands on moves toward or away from the satellite, against the ground around it, from NASA's OPERA ground-motion product, labelled exploratory",
       "The USGS map of ground prone to sinkholes",

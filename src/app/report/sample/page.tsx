@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
-import { Em, Placeholder, PlaceholderPlot } from "@/components/system/placeholder";
 
 export const metadata: Metadata = {
-  title: "How a report is laid out",
-  description: "The house report, section by section: findings first, how sure each one is printed on it in words, then limits and sources. What it will and will not say.",
+  title: "Sample reports",
+  description: "Two real house reports for two Philadelphia rowhouses, addresses withheld: every page, every finding with its evidence label, and what a report will never say.",
 };
 
 // The buyer report's structure, from the Climate Inspection repository's
@@ -16,11 +16,54 @@ export const metadata: Metadata = {
 // finding. A public sample report replaces it once there is a place that can
 // be shown (docs/HANDOFF.md, item 5).
 //
+// 22 November 2026: two real sample reports replace the empty layout as the
+// page's main exhibit. They were built by the real pipeline in Climate Home
+// Inspection (PR 23, reports/samples/) for PHL-POC-001 and PHL-POC-002, carry
+// "Sample report" on every page, withhold the address and do not mark the
+// house on any map. Files: public/samples/. The statements quoted below are
+// copied from page 3 of each report (finding F1), labels included.
+//
 // Ground movement and wind sit in the order as sections still to come: the
 // directive's §13 rule is that a new hazard is reported only once it has a
 // method, an evidence record and a label.
 
 const LABELS = ["Well supported", "Moderately supported", "Limited evidence", "Insufficient information"];
+
+
+const SAMPLES = [
+  {
+    id: "a",
+    name: "Sample A",
+    place: "A rowhouse on South Street, Center City",
+    stat: "0 of 24",
+    statLine: "design-storm runs with water at the house's walls",
+    finding:
+      "In the model, water does not reach the house's outside walls in any of the six design storms (10-, 100- and 500-year, lasting 1 hour and 24 hours): none of 24 runs.",
+    pdf: "/samples/sample-report-a.pdf",
+  },
+  {
+    id: "b",
+    name: "Sample B",
+    place: "A rowhouse in Northeast Philadelphia",
+    stat: "24 of 24",
+    statLine: "design-storm runs with water at the house's walls",
+    finding:
+      "In the model, water reaches the house's outside walls in 24 of 24 design-storm runs, standing up to 30 cm above the typical ground beside the house.",
+    pdf: "/samples/sample-report-b.pdf",
+  },
+] as const;
+
+const PAGE_NAMES = [
+  "What you get: a sample report",
+  "Main findings",
+  "Does storm water reach the house?",
+  "Harder tests, and what the public record shows",
+  "How hot do the block's surfaces run?",
+  "How warm is the air, and how does it feel outdoors?",
+  "What to check at the house, and how sure each finding is",
+  "Limits and points to note",
+  "Where each finding comes from",
+];
 
 const SECTIONS: { title: string; what: string; cards: string[]; plot?: string; coming?: boolean }[] = [
   {
@@ -74,11 +117,65 @@ export default function SampleReportPage() {
     <>
       <Nav active="models" />
       <PageHero
-        kicker="the report · layout only"
-        title="How a report is laid out."
-        lead="Findings first. How sure each one is, printed on it in words. The reasons, limits and sources at the back, never in front. This is the layout; no finding on this page is real."
+        kicker="sample reports · real homes · addresses withheld"
+        title="What you get."
+        lead="Two real reports for two Philadelphia rowhouses, built by the same models and the same code as a paid report. Every page, every finding, every label for how sure it is. The addresses are withheld and no map marks the house."
         accent="var(--flood)"
       />
+
+      <Section kicker="two homes, two answers" title="Same storms. Very different streets.">
+        <div className="sample-pair">
+          {SAMPLES.map((x) => (
+            <article key={x.id} className="sample-card">
+              <a href={`#sample-${x.id}`} className="sample-cover" aria-label={`${x.name}: read it page by page`}>
+                <Image src={`/samples/${x.id}-page-3-thumb.webp`} alt={`${x.name}, page 3: does storm water reach the house?`} width={408} height={528} />
+              </a>
+              <div className="sample-body">
+                <span className="kicker">{x.name}</span>
+                <h3>{x.place}</h3>
+                <p className="sample-stat">
+                  <strong>{x.stat}</strong> {x.statLine}
+                </p>
+                <p>&ldquo;{x.finding}&rdquo;</p>
+                <p className="sample-label">Labelled: limited evidence. Model output, not a measurement.</p>
+                <div className="row" style={{ marginTop: 12 }}>
+                  <a href={`#sample-${x.id}`} className="btn btn-accent">
+                    Read it page by page <span className="arrow">→</span>
+                  </a>
+                  <a href={x.pdf} className="btn" download>
+                    Download the PDF
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+        <p className="screening-note" style={{ marginTop: 28 }}>
+          <strong>Samples, not advice.</strong> These show what a report contains. They are screening reports: every
+          model finding is labelled exploratory or limited evidence, and nothing at either house was measured. Ground
+          movement and wind are not in reports yet; page 1 of each says why.
+        </p>
+      </Section>
+
+      {SAMPLES.map((x, n) => (
+        <Section key={x.id} sunken={n === 0} kicker={`${x.name} · nine pages`} title={x.place + "."}>
+          <div id={`sample-${x.id}`} className="sample-pages" style={{ scrollMarginTop: 96 }}>
+            {PAGE_NAMES.map((name, i) => (
+              <a key={name} href={`/samples/${x.id}-page-${i + 1}.webp`} target="_blank" rel="noopener" className="sample-page">
+                <Image src={`/samples/${x.id}-page-${i + 1}-thumb.webp`} alt={`${x.name}, page ${i + 1}: ${name}`} width={408} height={528} />
+                <span>
+                  {i + 1}. {name}
+                </span>
+              </a>
+            ))}
+          </div>
+          <div className="row" style={{ marginTop: 20 }}>
+            <a href={x.pdf} className="btn" download>
+              Download {x.name} as a PDF
+            </a>
+          </div>
+        </Section>
+      ))}
 
       <Section kicker="the rules a report follows" title="What it will and will not say.">
         <div className="split-1-1" style={{ alignItems: "start" }}>
@@ -88,7 +185,7 @@ export default function SampleReportPage() {
               its limits. The report is built from those records and nothing else. Nobody types a figure or a label
               into it by hand.
             </p>
-            <p>Each modelled finding carries one of four labels, set by fixed rules from the kind of evidence behind it, never from whether the news is good:</p>
+            <p>Each finding carries one of four labels, set by fixed rules from the kind of evidence behind it, never from whether the news is good:</p>
             <ul>
               {LABELS.map((l) => (
                 <li key={l}>
@@ -111,7 +208,7 @@ export default function SampleReportPage() {
         </div>
       </Section>
 
-      <Section sunken kicker="the sections, in order" title="A section takes as many pages as it needs.">
+      <Section sunken kicker="the sections, in order" title="Every report follows the same order.">
         <ol className="report-sections">
           {SECTIONS.map((s) => (
             <li key={s.title} className="report-section" data-coming={s.coming ? "true" : undefined}>
@@ -120,36 +217,19 @@ export default function SampleReportPage() {
                 {s.coming && <span className="shelf-state" data-state="coming">Coming</span>}
               </div>
               <p>{s.what}</p>
-              <Placeholder
-                label="report · section"
-                note="Layout only. No report on this site holds a finding. Each card would carry a figure, its sentence and its label."
-              >
-                {s.plot && <PlaceholderPlot height={120} ariaLabel={s.plot} />}
-                <div className="report-cards" style={s.plot ? { marginTop: 12 } : undefined}>
-                  {s.cards.map((c) => (
-                    <div key={c} className="report-card">
-                      <span className="kicker">{c}</span>
-                      <span className="report-card-figure">
-                        <Em />
-                      </span>
-                      <span className="report-card-label">
-                        <Em />
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </Placeholder>
             </li>
           ))}
         </ol>
         <p className="screening-note" style={{ marginTop: 28 }}>
           <strong>A screening report.</strong> Not an engineering study, an appraisal, an insurance quote or a home
-          inspection, and not for engineering decisions. A real sample will be linked here once there is a place that
-          can be shown in public.
+          inspection, and not for engineering decisions.
         </p>
         <div className="row" style={{ marginTop: 24 }}>
           <Link href="/start" className="btn btn-accent">
             Ask for a report <span className="arrow">→</span>
+          </Link>
+          <Link href="/faq" className="btn">
+            Questions
           </Link>
           <Link href="/models" className="btn">
             The models behind it

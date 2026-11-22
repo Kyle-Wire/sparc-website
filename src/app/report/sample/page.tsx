@@ -18,7 +18,8 @@ export const metadata: Metadata = {
 //
 // 22 November 2026: two real sample reports replace the empty layout as the
 // page's main exhibit. They were built by the real pipeline in Climate Home
-// Inspection (PR 23, reports/samples/) for PHL-POC-001 and PHL-POC-002, carry
+// Inspection (PR 23, remade on HeatSim 0.6.1 with Copernicus weather in PR 26,
+// reports/samples/) for PHL-POC-001 and PHL-POC-002, carry
 // "Sample report" on every page, withhold the address and do not mark the
 // house on any map. Files: public/samples/. The statements quoted below are
 // copied from page 3 of each report (finding F1), labels included.

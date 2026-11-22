@@ -3,7 +3,10 @@ import { PageHero, Section } from "@/components/marketing/page-shell";
 import Link from "next/link";
 import { EMAIL_PRIMARY } from "@/lib/brand";
 
-export const metadata = { title: "Data Use" };
+export const metadata = {
+  title: "Data Use",
+  description: "The short version of what happens to your data on SPARC Labs, by what you are doing.",
+};
 
 // This page was rewritten on 2026-10-30 because every specific claim on it was
 // either unsupported or the reverse of what the code does. Removed, and not to

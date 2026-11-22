@@ -4,7 +4,10 @@ import { PageHero, Section } from "@/components/marketing/page-shell";
 import { EMAIL_PRIMARY } from "@/lib/brand";
 import { REPORT, checkoutEnabled, formatPrice } from "@/lib/payments";
 
-export const metadata = { title: "Pricing" };
+export const metadata = {
+  title: "Pricing",
+  description: "The public record for any US address is free with no account. Our models, run for one house, are the paid part.",
+};
 // The price shows only when checkout is switched on, so the page is rendered per request.
 export const dynamic = "force-dynamic";
 

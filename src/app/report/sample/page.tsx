@@ -4,7 +4,10 @@ import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 import { Em, Placeholder, PlaceholderPlot } from "@/components/system/placeholder";
 
-export const metadata: Metadata = { title: "How a report is laid out" };
+export const metadata: Metadata = {
+  title: "How a report is laid out",
+  description: "The house report, section by section: findings first, how sure each one is printed on it in words, then limits and sources. What it will and will not say.",
+};
 
 // The buyer report's structure, from the Climate Inspection repository's
 // docs/product/DIRECTIVE.md §7 ("The report"), opened 18 November 2026. The

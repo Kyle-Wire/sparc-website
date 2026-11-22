@@ -2,7 +2,10 @@ import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero } from "@/components/marketing/page-shell";
 
-export const metadata = { title: "Plain glossary" };
+export const metadata = {
+  title: "Plain glossary",
+  description: "Flood zones, base flood elevation, tree canopy, surface temperature and the other words on a place page, in plain language, with the publisher's own definitions.",
+};
 
 // The words a place page uses, in plain language.
 //

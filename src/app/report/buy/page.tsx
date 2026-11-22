@@ -141,11 +141,12 @@ export default async function BuyReportPage({ searchParams }: Props) {
                     </span>
                   </label>
                   <button type="submit" className="btn btn-accent buy-submit">
-                    Continue to secure checkout <span className="arrow">→</span>
+                    Save a card and order <span className="arrow">→</span>
                   </button>
                   <p className="buy-hint">
-                    Signed in as <span className="mono">{email}</span>. Payment is taken by our payment provider, who
-                    also handles sales tax; we never see your card.
+                    <strong>Nothing is charged today.</strong> You save a card on Stripe&apos;s secure page. When your
+                    report is ready, we charge it {formatPrice(REPORT.priceCents)} plus any sales tax, and the report
+                    opens in your account. Signed in as <span className="mono">{email}</span>; we never see your card.
                   </p>
                 </form>
               )}
@@ -173,11 +174,11 @@ export default async function BuyReportPage({ searchParams }: Props) {
                 <div className="kicker">our promise</div>
                 <p>
                   <strong>
-                    Your report within {REPORT.deliveryDays} working days, or your money back.
+                    You pay when your report is ready, within {REPORT.deliveryDays} working days, or not at all.
                   </strong>{" "}
                   We check what can be modelled at your place before we start. If something cannot be, we tell you;
-                  if the report cannot be made at all, you get a full refund. Changed your mind before we start? Full
-                  refund too. <Link href="/terms#reports">The terms</Link>
+                  if the report cannot be made at all, we charge nothing. Changed your mind before it is ready? Tell
+                  us and we charge nothing. <Link href="/terms#reports">The terms</Link>
                 </p>
               </div>
             </aside>

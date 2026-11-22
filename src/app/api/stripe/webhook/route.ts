@@ -8,10 +8,12 @@ export const runtime = "nodejs";
 
 // Stripe's webhook for house report orders. Endpoint:
 //   https://sparclabs.co/api/stripe/webhook
-// Events: checkout.session.completed, checkout.session.async_payment_succeeded,
-// charge.refunded. The signature is checked over the raw body; the event goes
-// through src/lib/payments/webhook.ts and apply_payment_event (migration 0007),
-// which applies a payment once however often Stripe resends it.
+// Events: checkout.session.completed (the card saved at order),
+// payment_intent.succeeded (the charge on delivery, or the buyer paying from
+// their account), payment_intent.payment_failed, charge.refunded. The
+// signature is checked over the raw body; the event goes through
+// src/lib/payments/webhook.ts and apply_payment_event (migration 0008), which
+// applies each event once however often Stripe resends it.
 export async function POST(req: NextRequest) {
   const raw = await req.text();
   const provider = paymentProvider();
@@ -33,6 +35,9 @@ export async function POST(req: NextRequest) {
       p_currency: e.currency,
       p_test_mode: e.testMode,
       p_receipt_url: e.receiptUrl,
+      p_customer_id: e.customerId ?? null,
+      p_setup_id: e.setupId ?? null,
+      p_error: e.error ?? null,
     });
     if (error) throw error;
     return String(data);

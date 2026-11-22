@@ -61,7 +61,7 @@ pnpm dev              # http://localhost:3000
 | `LEMONSQUEEZY_API_KEY`, `LEMONSQUEEZY_STORE_ID` | Checkout creation |
 | `LEMONSQUEEZY_WEBHOOK_SECRET` | HMAC verification on `/api/lemonsqueezy/webhook` |
 | `CHECKOUT_ENABLED` | Switch house report checkout on (`true`) |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_REPORT` | The house report on Stripe Checkout with Managed Payments; `STRIPE_MANAGED_PAYMENTS=false` falls back to Stripe Tax |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_REPORT` | The house report on Stripe: a card saved at order, charged with Stripe Tax when the report is delivered |
 | `LEMONSQUEEZY_VARIANT_PURSUE_{MONTHLY,YEARLY}` | Variant IDs for Pursue plan |
 | `LEMONSQUEEZY_VARIANT_CONVERGE_{MONTHLY,YEARLY}` | Variant IDs for Converge plan |
 | `RESEND_API_KEY`, `WAITLIST_NOTIFY_EMAIL` | Optional waitlist notifications |
@@ -87,9 +87,10 @@ to provision tables (`profiles`, `subscriptions`, `orders`, `seats`, `license_ke
 
 The house report, bought once: [`docs/payments.md`](docs/payments.md). Off unless
 `CHECKOUT_ENABLED=true`. `/report/buy` → `POST /api/reports/order` → the provider's
-Stripe Checkout (Managed Payments) → `/api/stripe/webhook` (signature checked,
-applied once by `apply_payment_event`) → `scripts/report-order.ts deliver` →
-`/account/reports`.
+Stripe Checkout in setup mode (card saved, nothing charged) → `/api/stripe/webhook`
+(signature checked, applied once by `apply_payment_event`) → `scripts/report-order.ts
+deliver` (uploads the report, charges the saved card with Stripe Tax) → `/account/reports`
+(unlocks once paid; a failed card gets a pay button).
 
 The older subscription checkout (`/api/checkout`, Pursue/Converge, Lemon Squeezy)
 stays switched off. Lemon Squeezy stops processing payments on 31 March 2027.

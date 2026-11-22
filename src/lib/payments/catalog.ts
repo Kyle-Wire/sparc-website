@@ -4,9 +4,9 @@
  * written once.
  *
  * PRICE: $149, Kyle's decision (pricing thread, 22 November 2026). The figure
- * here must equal the report's Price in Stripe (STRIPE_PRICE_REPORT);
- * the webhook records what was actually paid and flags an order paid at more
- * than this figure (supabase/migrations/0007_report_orders.sql).
+ * here must equal the report's Price in Stripe (STRIPE_PRICE_REPORT): the
+ * deliver step refuses to charge if they differ. The buyer is charged when the
+ * report is ready, plus sales tax (Kyle, 22 November 2026; migration 0008).
  *
  * Nothing in this file is shown to a visitor unless checkout is switched on
  * (checkoutEnabled() below), and checkout is switched on only where Kyle sets
@@ -30,7 +30,7 @@ export interface Product {
   includes: string[];
   /** What it is not. Shown beside the price, not in small print. */
   isNot: string[];
-  /** Working days from payment to delivery, or a full refund. */
+  /** Working days from order to the finished report; later, the buyer may cancel and pays nothing. */
   deliveryDays: number;
 }
 

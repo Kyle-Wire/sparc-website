@@ -8,9 +8,11 @@ import { checkOrder } from "@/lib/payments/order-input";
 
 export const runtime = "nodejs";
 
-// POST from the form on /report/buy. Writes the order (awaiting payment) and
-// sends the buyer to the provider's checkout with only the order's id. The
-// price recorded is the one the page showed, from src/lib/payments/catalog.ts.
+// POST from the form on /report/buy. Writes the order (awaiting a card) and
+// sends the buyer to the provider's checkout to save a card, with only the
+// order's id. Nothing is charged until the report is ready (Kyle, 22 November
+// 2026). The price recorded is the one the page showed, from
+// src/lib/payments/catalog.ts.
 export async function POST(req: NextRequest) {
   const back = (error: string, place?: string | null) => {
     const u = new URL("/report/buy", req.url);
@@ -72,7 +74,7 @@ export async function POST(req: NextRequest) {
       orderId: order.id,
       userId: user.id,
       email: user.email,
-      successUrl: `${SITE_URL}/account/reports?paid=${order.id}`,
+      successUrl: `${SITE_URL}/account/reports?ordered=${order.id}`,
       cancelUrl: `${SITE_URL}/report/buy${input.placeSlug ? `?place=${input.placeSlug}` : ""}`,
     });
     return NextResponse.redirect(url, { status: 303 });

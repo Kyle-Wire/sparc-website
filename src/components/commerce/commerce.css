@@ -32,3 +32,4 @@
 .order-note { font-size: 14px; line-height: 1.6; color: var(--ink-2); margin: 0; }
 .order-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .pill[data-state="test"] { color: var(--amber-ink); }
+.pill[data-state="attention"] { color: var(--status-warn); border-color: currentColor; }

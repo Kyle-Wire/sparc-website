@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../styles/globals.css";
 import "../styles/cabinet.css";
 import "../styles/quiet.css";
+import "../styles/brand.css";
 import { COMPANY, SITE_TITLE, TAGLINE_LONG, SITE_URL } from "@/lib/brand";
 import { CookieNotice } from "@/components/shell/CookieNotice";
 import { Mist } from "@/components/system/Mist";

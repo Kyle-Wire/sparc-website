@@ -295,7 +295,7 @@ function InfoPanel() {
         for one house. <Link href="/report/sample">See a sample</Link>.
       </p>
       <p>
-        <Link href="/about">How it works, and who we are</Link> · <Link href="/data">Every source</Link>
+        <Link href="/how-it-works">How it works</Link> · <Link href="/about">Who we are</Link> · <Link href="/data">Every source</Link>
       </p>
     </div>
   );
@@ -335,6 +335,7 @@ function SpotCard({ slug, matched, spot, onClose }: { slug: string; matched: str
 }
 
 const MENU: { href: Route; label: string }[] = [
+  { href: "/how-it-works", label: "How it works" },
   { href: "/places", label: "Your places" },
   { href: "/models", label: "The models" },
   { href: "/pricing", label: "Pricing and the report" },

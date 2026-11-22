@@ -112,7 +112,7 @@ export default async function BuyReportPage({ searchParams }: Props) {
                     className="input"
                     maxLength={2000}
                     style={{ minHeight: 84, resize: "vertical" }}
-                    placeholder="For example: we close in three weeks and the basement is finished."
+                    placeholder="For example: we close in three weeks and want to know which side of the house gets water."
                   />
                   <label className="buy-agree">
                     <input type="checkbox" name="agree" value="yes" required />

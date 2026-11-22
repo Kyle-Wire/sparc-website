@@ -11,6 +11,7 @@ import { GroundCards, Verdicts, VerdictsPending, WindCard } from "@/components/p
 import { landslidesNear, nearestFault, soilAt } from "@/lib/place/ground";
 import { windFrequencyAt } from "@/lib/place/wind";
 import { Questions } from "@/components/place/questions";
+import { OpenQuestion, RecordMeter } from "@/components/place/conversion";
 import { KM_PER_MILE, parsePlaceSlug } from "@/lib/place/coords";
 import type { NearbyStorm } from "@/lib/place/hurricanes";
 import type { Lookup } from "@/lib/place/lookup";
@@ -399,6 +400,16 @@ export default async function PlacePage({ params }: Props) {
               <Later value={record}>{(r) => <PlaceActions slug={slug} glance={r.glance} />}</Later>
             </Suspense>
           </div>
+          <Suspense fallback={null}>
+            <Later value={verdicts}>
+              {([r, , g, w]) => (
+                <RecordMeter
+                  place={slug}
+                  answered={[r.areas.ok, r.zones.ok, r.claims.ok, r.declarations.ok, r.risk.ok, true, r.cover.ok, r.ground.ok, g.fault.ok, g.slides.ok, g.soil.ok, w.ok]}
+                />
+              )}
+            </Later>
+          </Suspense>
         </div>
       </section>
 
@@ -505,6 +516,7 @@ export default async function PlacePage({ params }: Props) {
             </div>
           </div>
 
+          <OpenQuestion hazard="flood" />
           <PaidStrip
             hazard="flood"
             place={slug}
@@ -534,6 +546,7 @@ export default async function PlacePage({ params }: Props) {
             </div>
           </div>
 
+          <OpenQuestion hazard="heat" />
           <PaidStrip
             hazard="heat"
             place={slug}
@@ -578,6 +591,7 @@ export default async function PlacePage({ params }: Props) {
               </Suspense>
             </div>
           </div>
+          <OpenQuestion hazard="ground" />
           <PaidStrip
             hazard="ground"
             place={slug}
@@ -605,6 +619,7 @@ export default async function PlacePage({ params }: Props) {
               </Suspense>
             </div>
           </div>
+          <OpenQuestion hazard="wind" />
           <PaidStrip hazard="wind" place={slug} shelves={[{ name: "Modelled", kind: "wind-model" }]} />
         </div>
       </section>

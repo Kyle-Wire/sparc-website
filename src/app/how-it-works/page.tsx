@@ -210,7 +210,7 @@ export default function HowItWorksPage() {
           <p className="receipts-src">
             As of {RECEIPTS_AS_OF}. Each rung is for one quantity, never a score for a model or a house. From the validation audit in the Climate Home Inspection repository
             (docs/validation/VALIDATION-STATUS.md), which names the file behind every line. Failures are listed at the same size as passes, on purpose. More on each model:{" "}
-            <Link href="/models">the models</Link>.
+            <Link href="/models">the models</Link>. Every test we ran, as it came out: <Link href="/how-we-test">how we test</Link>.
           </p>
         </div>
       </section>

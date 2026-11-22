@@ -2,8 +2,11 @@ import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 import { EMAIL_PRIMARY } from "@/lib/brand";
+import { REPORT, checkoutEnabled, formatPrice } from "@/lib/payments";
 
 export const metadata = { title: "Pricing" };
+// The price shows only when checkout is switched on, so the page is rendered per request.
+export const dynamic = "force-dynamic";
 
 // History, kept because the rule it produced still stands.
 //
@@ -18,6 +21,13 @@ export const metadata = { title: "Pricing" };
 //
 //   Do not put a price, an entitlement list or a purchase button on this page
 //   until every line is something SPARC Labs LLC can be held to in a contract.
+//
+// 22 November 2026: the house report can be bought, behind CHECKOUT_ENABLED
+// (src/lib/payments/catalog.ts). With it off, this page is exactly as before.
+// With it on, the report card carries its price and one link to /report/buy,
+// and the Terms carry the report's billing and refund terms (/terms#reports),
+// both read from the same catalogue entry. docs/payments.md lists what Kyle
+// signs off before it is switched on in production.
 
 const PLANS: { name: string; state: string; who: string; what: string[] }[] = [
   {
@@ -61,7 +71,86 @@ const BEFORE_WE_CHARGE: string[] = [
   "Billing, cancellation and refund terms, published in the Terms of Service before any charge is taken.",
 ];
 
+// For scale, the costs a buyer already knows. Rocket Mortgage, "How much does a
+// home inspection cost in 2026?" (updated 12 November 2026, citing 2026
+// HomeAdvisor data), opened 22 November 2026: a standard inspection "typically
+// costs about $343, with most inspections falling between $296 – $424"; an
+// optional radon test $150–$250 and sewer scope $175–$295.
+const FOR_SCALE =
+  "For scale: a standard home inspection usually costs $296 to $424, and a radon test or sewer scope added to it $150 to $295 (2026 HomeAdvisor figures, via Rocket Mortgage).";
+
 export default function PricingPage() {
+  const onSale = checkoutEnabled();
+  return onSale ? <OnSale /> : <NotOnSale />;
+}
+
+function OnSale() {
+  return (
+    <>
+      <Nav active="pricing" />
+      <PageHero
+        kicker="pricing"
+        title="The public record is free. The house report is paid."
+        lead="Looking up what is on record costs nothing and needs no account. When you are deciding on one house, the house report runs our own models for it."
+        accent="var(--amber)"
+      />
+      <Section kicker="two ways to use it" title="Free for the area. Paid for the house.">
+        <div className="grid-2 pricing-tiers" style={{ gap: 18, alignItems: "stretch" }}>
+          <div className="card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 10 }}>
+            <div className="kicker">Free · no account</div>
+            <h3 style={{ margin: 0 }}>{PLANS[0].name}</h3>
+            <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6, margin: 0 }}>What is on public record around any US address.</p>
+            <ul style={{ margin: "4px 0 0", paddingLeft: 18, fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6 }}>
+              {PLANS[0].what.map((w) => (
+                <li key={w}>{w}</li>
+              ))}
+            </ul>
+            <div style={{ marginTop: "auto", paddingTop: 10 }}>
+              <Link href="/" className="btn">Look up a place <span className="arrow">→</span></Link>
+            </div>
+          </div>
+          <div className="card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 10 }}>
+            <div className="kicker">Bought once · for one house</div>
+            <h3 style={{ margin: 0 }}>{REPORT.name}</h3>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+              <span style={{ fontSize: 36, fontWeight: 800, letterSpacing: "-0.03em", color: "var(--ink)" }}>{formatPrice(REPORT.priceCents)}</span>
+              <span style={{ fontSize: 14, color: "var(--muted)" }}>once</span>
+            </div>
+            <ul style={{ margin: "4px 0 0", paddingLeft: 18, fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6 }}>
+              {REPORT.includes.map((w) => (
+                <li key={w}>{w}</li>
+              ))}
+            </ul>
+            <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6, margin: "4px 0 0" }}>
+              <strong style={{ color: "var(--ink)" }}>Within {REPORT.deliveryDays} working days, or your money back.</strong>{" "}
+              If we cannot model your place, you get a full refund.
+            </p>
+            <div className="row" style={{ marginTop: "auto", paddingTop: 10, gap: 10, flexWrap: "wrap" }}>
+              <Link href="/report/buy" className="btn btn-accent">Order the house report <span className="arrow">→</span></Link>
+              <Link href="/report/sample" className="btn">See a sample</Link>
+            </div>
+          </div>
+        </div>
+        <p style={{ marginTop: 20, fontSize: 14, lineHeight: 1.7, color: "var(--ink-2)", maxWidth: 760 }}>{FOR_SCALE}</p>
+      </Section>
+
+      <Section sunken kicker="what it is not" title="Said before you pay, not after.">
+        <ul style={{ margin: 0, paddingLeft: 18, fontSize: 15, color: "var(--ink-2)", lineHeight: 1.7, maxWidth: 760 }}>
+          {REPORT.isNot.map((w) => (
+            <li key={w}>{w}</li>
+          ))}
+        </ul>
+        <p style={{ marginTop: 18, fontSize: 14, lineHeight: 1.7, color: "var(--muted)", maxWidth: 760 }}>
+          A subscription for owners trying projects over time is planned, not on sale. Billing and refund terms are in
+          the <Link href="/terms#reports">Terms of Service</Link>. Questions: {EMAIL_PRIMARY}.
+        </p>
+      </Section>
+      <Footer />
+    </>
+  );
+}
+
+function NotOnSale() {
   return (
     <>
       <Nav active="pricing" />

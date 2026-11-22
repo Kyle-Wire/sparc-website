@@ -41,6 +41,14 @@ import WaitlistConfirmation, {
   subject as waitlistConfirmationSubject,
   type WaitlistConfirmationProps,
 } from "@/emails/waitlist-confirmation";
+import ReportOrderReceived, {
+  subject as reportOrderReceivedSubject,
+  type ReportOrderReceivedProps,
+} from "@/emails/report-order-received";
+import ReportDelivered, {
+  subject as reportDeliveredSubject,
+  type ReportDeliveredProps,
+} from "@/emails/report-delivered";
 import DemoRequestReceived, {
   subject as demoRequestReceivedSubject,
   type DemoRequestReceivedProps,
@@ -54,7 +62,9 @@ export type EmailTemplate =
   | { template: "subscription-renewing"; props: SubscriptionRenewingProps }
   | { template: "subscription-canceled"; props: SubscriptionCanceledProps }
   | { template: "waitlist-confirmation"; props: WaitlistConfirmationProps }
-  | { template: "demo-request-received"; props: DemoRequestReceivedProps };
+  | { template: "demo-request-received"; props: DemoRequestReceivedProps }
+  | { template: "report-order-received"; props: ReportOrderReceivedProps }
+  | { template: "report-delivered"; props: ReportDeliveredProps };
 
 type Registry = {
   [K in EmailTemplate as K["template"]]: {
@@ -92,6 +102,14 @@ const registry: Registry = {
   "demo-request-received": {
     Component: DemoRequestReceived,
     subject: demoRequestReceivedSubject,
+  },
+  "report-order-received": {
+    Component: ReportOrderReceived,
+    subject: reportOrderReceivedSubject,
+  },
+  "report-delivered": {
+    Component: ReportDelivered,
+    subject: reportDeliveredSubject,
   },
 };
 

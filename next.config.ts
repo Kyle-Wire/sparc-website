@@ -23,7 +23,9 @@ const CSP = [
   "worker-src 'self' blob:",
   "frame-ancestors 'none'",
   "base-uri 'self'",
-  "form-action 'self' https://*.lemonsqueezy.com",
+  // The house report's checkout is Stripe's hosted page: the order form posts
+  // to /api/reports/order, which redirects there (docs/payments.md).
+  "form-action 'self' https://checkout.stripe.com https://*.lemonsqueezy.com",
   "object-src 'none'",
   "upgrade-insecure-requests",
 ].join("; ");

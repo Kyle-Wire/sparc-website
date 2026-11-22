@@ -60,6 +60,8 @@ pnpm dev              # http://localhost:3000
 | `SUPABASE_SERVICE_ROLE_KEY` | Webhook + admin operations only — never exposed to the browser |
 | `LEMONSQUEEZY_API_KEY`, `LEMONSQUEEZY_STORE_ID` | Checkout creation |
 | `LEMONSQUEEZY_WEBHOOK_SECRET` | HMAC verification on `/api/lemonsqueezy/webhook` |
+| `CHECKOUT_ENABLED` | Switch house report checkout on (`true`) |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_REPORT` | The house report on Stripe Checkout with Managed Payments; `STRIPE_MANAGED_PAYMENTS=false` falls back to Stripe Tax |
 | `LEMONSQUEEZY_VARIANT_PURSUE_{MONTHLY,YEARLY}` | Variant IDs for Pursue plan |
 | `LEMONSQUEEZY_VARIANT_CONVERGE_{MONTHLY,YEARLY}` | Variant IDs for Converge plan |
 | `RESEND_API_KEY`, `WAITLIST_NOTIFY_EMAIL` | Optional waitlist notifications |
@@ -83,10 +85,14 @@ to provision tables (`profiles`, `subscriptions`, `orders`, `seats`, `license_ke
 
 ## Billing flow
 
-1. User picks a plan on `/pricing` → `GET /api/checkout?tier=…&period=…`
-2. We create a Lemon Squeezy checkout with `custom_data.user_id`
-3. LS posts to `/api/lemonsqueezy/webhook` (HMAC-verified) and we upsert `subscriptions`
-4. User manages billing at `/account/subscription` → `/api/portal`
+The house report, bought once: [`docs/payments.md`](docs/payments.md). Off unless
+`CHECKOUT_ENABLED=true`. `/report/buy` → `POST /api/reports/order` → the provider's
+Stripe Checkout (Managed Payments) → `/api/stripe/webhook` (signature checked,
+applied once by `apply_payment_event`) → `scripts/report-order.ts deliver` →
+`/account/reports`.
+
+The older subscription checkout (`/api/checkout`, Pursue/Converge, Lemon Squeezy)
+stays switched off. Lemon Squeezy stops processing payments on 31 March 2027.
 
 ## Account portal
 

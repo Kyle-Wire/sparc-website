@@ -10,14 +10,13 @@ export const metadata = {
   robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
 };
 
+// The account holds what a buyer has: their house reports and their settings.
+// The pages for the old desktop product (subscription, seats, downloads, API
+// keys, usage, devices) are left in place but out of the menu: none of them
+// describes anything that can be bought (docs/HANDOFF.md §6).
 const NAV: { href: Route; label: string }[] = [
   { href: "/account", label: "Overview" },
-  { href: "/account/subscription", label: "Subscription" },
-  { href: "/account/seats", label: "Seats" },
-  { href: "/account/downloads", label: "Downloads & licenses" },
-  { href: "/account/api-keys", label: "API keys (BYOK)" },
-  { href: "/account/usage", label: "Usage" },
-  { href: "/account/devices", label: "Devices" },
+  { href: "/account/reports", label: "Your reports" },
   { href: "/account/settings", label: "Settings" },
 ];
 

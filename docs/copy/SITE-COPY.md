@@ -12,6 +12,19 @@ Pages already in code are edited in this PR (`src/lib/engines.ts`, `src/app/abou
 2. **The public record, read for you. Our models, with the receipts.**
 3. **A first look at flood, heat and ground around a home, with every limit on the label.**
 
+**More in the same line (Kyle liked 1, 22 Nov 2026).** Each sets one official label against the fuller public record, and none promises an outcome:
+
+4. Your flood zone fits in one letter. Your street needs a few more pages.
+5. Zone X is a letter, not a forecast. Read the rest of the block.
+6. The listing has forty photos. None of them show where the water goes.
+7. One letter from FEMA. A whole block of public record, free.
+8. The listing shows the kitchen. We show the block.
+9. Before you sign for the house, read the block.
+10. Flood zone: one letter. Storms, ground, heat: the rest of the alphabet.
+11. Your flood zone is one letter. Your block's record is the whole sentence.
+
+Pairs well with branding's positioning line, "Your inspector checks the house. Who checks the block?": use 1 (or 4) as the map hero and branding's line on How it works.
+
 Meta description (fits 155 characters): *Free flood, storm and ground records for any US address. Flood, heat and ground models of the block, each labelled with what it has been checked against.*
 
 ---

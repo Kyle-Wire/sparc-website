@@ -33,9 +33,9 @@ create table if not exists public.report_orders (
   address text not null check (length(address) between 5 and 300),
   note text check (note is null or length(note) <= 2000),
   -- What the provider told us.
-  provider text,                                 -- 'lemonsqueezy' | 'stripe'
-  provider_order_id text,
-  provider_order_number text,
+  provider text,                                 -- 'stripe' (the provider is behind src/lib/payments/provider.ts)
+  provider_order_id text,                        -- Stripe: the PaymentIntent id
+  provider_order_number text,                    -- Stripe: the Checkout Session id
   amount_paid_cents int,
   receipt_url text,
   test_mode boolean,
@@ -61,8 +61,8 @@ create policy "report_orders_self_read" on public.report_orders
 revoke insert, update, delete on public.report_orders from anon, authenticated;
 
 -- Every webhook delivery that passed its signature check, once. The key is the
--- provider's event name and object id (Lemon Squeezy sends no event id), so a
--- resend is recognised and answered without touching the order twice.
+-- provider's event id (Stripe resends an event under the same id), so a resend
+-- is recognised and answered without touching the order twice.
 create table if not exists public.payment_events (
   provider text not null,
   event_key text not null,
@@ -114,8 +114,15 @@ begin
     return 'duplicate';
   end;
 
-  select * into o from public.report_orders where id = p_order_id for update;
-  if not found then
+  -- A refund event may not carry our order id (a Stripe charge does not), so
+  -- it is matched on the provider's payment id instead.
+  if p_order_id is not null then
+    select * into o from public.report_orders where id = p_order_id for update;
+  elsif p_kind = 'order_refunded' then
+    select * into o from public.report_orders
+     where provider = p_provider and provider_order_id = p_provider_order_id for update;
+  end if;
+  if o.id is null then
     v_outcome := 'unknown_order';
   elsif p_user_id is not null and o.user_id <> p_user_id then
     v_outcome := 'wrong_user';
@@ -160,6 +167,8 @@ begin
   elsif p_kind = 'order_refunded' then
     if o.status = 'refunded' then
       v_outcome := 'duplicate';
+    elsif o.provider_order_id is null then
+      v_outcome := 'review';
     elsif o.provider_order_id is distinct from p_provider_order_id then
       update public.report_orders set
         needs_review = format('refund for order %s, which is not the payment on record', p_provider_order_id),
@@ -176,7 +185,7 @@ begin
 
   update public.payment_events
      set outcome = v_outcome,
-         order_id = case when v_outcome = 'unknown_order' then null else p_order_id end
+         order_id = o.id
    where provider = p_provider and event_key = p_event_key;
   return v_outcome;
 end $$;

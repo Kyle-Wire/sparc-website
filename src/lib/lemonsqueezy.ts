@@ -1,5 +1,5 @@
 // Lemon Squeezy helpers — checkout creation + webhook signature verification.
-import { signatureValid } from "@/lib/payments/lemonsqueezy";
+import crypto from "node:crypto";
 import { lemonSqueezySetup, createCheckout } from "@lemonsqueezy/lemonsqueezy.js";
 
 let configured = false;
@@ -44,9 +44,17 @@ export async function createUserCheckout(args: {
   return result.data?.data.attributes.url;
 }
 
-// Webhook signature verification: one implementation, in src/lib/payments/lemonsqueezy.ts.
+// Webhook signature verification — see https://docs.lemonsqueezy.com/api/webhooks
 export function verifyWebhookSignature(rawBody: string, signature: string | null): boolean {
-  return signatureValid(rawBody, signature, process.env.LEMONSQUEEZY_WEBHOOK_SECRET);
+  const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
+  if (!secret || !signature) return false;
+  const hmac = crypto.createHmac("sha256", secret);
+  const digest = hmac.update(rawBody).digest("hex");
+  try {
+    return crypto.timingSafeEqual(Buffer.from(digest, "hex"), Buffer.from(signature, "hex"));
+  } catch {
+    return false;
+  }
 }
 
 export type LemonSqueezyEvent =

@@ -1,11 +1,9 @@
 import type { PaymentProvider } from "./provider";
-import { lemonSqueezy, type LemonSqueezyEnv } from "./lemonsqueezy";
+import { stripe, type StripeEnv } from "./stripe";
 
-/** The provider in use. PAYMENTS_PROVIDER names it; Lemon Squeezy is the only one so far. */
-export function paymentProvider(env: NodeJS.ProcessEnv = process.env): PaymentProvider {
-  const id = env.PAYMENTS_PROVIDER ?? "lemonsqueezy";
-  if (id === "lemonsqueezy") return lemonSqueezy(env as LemonSqueezyEnv);
-  throw new Error(`Unknown PAYMENTS_PROVIDER: ${id}`);
+/** The provider in use: Stripe (Kyle, 22 November 2026). */
+export function paymentProvider(env: Record<string, string | undefined> = process.env): PaymentProvider {
+  return stripe(env as StripeEnv);
 }
 
 export * from "./provider";

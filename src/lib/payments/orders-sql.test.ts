@@ -36,11 +36,11 @@ async function newOrder(price = 14900): Promise<string> {
 async function apply(
   key: string,
   kind: string,
-  order: string,
+  order: string | null,
   o: { user?: string | null; providerOrder?: string; amount?: number; currency?: string } = {},
 ): Promise<string> {
   const r = await db.query<{ t: string }>(
-    "select public.apply_payment_event('lemonsqueezy', $1, $2, $3, $4, $5, $6, 'N-1', $7, $8, true, 'https://receipt') as t",
+    "select public.apply_payment_event('stripe', $1, $2, $3, $4, $5, $6, 'N-1', $7, $8, true, 'https://receipt') as t",
     [key, kind === "order_paid" ? "order_created" : "order_refunded", kind, order, o.user === undefined ? BUYER : o.user, o.providerOrder ?? "LS-1", o.amount ?? 14900, o.currency ?? "USD"],
   );
   return r.rows[0].t;
@@ -152,6 +152,21 @@ test("one provider order cannot pay for two of ours", async () => {
   assert.equal(await apply("l2", "order_paid", b, { providerOrder: "LS-l" }), "review");
   assert.equal((await row(b)).status, "awaiting_payment");
   assert.match(String((await row(b)).needs_review), /already on another order/);
+});
+
+test("a refund with no order id is matched on the provider's payment id", async () => {
+  const id = await newOrder();
+  await apply("m1", "order_paid", id, { providerOrder: "pi_m" });
+  assert.equal(await apply("m2", "order_refunded", null, { providerOrder: "pi_m", user: null }), "refunded");
+  assert.equal((await row(id)).status, "refunded");
+  const ev = await db.query<{ order_id: string }>("select order_id from public.payment_events where event_key = 'm2'");
+  assert.equal(ev.rows[0].order_id, id);
+  assert.equal(await apply("m3", "order_refunded", null, { providerOrder: "pi_nobody", user: null }), "unknown_order");
+});
+
+test("a refund for an order never paid is flagged", async () => {
+  const id = await newOrder();
+  assert.equal(await apply("n1", "order_refunded", id, { providerOrder: "pi_n" }), "review");
 });
 
 test("the browser roles can write nothing", async () => {

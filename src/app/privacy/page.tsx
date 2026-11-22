@@ -108,9 +108,9 @@ export default function PrivacyPage() {
                 Only you (signed in) and the person making your report can read it. It is not put in any link.
               </p>
               <p>
-                Payment is taken by our payment provider, Lemon Squeezy, which receives your email and the payment
-                details you enter on its checkout page. We never see your card. It tells us the order is paid, the
-                amount and a receipt link. The finished report is stored privately and is downloaded through your
+                Payment is taken by Stripe, on its own checkout page, where Link (Stripe&apos;s merchant of record
+                service) receives your email and the payment details you enter. We never see your card. Stripe tells
+                us the order is paid and the amount, and Link sends your receipt. The finished report is stored privately and is downloaded through your
                 account with a link that lasts a few minutes.
               </p>
               <p>
@@ -163,7 +163,7 @@ export default function PrivacyPage() {
             <li>Vercel: hosts the website, and receives your internet address with each page you load, as any host does. Also the visit counting above.</li>
             <li>Supabase: the database for contact messages and accounts.</li>
             <li>Resend: sends the email that tells us a contact message has arrived{onSale ? ", and the emails about a report order" : ""}.</li>
-            {onSale && <li>Lemon Squeezy: takes payment for a report as the merchant of record, and receives your email and payment details on its checkout page.</li>}
+            {onSale && <li>Stripe and Link: take payment for a report on Stripe&apos;s checkout page (Link acts as merchant of record and sends the receipt), and receive your email and payment details there.</li>}
             <li>US Census Bureau: receives an address you search for, from our server.</li>
             <li>komoot (Photon, OpenStreetMap search): receives an address you search for, from our server, only when the Census Bureau does not find it.</li>
             <li>FEMA, US Geological Survey, NOAA, the USDA soil survey (NRCS) and the national land cover server (MRLC): the sources of the records and map layers, as described above. A spot you click is sent to them, rounded to about a metre, and not stored.</li>

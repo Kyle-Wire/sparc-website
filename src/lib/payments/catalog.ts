@@ -3,8 +3,8 @@
  * account pages and the Terms all read this file, so a price or a promise is
  * written once.
  *
- * PRICE IS A PROPOSAL. Kyle decides it (pricing thread, 22 November 2026). The
- * figure here must equal the variant's price in the payment provider's store;
+ * PRICE: $149, Kyle's decision (pricing thread, 22 November 2026). The figure
+ * here must equal the report's Price in Stripe (STRIPE_PRICE_REPORT);
  * the webhook records what was actually paid and flags an order paid at more
  * than this figure (supabase/migrations/0007_report_orders.sql).
  *

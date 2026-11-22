@@ -1,13 +1,13 @@
 # Selling the house report
 
-**22 November 2026.** How a buyer pays for a house report, how it reaches them, and the steps only Kyle can do. Everything here is off on the live site until `CHECKOUT_ENABLED=true` is set in Vercel's Production environment.
+**22 November 2026.** Kyle's decisions that day: **$149**, and **Stripe Managed Payments only**. How a buyer pays for a house report, how it reaches them, and the steps only Kyle can do. Everything here is off on the live site until `CHECKOUT_ENABLED=true` is set in Vercel's Production environment.
 
 ## The flow
 
 1. **Pricing → order page.** `/pricing` shows the price and one link to `/report/buy` (only when checkout is on). The page shows what the report includes, what it is not, and the promise, all read from `src/lib/payments/catalog.ts`.
 2. **Account.** Ordering needs an account, because the report lives there. `/signup` and `/login` carry the buyer back to the order page.
-3. **Order.** The form posts to `POST /api/reports/order`. It writes a `report_orders` row (`awaiting_payment`, the price shown, the address) and redirects to the provider's hosted checkout. Only the row's id travels in the checkout's custom data.
-4. **Payment.** The provider calls `POST /api/lemonsqueezy/webhook`. The signature is checked over the raw body; the event goes through `src/lib/payments/webhook.ts` and the SQL function `apply_payment_event` (migration 0007), which moves the order to `paid` once, however many times the event is resent. The buyer gets an email; the inbox (`WAITLIST_NOTIFY_EMAIL`) gets one line with the next command.
+3. **Order.** The form posts to `POST /api/reports/order`. It writes a `report_orders` row (`awaiting_payment`, the price shown, the address) and redirects to a Stripe Checkout Session with Managed Payments on. Only the row's id travels with it (`client_reference_id` and metadata).
+4. **Payment.** Stripe calls `POST /api/stripe/webhook`. The signature is checked over the raw body; the event goes through `src/lib/payments/webhook.ts` and the SQL function `apply_payment_event` (migration 0007), which moves the order to `paid` once, however many times the event is resent. The buyer gets an email; the inbox (`WAITLIST_NOTIFY_EMAIL`) gets one line with the next command.
 5. **Making the report.** A person runs the models in Climate Home Inspection, then:
    ```bash
    export NEXT_PUBLIC_SUPABASE_URL=...  SUPABASE_SERVICE_ROLE_KEY=...  RESEND_API_KEY=...
@@ -17,57 +17,52 @@
    npx tsx scripts/report-order.ts cannot-model <order-id> "why, in words the buyer reads"   # then refund in the dashboard
    ```
 6. **Download.** `/account/reports` shows each order's progress. A delivered report downloads through `/api/reports/<id>/download`, which checks the buyer and hands out a five-minute link to the private `reports` bucket.
-7. **Refunds** are made in the provider's dashboard. Its `order_refunded` webhook marks the order refunded.
+7. **Refunds** are made in the Stripe Dashboard. Its `charge.refunded` event marks the order refunded (matched on the PaymentIntent). A partial refund is left for a person.
 
 What the code refuses, each with a test: a forged signature (401); a resend (answered 200, nothing changes); a test-mode payment while the store is live; another product's payment; one payment applied to two orders; a refund for a payment that is not the one on record; a payment arriving after a refund; any write from the browser.
 
 ## Kyle: set it up in test mode (about 20 minutes)
 
-Lemon Squeezy **closed new store sign-ups on 16 November 2026** and stops processing payments on **31 March 2027** (their post, "Saying goodbye to Lemon Squeezy"). These steps work only if you already have a store. If you do not, skip to the Stripe section.
-
 1. **Supabase.** Apply `supabase/migrations/0007_report_orders.sql` (SQL editor, or `supabase db push` once the migration history is repaired, see `TIER1_HANDOFF.md` A). It creates `report_orders`, `payment_events`, the two functions and the private `reports` bucket. Check in Storage that `reports` exists and is **not public**.
-2. **Lemon Squeezy, in Test mode** (toggle at the bottom left of the dashboard):
-   - Products → New product: "The house report", single payment, price as decided (the proposal is $149), tax category digital/e-service. Note the **variant id** (the product's variant, in its URL or via the API).
-   - Settings → API → new key. Test mode keys are separate from live keys.
-   - Settings → Webhooks → add `https://<your preview URL>/api/lemonsqueezy/webhook` (and later `https://sparclabs.co/api/lemonsqueezy/webhook`), events `order_created` and `order_refunded`, and a signing secret: generate one with `openssl rand -hex 20` (Lemon Squeezy allows 6 to 40 characters).
-   - Note the **store id** (Settings → Stores).
+2. **Stripe, in test mode** (the toggle at the top of the Dashboard):
+   - Settings → Managed Payments (dashboard.stripe.com/settings/managed-payments): turn it on. Stripe reviews eligibility first. **Read this:** its eligibility page asks for digital products that are "fully automated, with no human intervention". Our report is a digital file but a person makes it, so Stripe may say no. If it does, set `STRIPE_MANAGED_PAYMENTS=false`: the same checkout then runs with Stripe Tax, and SPARC Labs is the seller (you register for and file sales tax where Stripe Tax says you owe it).
+   - Product catalogue → Add product: "The house report", one-off price **$149.00 USD**, tax code from the "Eligible for Managed Payments" list (for example `txcd_10000000`, General - Electronically Supplied Services). Copy the **price id** (`price_…`).
+   - Developers → API keys: copy the **secret key** (`sk_test_…`).
+   - Developers → Webhooks → Add endpoint: `https://<your preview URL>/api/stripe/webhook` (later `https://sparclabs.co/api/stripe/webhook`), API version `2026-04-22.dahlia`, events `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `charge.refunded`. Copy its **signing secret** (`whsec_…`).
 3. **Vercel → Settings → Environment Variables, Preview environment only:**
 
    | Name | Value |
    |---|---|
    | `CHECKOUT_ENABLED` | `true` |
-   | `PAYMENTS_PROVIDER` | `lemonsqueezy` |
-   | `LEMONSQUEEZY_API_KEY` | the test API key |
-   | `LEMONSQUEEZY_STORE_ID` | the store id |
-   | `LEMONSQUEEZY_VARIANT_REPORT` | the report's variant id |
-   | `LEMONSQUEEZY_WEBHOOK_SECRET` | the signing secret |
-   | `LEMONSQUEEZY_TEST_MODE` | `true` |
+   | `STRIPE_SECRET_KEY` | the `sk_test_…` key |
+   | `STRIPE_PRICE_REPORT` | the `price_…` id |
+   | `STRIPE_WEBHOOK_SECRET` | the `whsec_…` secret |
    | `SUPABASE_SERVICE_ROLE_KEY` | already set? check |
    | `RESEND_API_KEY`, `WAITLIST_NOTIFY_EMAIL` | already set? check |
 
    Never put any of these in the repository: it is public.
-4. **Try it.** Open the preview, sign up, order, and pay with Lemon Squeezy's test card `4242 4242 4242 4242`, any future date, any CVC. Expect: the order shows **Paid** with a "test mode" badge in Your reports, and an email in the inbox. Then refund it in the dashboard and expect **Refunded**.
+4. **Try it.** Open the preview, sign up, order, and pay with Stripe's test card `4242 4242 4242 4242`, any future date, any CVC. Expect: the order shows **Paid** with a "test mode" badge in Your reports, and an email in the inbox. Then refund it in the Dashboard and expect **Refunded**.
 
 ## Before turning it on for real
 
 All of these are Kyle's calls:
 
-- [ ] The price (decision card in the thread, 22 November 2026), set in `catalog.ts` and in the store.
-- [ ] The promise: report within 10 working days or a full refund. Change `deliveryDays` if a different number is right.
+- [x] The price: $149 (22 November 2026).
+- [x] The provider: Stripe Managed Payments (22 November 2026).
+- [ ] Stripe's Managed Payments eligibility answer, or the Stripe Tax fallback and a sales-tax plan.
+- [ ] The promise: report within 10 working days or a full refund. Change `deliveryDays` in `catalog.ts` if a different number is right.
 - [ ] The Terms' report section (`/terms#reports`, shown only when checkout is on) read and agreed. A lawyer's read is recommended.
 - [ ] The privacy page's report section, likewise.
-- [ ] A live store approved for payments, live keys in Vercel **Production**, `LEMONSQUEEZY_TEST_MODE` unset or `false`. Test-mode orders are then refused as payments.
+- [ ] Live keys, live price and a live webhook endpoint in Vercel **Production**. A test-mode event is then refused as a payment, because the key is live.
 - [ ] The first live order fulfilled end to end by hand.
 
-## Moving to Stripe (before 31 March 2027)
+## What a buyer sees at checkout
 
-Lemon Squeezy points sellers to **Stripe Managed Payments**, Stripe's merchant of record, with migration tooling from 2 December 2026. It "isn't a like-for-like replacement" by their own account. The site is built for the switch:
-
-- `src/lib/payments/provider.ts` is the one interface: create a checkout, verify and parse a webhook, recognise the report's product.
-- A Stripe adapter is one new file beside `lemonsqueezy.ts`, chosen by `PAYMENTS_PROVIDER=stripe`, plus a webhook route for Stripe's signature header. The order table, the state machine, the pages and the fulfilment script do not change: `report_orders.provider` and `payment_events.provider` already record which provider took each payment.
-- The site's Content Security Policy (`next.config.ts`) allows forms to reach `*.lemonsqueezy.com` only; Stripe's checkout host will need adding there.
+From Stripe's Managed Payments page: the checkout runs through Link, which the buyer sees as the merchant of record ("Sold through Link"); cards, Apple Pay, Google Pay and Link are offered; receipts and refund notices come from Link; the card statement reads `LINK.COM* <our descriptor>`. Link handles buyer support and may contact us, and "if you don't respond within 48 hours, Stripe might issue a refund without your approval". Stripe handles disputes.
 
 ## What was tested
 
-- `npm test`: the state machine on the migration itself in PGlite, the Lemon Squeezy adapter (signature, parsing, checkout body), the webhook's decisions and the order form.
-- The whole flow in a production build against local stand-ins for Supabase (with the real migration in PGlite) and Lemon Squeezy: pricing, sign-up, order, a stand-in checkout that sends a signed webhook, paid, resend answered as duplicate, forged signature refused, `scripts/report-order.ts start` and `deliver`, download of the PDF, a second order refunded. The stand-ins are not committed. **Not tested:** a real Lemon Squeezy test-mode checkout, which needs Kyle's keys.
+- `npm test`: the state machine on the migration itself in PGlite, the Stripe adapter (signature with timestamp tolerance and several v1 values, parsing, the Checkout Session body, form encoding), the webhook's decisions and the order form.
+- The whole flow in a production build against local stand-ins for Supabase (with the real migration in PGlite) and Stripe: pricing, sign-up, order, a stand-in checkout that sends a signed `checkout.session.completed`, paid, resend answered as duplicate, forged signature refused, `scripts/report-order.ts start` and `deliver`, download of the PDF, a second order refunded by `charge.refunded` with no order id on the charge. The stand-ins are not committed. **Not tested:** a real Stripe test-mode checkout, which needs Kyle's keys.
+
+Sources opened 22 November 2026 are listed at the top of `src/lib/payments/stripe.ts`.

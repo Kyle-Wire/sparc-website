@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
       userId: user.id,
       email: user.email,
       successUrl: `${SITE_URL}/account/reports?paid=${order.id}`,
+      cancelUrl: `${SITE_URL}/report/buy${input.placeSlug ? `?place=${input.placeSlug}` : ""}`,
     });
     return NextResponse.redirect(url, { status: 303 });
   } catch (err) {

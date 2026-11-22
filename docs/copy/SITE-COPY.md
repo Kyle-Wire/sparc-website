@@ -16,7 +16,7 @@ Pages already in code are edited in this PR (`src/lib/engines.ts`, `src/app/abou
 
 4. Your flood zone fits in one letter. Your street needs a few more pages.
 5. Zone X is a letter, not a forecast. Read the rest of the block.
-6. The listing has forty photos. None of them show where the water goes.
+6. The listing shows every room. None of the photos show where the water goes.
 7. One letter from FEMA. A whole block of public record, free.
 8. The listing shows the kitchen. We show the block.
 9. Before you sign for the house, read the block.

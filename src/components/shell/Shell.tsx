@@ -85,6 +85,7 @@ export function Footer() {
             <Link href="/data">Data sources</Link>
             <Link href="/models">The models</Link>
             <Link href="/pricing">Pricing</Link>
+            <Link href="/faq">Questions</Link>
           </div>
           <div>
             <h6>Company</h6>

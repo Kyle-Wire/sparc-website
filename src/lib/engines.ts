@@ -37,8 +37,12 @@
  *                  model" (brief §4).
  *
  * What this file may NOT say: that any engine is validated for a place, that
- * any is on sale or runnable from the site today, any accuracy figure, any
- * run time, any price.
+ * any is on sale or runnable from the site today, any run time, any price.
+ * An error figure appears only as the engine's own, with where it was
+ * measured (climate-home-inspection docs/validation/VALIDATION-STATUS.md
+ * §3.3). Words revised 22 November 2026 against that file at 4c25efc; the
+ * sources are listed in docs/copy/SITE-COPY.md. What each engine passed and
+ * failed lives in src/lib/copy/receipts.ts, not here.
  */
 
 export type EngineId = "flood" | "heat" | "ground" | "wind";
@@ -176,7 +180,7 @@ export const ENGINES: Engine[] = [
       "A ground section can be held for a person to review, for example when the ground at the house moves on its own or a new rate appears. The order then shows it as in review, not as failed. Our own full processing takes one to two days for a place and is shared by every property near it, so a paid order may wait on it.",
     selfServe: "run-for-you",
     status:
-      "Defined, with each reading marked free or paid and ready, in review or refused. No radar has been read for any place yet.",
+      "NASA's OPERA product has been read at our three test places. No GNSS station has checked it there yet, so every reading is exploratory.",
     source: { repo: "Kyle-Wire/insar_pipeline", commit: "3612eda" },
   },
   {
@@ -186,11 +190,11 @@ export const ENGINES: Engine[] = [
     runsOn: "our-workstation",
     where: "On our workstation. Wind is worked out for the neighbourhood from every direction, then shown to you as a map.",
     summary:
-      "Works out how wind moves between the buildings and over the roofs of the neighbourhood, and puts that together with the local wind record to show how it moves through the seasons.",
+      "Two layers. The first carries a storm's gusts in from the airport anemometers around a place, through the land cover upwind. The second models wind between the buildings, and stays in the wind tunnel until it passes there.",
     findings: [
       "How wind moves through the neighbourhood, season by season",
-      "Where buildings may funnel it and speed it up, once the street model passes its wind-tunnel test (it does not yet)",
-      "Gusts at street level and at roof level, once checked against airport wind records",
+      "Storm gusts for the block, carried in from nearby airport records, once that check is published",
+      "Wind between the buildings, only after the street model passes its wind-tunnel tests (it does not yet)",
       "Past storm tracks nearby, from the public record",
     ],
     choices: ["A season", "Street level or roof level", "A named past storm, later"],
@@ -201,7 +205,7 @@ export const ENGINES: Engine[] = [
       "Whether the house meets a building code",
     ],
     selfServe: "run-for-you",
-    status: "The engine runs on a workstation and is being checked against wind-tunnel cases. It is not connected to the site yet.",
+    status: "Storm gusts are being checked against airport records; the street model is still failing its wind-tunnel tests. Nothing about wind is in a report yet.",
     source: { repo: "Kyle-Wire/WindSim", commit: "cc15851" },
   },
 ];

@@ -24,16 +24,21 @@ const PRINCIPLES = [
   },
   {
     k: "02",
-    t: "Findings first, evidence behind.",
-    b: "A result leads with what it means. How much stands behind it, its limits and its sources sit one step behind, never hidden and never in the way.",
+    t: "Findings first, receipts right behind.",
+    b: "A result leads with what it means. How much stands behind it, its limits and its sources sit one tap away, never hidden and never in the way.",
   },
   {
     k: "03",
-    t: "Nothing is called validated until it is measured.",
-    b: "A model result that has not been compared with a measurement at the place says so. A panel with no run behind it shows no numbers. That second rule is checked by the build, not left to care.",
+    t: "Measured beats modelled, every time.",
+    b: "A model result that has not been compared with a measurement at the place says so, on the result, at full size. A panel with no run behind it shows no numbers, and the build checks that, not our good intentions.",
   },
   {
     k: "04",
+    t: "We post our misses.",
+    b: "When a model fails a check, the failure goes on the page next to the passes. A scoreboard that only shows wins is not a scoreboard.",
+  },
+  {
+    k: "05",
     t: "A block, not a house.",
     b: "An address is used to find the place and is then dropped. Pages, links and maps carry the neighbourhood. Only a report someone has asked for is tied to a property, and it stays with them.",
   },
@@ -46,7 +51,7 @@ export default function AboutPage() {
       <PageHero
         kicker={`about · ${COMPANY.toLowerCase()}`}
         title="Making planning available to everyone."
-        lead={`${COMPANY} builds flood and heat models and puts environmental records where a home buyer can read them. Founded in ${FOUNDED_YEAR} in ${OFFICE_CITY}, ${OFFICE_STATE}.`}
+        lead={`${COMPANY} builds flood, heat, ground and wind models and puts the public record where a home buyer can actually read it. Founded in ${FOUNDED_YEAR} in ${OFFICE_CITY}, ${OFFICE_STATE}. One person and a lot of benchmarks.`}
         accent="var(--purple)"
       />
 
@@ -60,18 +65,18 @@ export default function AboutPage() {
             <div className="prose">
               <p>
                 Engineers and planners have tools for asking where storm water goes and how hot a street
-                gets. A person buying a house mostly has a listing and a flood zone letter. We want to
-                close some of that gap.
+                gets. A buyer mostly has a listing and a flood-zone letter. That gap is lowkey wild, and we
+                want to close some of it.
               </p>
               <p>
                 The site does two things. It gathers what public agencies already publish about a place and
                 shows it plainly, free. And it will offer our own models of the neighbourhood around a
-                property, so someone can see what a hard storm or a hot week is likely to look like there,
-                and try out what they could do about it.
+                property, so you can see what a hard storm or a hot week looks like there in the model, and
+                try out what you could do about it.
               </p>
               <p>
-                It is a screening tool. It is meant to give people more to go on, not to replace an
-                engineer, an inspector or an insurer.
+                It&apos;s a screening tool. It gives you more to go on before you talk to an inspector, an
+                engineer or an insurer. It doesn&apos;t replace any of them.
               </p>
             </div>
           </div>
@@ -82,7 +87,7 @@ export default function AboutPage() {
               <dt>entity</dt><dd className="mono">{COMPANY_LEGAL}</dd>
               <dt>people</dt><dd className="mono">one</dd>
               <dt>free today</dt><dd className="mono">the public record, any US address</dd>
-              <dt>paid</dt><dd className="mono">flood and heat models · not on sale yet</dd>
+              <dt>paid</dt><dd className="mono">flood, heat and ground models · not on sale yet</dd>
               <dt>contact</dt><dd className="mono">{EMAIL_PRIMARY}</dd>
             </dl>
           </div>

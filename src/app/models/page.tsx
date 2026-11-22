@@ -142,6 +142,10 @@ export default function ModelsPage() {
               was tested against and its margins will be linked here. Until it&apos;s out, treat every result
               as a first look.
             </li>
+            <li>
+              <strong>Tested, failures included.</strong> Every test suite and benchmark we ran, and what it
+              returned, is on <Link href="/how-we-test">how we test</Link>.
+            </li>
           </ul>
         </div>
         <p className="screening-note" style={{ marginTop: 24 }}>

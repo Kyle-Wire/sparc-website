@@ -43,6 +43,17 @@ What the code refuses, each with a test: a forged signature (401); a resend (ans
    Never put any of these in the repository: it is public.
 4. **Try it.** Open the preview, sign up, order, and pay with Stripe's test card `4242 4242 4242 4242`, any future date, any CVC. Expect: the order shows **Paid** with a "test mode" badge in Your reports, and an email in the inbox. Then refund it in the Dashboard and expect **Refunded**.
 
+## Invitation first (soft launch)
+
+Kyle's decision, 22 November 2026: open by invitation before anyone can order. Once `CHECKOUT_ENABLED=true`, sales are **invitation only by default** (`salesMode()` in `catalog.ts`):
+
+| Variable | Effect |
+|---|---|
+| `ORDER_INVITE_EMAILS` | Comma-separated emails that may order. Anyone else signed in sees "open by invitation for now" on `/report/buy`, and a hand-made POST to `/api/reports/order` is refused |
+| `ORDERS_OPEN=true` | Anyone signed in may order, and the price and Order button appear on `/pricing`. Set only after the soft-launch reports are delivered on time |
+
+During the invitation phase `/pricing` shows no price. Terms, privacy and the FAQ show the report terms as soon as checkout is on, because invited buyers need them.
+
 ## Before turning it on for real
 
 All of these are Kyle's calls:

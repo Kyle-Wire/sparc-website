@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 import { EMAIL_PRIMARY } from "@/lib/brand";
-import { REPORT, checkoutEnabled, formatPrice } from "@/lib/payments";
+import { REPORT, formatPrice, salesMode } from "@/lib/payments";
 
 export const metadata = {
   title: "Pricing",
@@ -83,8 +83,9 @@ const FOR_SCALE =
   "For scale: a standard home inspection usually costs $296 to $424, and a radon test or sewer scope added to it $150 to $295 (2026 HomeAdvisor figures, via Rocket Mortgage).";
 
 export default function PricingPage() {
-  const onSale = checkoutEnabled();
-  return onSale ? <OnSale /> : <NotOnSale />;
+  // The price goes on this page only when anyone can order (ORDERS_OPEN).
+  // During the invitation-only soft launch it reads as not on sale.
+  return salesMode() === "open" ? <OnSale /> : <NotOnSale />;
 }
 
 function OnSale() {

@@ -39,4 +39,5 @@ export const ORDER_ERRORS: Record<string, string> = {
   checkout: "We could not open the checkout. Nothing was charged. Please try again in a minute.",
   unavailable: "Reports are not on sale yet. Nothing was charged.",
   unconfigured: "Checkout is not set up yet. Nothing was charged.",
+  invite: "Reports are open by invitation for now, and this account is not on the list. Nothing was charged.",
 };

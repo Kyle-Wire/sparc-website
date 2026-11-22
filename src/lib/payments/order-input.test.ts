@@ -45,3 +45,19 @@ test("checkout is off unless switched on exactly", () => {
   assert.equal(checkoutEnabled({ CHECKOUT_ENABLED: "1" }), false);
   assert.equal(checkoutEnabled({ CHECKOUT_ENABLED: "true" }), true);
 });
+
+test("soft launch: checkout on means invitation only until ORDERS_OPEN", async () => {
+  const { salesMode, mayOrder } = await import("./catalog");
+  const invite = { CHECKOUT_ENABLED: "true", ORDER_INVITE_EMAILS: "A@Example.com, b@example.com;c@x.org" };
+  assert.equal(salesMode({}), "off");
+  assert.equal(salesMode({ ORDERS_OPEN: "true" }), "off");
+  assert.equal(salesMode(invite), "invite");
+  assert.equal(salesMode({ ...invite, ORDERS_OPEN: "true" }), "open");
+  assert.equal(mayOrder("a@example.com", invite), true);
+  assert.equal(mayOrder(" C@X.ORG ", invite), true);
+  assert.equal(mayOrder("d@example.com", invite), false);
+  assert.equal(mayOrder(null, invite), false);
+  assert.equal(mayOrder("a@example.com", {}), false);
+  assert.equal(mayOrder("anyone@example.com", { CHECKOUT_ENABLED: "true" }), false);
+  assert.equal(mayOrder("anyone@example.com", { CHECKOUT_ENABLED: "true", ORDERS_OPEN: "true" }), true);
+});

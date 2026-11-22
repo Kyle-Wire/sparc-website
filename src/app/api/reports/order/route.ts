@@ -3,7 +3,7 @@ import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/sup
 import { isSameOrigin } from "@/lib/require-same-origin";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/brand";
-import { checkoutEnabled, paymentProvider, REPORT } from "@/lib/payments";
+import { checkoutEnabled, mayOrder, paymentProvider, REPORT } from "@/lib/payments";
 import { checkOrder } from "@/lib/payments/order-input";
 
 export const runtime = "nodejs";
@@ -27,6 +27,11 @@ export async function POST(req: NextRequest) {
   if (!user || !user.email) {
     return NextResponse.redirect(new URL(`/login?next=${encodeURIComponent("/report/buy")}`, req.url), { status: 303 });
   }
+
+  // Soft launch (Kyle, 22 November 2026): only invited emails may order until
+  // ORDERS_OPEN is set. Checked here, not only on the page, so a hand-made
+  // POST is refused too.
+  if (!mayOrder(user.email)) return back("invite");
 
   const rl = await checkRateLimit("apiWrite", `report-order:${user.id}`);
   if (!rl.ok) return back("checkout");

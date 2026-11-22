@@ -79,3 +79,38 @@ export function formatPrice(cents: number, currency = "USD"): string {
 export function checkoutEnabled(env: Record<string, string | undefined> = process.env): boolean {
   return env.CHECKOUT_ENABLED === "true";
 }
+
+/**
+ * How the report is sold. Kyle, 22 November 2026: open by invitation first
+ * (a soft launch of 5 to 10 buyers, every report run by hand), then to anyone.
+ *
+ *   off     checkout is off (CHECKOUT_ENABLED is not "true"): nothing is sold.
+ *   invite  checkout is on, and only emails in ORDER_INVITE_EMAILS can order.
+ *           /pricing shows no price; /report/buy tells anyone else it is by
+ *           invitation. This is the default once checkout is on.
+ *   open    checkout is on and ORDERS_OPEN is "true": anyone signed in can order.
+ */
+export type SalesMode = "off" | "invite" | "open";
+
+export function salesMode(env: Record<string, string | undefined> = process.env): SalesMode {
+  if (!checkoutEnabled(env)) return "off";
+  return env.ORDERS_OPEN === "true" ? "open" : "invite";
+}
+
+/** The invited emails, lower-cased, from a comma- or whitespace-separated list. */
+export function invitedEmails(env: Record<string, string | undefined> = process.env): Set<string> {
+  return new Set(
+    (env.ORDER_INVITE_EMAILS ?? "")
+      .split(/[\s,;]+/)
+      .map((e) => e.trim().toLowerCase())
+      .filter((e) => e.includes("@")),
+  );
+}
+
+/** Whether this signed-in email may place an order now. */
+export function mayOrder(email: string | null | undefined, env: Record<string, string | undefined> = process.env): boolean {
+  const mode = salesMode(env);
+  if (mode === "off" || !email) return false;
+  if (mode === "open") return true;
+  return invitedEmails(env).has(email.trim().toLowerCase());
+}

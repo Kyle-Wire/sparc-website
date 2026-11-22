@@ -3,7 +3,10 @@ import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section, Kicker } from "@/components/marketing/page-shell";
 import { COMPANY, COMPANY_LEGAL, EMAIL_PRIMARY, OFFICE_FULL, FOUNDED_YEAR, OFFICE_CITY, OFFICE_STATE } from "@/lib/brand";
 
-export const metadata = { title: "About" };
+export const metadata = {
+  title: "About",
+  description: "Who SPARC Labs is and why we put a neighbourhood's flood, heat and ground record in front of home buyers, with our own models labelled by how much evidence stands behind them.",
+};
 
 // Rewritten 2026-11-17 for the site's new direction
 // (docs/design/site-redesign-brief.md). The page it replaces described a

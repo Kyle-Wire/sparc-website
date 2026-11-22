@@ -4,7 +4,10 @@ import { PageHero, Section } from "@/components/marketing/page-shell";
 import { COMPANY, COMPANY_LEGAL, EMAIL_PRIMARY, OFFICE_FULL, COPYRIGHT_YEAR } from "@/lib/brand";
 import { checkoutEnabled } from "@/lib/payments";
 
-export const metadata = { title: "Privacy" };
+export const metadata = {
+  title: "Privacy",
+  description: "What SPARC Labs keeps when you look up a place or order a report: an address you search is not kept, saved places stay in your browser, and nothing is sold or shared.",
+};
 export const dynamic = "force-dynamic";
 
 // Rewritten 2026-11-18 for the site as it now runs.

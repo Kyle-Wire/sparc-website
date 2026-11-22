@@ -4,7 +4,10 @@ import { PageHero, Section } from "@/components/marketing/page-shell";
 import { LockedShelf } from "@/components/place/cards";
 import { ENGINES, RUNS_ON_WORDS } from "@/lib/engines";
 
-export const metadata = { title: "The models" };
+export const metadata = {
+  title: "The models",
+  description: "SPARC Labs' own flood, heat, ground movement and wind models: what each gives, what it has been checked against, and what it will never say.",
+};
 
 // What this page may say about the models, and where each sentence comes
 // from. All four are SPARC Labs' own engines, kept in their own repositories.

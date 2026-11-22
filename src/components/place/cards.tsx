@@ -156,7 +156,7 @@ const SHELVES: Record<
   },
   "flood-whatif": {
     label: "what if · projects you can do",
-    note: "Layout only. Nothing has been modelled. A what-if run shows what a project is likely to change in the model, with its margins. It is not a promise.",
+    note: "Layout only. Nothing has been modelled. A what-if run shows what a project changes in the model, with the spread across its test runs. It is not a measurement or a promise.",
     slots: ["Rain garden", "French drain", "Paving removed", "Rain barrels"],
     tracks: true,
   },
@@ -168,7 +168,7 @@ const SHELVES: Record<
   },
   "heat-whatif": {
     label: "what if · projects you can do",
-    note: "Layout only. Nothing has been modelled. A what-if run shows the likely change across the neighbourhood, with its margins. It is not a promise.",
+    note: "Layout only. Nothing has been modelled. A what-if run shows the change across the neighbourhood in the model, with its range. It is not a measurement or a promise.",
     slots: ["Trees planted", "Paving removed", "Cool roof", "Cool pavement"],
     tracks: true,
   },
@@ -188,7 +188,7 @@ const SHELVES: Record<
     label: "wind model · through the seasons",
     note: "Layout only. No wind model has been run for this place, so there are no numbers here. A run shows how wind moves between the buildings, season by season.",
     plot: "Where a map of wind through the neighbourhood would go. Nothing has been modelled, so nothing is drawn.",
-    slots: ["Wind by season", "Where buildings funnel it", "Gusts at street level", "Gusts at roof level"],
+    slots: ["Wind by season", "Where buildings may funnel it", "Gusts at street level", "Gusts at roof level"],
   },
 };
 

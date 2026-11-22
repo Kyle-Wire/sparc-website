@@ -580,8 +580,8 @@ export default async function PlacePage({ params }: Props) {
             Ground
           </h2>
           <p className="lead">
-            Faults, landslides and the soil around the block, from USGS and the USDA soil survey. Whether the ground is
-            sinking or rising, measured from satellite radar, is in the house report.
+            Faults, landslides and the soil around the block, from USGS and the USDA soil survey. How the ground moves
+            against its surroundings, read from satellite radar, is planned for the house report.
           </p>
           <div className="shelf">
             <ShelfHead name="On record" state="free" />

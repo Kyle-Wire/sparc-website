@@ -31,8 +31,8 @@ export default function ModelsPage() {
       <Nav active="models" />
       <PageHero
         kicker="the models · paid · not on sale yet"
-        title="What the public record cannot tell you."
-        lead="A flood zone is a line on a map. It does not say where the water goes on your street in a hard storm, how hot the block gets in July, whether the ground is settling or how the wind moves between the houses. That takes a model of the neighbourhood."
+        title="What the public record can’t tell you."
+        lead="A flood zone is a line on a map. It doesn’t say where the water goes on your street in a hard storm, how warm the block stays on a July night, or whether the ground under it moves differently from the ground around it. That takes a model of the neighbourhood. We built four."
         accent="var(--flood)"
       />
 
@@ -96,7 +96,7 @@ export default function ModelsPage() {
             <p>
               The projects on offer are ones a home owner can do: a rain garden, a French drain, taking up
               paving, rain barrels, planting trees, a lighter roof. You pick one, the model runs again, and
-              you see what it is likely to change.
+              you see what it changes in the model.
             </p>
             <p>Every what-if result will say three things beside the number:</p>
             <ul>
@@ -105,9 +105,9 @@ export default function ModelsPage() {
               <li>The margin: how far off the model has been where it could be checked.</li>
             </ul>
             <p>
-              For heat, a project is shown as a change across the neighbourhood with its range, not as a
+              For heat, a project is shown as a change across the neighbourhood, not as a
               promise about one street. We are not promising an outcome. We are giving you a way to
-              understand the problem and what the options are likely to do.
+              see the problem and what each option changes in the model.
             </p>
           </div>
           <LockedShelf kind="flood-whatif" />
@@ -122,9 +122,9 @@ export default function ModelsPage() {
               a report is run by hand when someone asks for one.
             </li>
             <li>
-              <strong>Not validated for your address.</strong> None of the models has been checked
-              against measurements at any customer&apos;s property. Results are screening-level and will be labelled
-              with how much evidence stands behind each one.
+              <strong>Nothing measured at your house.</strong> No model has been checked against a
+              measurement at any property we report on. Results are screening-level, and each one says how
+              much stands behind it.
             </li>
             <li>
               <strong>The neighbourhood, not the house.</strong> The property sits at the centre of the map;
@@ -135,9 +135,9 @@ export default function ModelsPage() {
               <strong>No dollar figures.</strong> No expected loss, no insurance premium, no payback period.
             </li>
             <li>
-              <strong>Methods paper: not published yet.</strong> A plain account of how each model works,
-              what it has been tested against and its margins will be linked here. Until it exists, treat
-              any result as a first look.
+              <strong>Methods paper: coming.</strong> A plain write-up of how each model works, what it
+              was tested against and its margins will be linked here. Until it&apos;s out, treat every result
+              as a first look.
             </li>
           </ul>
         </div>

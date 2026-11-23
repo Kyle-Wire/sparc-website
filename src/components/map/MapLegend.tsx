@@ -123,6 +123,9 @@ export function MapLegend({
         </ul>
       )}
 
+      <p className="mk-evidence">
+        <span aria-hidden>▪</span> Public record · the agency&apos;s own map, not a SPARC Labs model
+      </p>
       <p className="mk-source">
         {layer.publisher}, {layer.vintage}. {layer.grain[0].toUpperCase() + layer.grain.slice(1)}.
       </p>

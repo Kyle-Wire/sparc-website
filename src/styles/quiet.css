@@ -298,3 +298,26 @@
 @media (max-width: 1100px) {
   .place-side .spot-panel { order: -1; }
 }
+
+/* One family with the report viewer (deliverables/tools/viewer.html): the map
+   carries its title top left, a hazard kicker in a ruled box over the layer
+   name, and the key says what kind of evidence it is above its source. */
+.pm-title { position: absolute; top: 12px; left: 12px; z-index: 2; display: grid; gap: 4px; justify-items: start; pointer-events: none; max-width: calc(100% - 80px); }
+.pm-title-kicker {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 7px; background: rgba(255, 255, 255, 0.94); border: 1px solid currentColor; color: var(--ink-2);
+}
+.pm-title-kicker[data-hazard="flood"] { color: var(--flood); }
+.pm-title-kicker[data-hazard="heat"] { color: var(--heat); }
+.pm-title-kicker[data-hazard="ground"] { color: var(--ground); }
+.pm-title-kicker[data-hazard="storm"] { color: var(--wind); }
+.pm-title strong { font-size: 20px; line-height: 1.2; letter-spacing: -0.01em; padding: 4px 9px; background: rgba(255, 255, 255, 0.94); border-radius: 3px; }
+.pm-zoom-note { top: auto; bottom: 14px; left: auto; right: 14px; transform: none; }
+.pm-key .mk-hazard { display: none; }
+.pm-key .mk-legend-head strong { font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding-right: 56px; }
+.mk-evidence { margin: 0; padding-top: 8px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.mk-evidence + .mk-source { margin-top: -4px; }
+@media (max-width: 720px) {
+  .pm-title strong { font-size: 16px; }
+  .pm-zoom-note { bottom: 10px; right: 10px; }
+}

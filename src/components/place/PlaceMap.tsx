@@ -490,7 +490,7 @@ export function PlaceMap({
         });
         mapRef.current = map;
         map.addControl(new maplibre.NavigationControl({ showCompass: false }), "top-right");
-        map.addControl(new maplibre.ScaleControl({ unit: "imperial" }), "top-left");
+        map.addControl(new maplibre.ScaleControl({ unit: "imperial" }), "bottom-right");
         map.on("zoomend", () => map && setZoom(map.getZoom()));
 
         const pinEl = document.createElement("div");
@@ -678,6 +678,17 @@ export function PlaceMap({
           />
           {failed && (
             <p className="place-map-failed">The map could not start in this browser. The records below do not depend on it.</p>
+          )}
+          {info && (
+            <div className="pm-title" aria-hidden>
+              <span className="pm-title-kicker" data-hazard={info.hazard}>
+                {HAZARD_WORDS[info.hazard]} · public record
+              </span>
+              <strong>
+                {info.title}
+                {info.key === "slr" ? `, ${slrFeet} ft higher` : ""}
+              </strong>
+            </div>
           )}
           {tooFar && <p className="pm-zoom-note">Zoom in to see {info?.title}</p>}
           {hover && (

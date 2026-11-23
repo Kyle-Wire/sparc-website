@@ -27,6 +27,15 @@ From `src/lib/payments/catalog.ts`: the report is finished within **10 working d
 
 A place already modelled (the same block as an earlier order) skips the flood and heat runs and is a one-day job.
 
+## Updates after delivery
+
+Policy: `business/15-update-policy.md` (option B, 23 November 2026): corrections are free for as long as the company exists; engine or label changes that move a finding, and new hazards, are free for 12 months after delivery.
+
+1. Rebuild the report in Climate Home Inspection with the version and one paragraph on what changed, and the date, on its first page.
+2. `report-order.ts update <id> correction|change|hazard report-v1.1.pdf "what changed, in one or two plain sentences"`. A correction or a change is the next minor version (v1.1), a new hazard the next major (v2.0). Each version is a new file; the old ones stay in the buyer's account, and the script never overwrites one. The buyer gets an email; for a correction its first line says we found a mistake. Nothing is charged.
+3. If the package changed too, run `package` again with the new zip.
+4. A buyer who replies "no more updates": `report-order.ts stop-updates <id>`. `update` then refuses everything but corrections for that buyer, and refuses changes and new hazards after 12 months for everyone.
+
 ## Coverage check, before any work
 
 Answer each from the address, and write the answers in the order note:

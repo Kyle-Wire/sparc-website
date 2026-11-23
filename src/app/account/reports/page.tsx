@@ -1,7 +1,9 @@
+import * as React from "react";
 import type { Route } from "next";
 import Link from "next/link";
 import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/supabase/server";
 import { ordersWithPackage } from "@/lib/payments/package";
+import { versionsByOrder, type Version } from "@/lib/payments/versions";
 import { formatPrice, REPORT, checkoutEnabled } from "@/lib/payments";
 import { mayCancel, orderDates } from "@/lib/payments/self-serve";
 import { formatDay } from "@/lib/payments/turnaround";
@@ -115,11 +117,15 @@ export default async function ReportsPage({
 
   // Which delivered orders have the offline atlas yet (one listing of the
   // buyer's own folder). If storage is unreachable, only the PDF is offered.
+  // The same listing gives each report's versions (updates, v1.1 and on).
   let withPackage = new Set<string>();
+  let versions = new Map<string, Version[]>();
   if (orders.some((o) => o.status === "delivered")) {
     try {
       const { data: files } = await createSupabaseAdminClient().storage.from("reports").list(user.id, { limit: 1000 });
-      withPackage = ordersWithPackage((files ?? []).map((f) => f.name));
+      const names = (files ?? []).map((f) => f.name);
+      withPackage = ordersWithPackage(names);
+      versions = versionsByOrder(names);
     } catch {
       /* the PDF is still offered */
     }
@@ -221,6 +227,18 @@ export default async function ReportsPage({
                 internet.
               </p>
             )}
+            {o.status === "delivered" && (versions.get(o.id)?.length ?? 0) > 1 && (
+              <p className="order-note">
+                Updated since delivery. Every version stays here, and each update says on its first page what changed:{" "}
+                {versions.get(o.id)!.map((v, i, all) => (
+                  <React.Fragment key={v.label}>
+                    <a href={`/api/reports/${o.id}/download?v=${v.label}`}>v{v.label}</a>
+                    {i < all.length - 1 ? " · " : ""}
+                  </React.Fragment>
+                ))}
+                .
+              </p>
+            )}
             <div className="order-actions">
               {o.status === "payment_failed" && (
                 <form method="post" action={`/api/reports/${o.id}/pay`}>
@@ -229,11 +247,18 @@ export default async function ReportsPage({
                   </button>
                 </form>
               )}
-              {o.status === "delivered" && (
-                <a className="btn btn-accent" href={`/api/reports/${o.id}/download`}>
-                  Download the report <span className="arrow">→</span>
-                </a>
-              )}
+              {o.status === "delivered" && (() => {
+                const latest = versions.get(o.id)?.at(-1);
+                return latest && latest.label !== "1.0" ? (
+                  <a className="btn btn-accent" href={`/api/reports/${o.id}/download?v=${latest.label}`}>
+                    Download the report, v{latest.label} <span className="arrow">→</span>
+                  </a>
+                ) : (
+                  <a className="btn btn-accent" href={`/api/reports/${o.id}/download`}>
+                    Download the report <span className="arrow">→</span>
+                  </a>
+                );
+              })()}
               {o.status === "delivered" && withPackage.has(o.id) && (
                 <a className="btn btn-sm" href={`/api/reports/${o.id}/download?file=package`}>
                   Download the offline atlas, prints and data (zip)

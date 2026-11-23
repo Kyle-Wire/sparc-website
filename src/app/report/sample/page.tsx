@@ -7,7 +7,7 @@ import { PageHero, Section } from "@/components/marketing/page-shell";
 
 export const metadata: Metadata = withPage("/report/sample", {
   title: "Sample reports",
-  description: "Two real house reports for two Philadelphia rowhouses, addresses withheld: every page, every finding with its evidence label, and what a report will never say.",
+  description: "Two real house reports for two Philadelphia rowhouses, addresses withheld: every page, every finding with its range, how sure the findings are, and what a report will never say.",
 });
 
 // The buyer report's structure, from the Climate Inspection repository's
@@ -23,7 +23,7 @@ export const metadata: Metadata = withPage("/report/sample", {
 // reports/samples/) for PHL-POC-001 and PHL-POC-002, carry
 // "Sample report" on every page, withhold the address and do not mark the
 // house on any map. Files: public/samples/. The statements quoted below are
-// copied from page 3 of each report (finding F1), labels included.
+// copied from page 3 of each report (finding F1), as printed.
 //
 // Ground movement and wind are in every report (Kyle, 23 November 2026). The
 // two samples were built before that and do not have the sections yet.
@@ -61,7 +61,7 @@ const PAGE_NAMES = [
   "Harder tests, and what the public record shows",
   "How hot do the block's surfaces run?",
   "How warm is the air, and how does it feel outdoors?",
-  "What to check at the house, and how sure each finding is",
+  "What to check at the house, and how sure the findings are",
   "Limits and points to note",
   "Where each finding comes from",
 ];
@@ -92,13 +92,13 @@ const SECTIONS: { title: string; what: string; cards: string[]; plot?: string; s
   },
   {
     title: "Wind",
-    what: "Storm gusts for the area from long weather-station records, and how wind moves between the buildings around the house, from our street model. Each with its range and its label.",
+    what: "Storm gusts for the area from long weather-station records, and how wind moves between the buildings around the house, from our street model. Each with its range.",
     cards: ["Storm gusts for the area", "Wind between the buildings"],
     screening: true,
   },
   {
-    title: "What to check at the house, and how sure each finding is",
-    what: "Every question the report cannot answer, with what would settle it. The four labels, which findings carry which, and why.",
+    title: "What to check at the house, and how sure the findings are",
+    what: "Every question the report cannot answer, with what would settle it. Then, said once: nothing is checked at the house itself, the four evidence levels, which findings carry which, and why.",
     cards: ["Questions, with what settles each", ...LABELS],
   },
   {
@@ -121,7 +121,7 @@ export default function SampleReportPage() {
       <PageHero
         kicker="sample reports · real homes · addresses withheld"
         title="What you get."
-        lead="Two real reports for two Philadelphia rowhouses, built by the same models and the same code as a paid report. Every page, every finding, every label for how sure it is. The addresses are withheld and no map marks the house."
+        lead="Two real reports for two Philadelphia rowhouses, built by the same models and the same code as a paid report. Every page and every finding, each with its range, and how sure the findings are, set out once at the back. The addresses are withheld and no map marks the house."
         accent="var(--flood)"
       />
 
@@ -139,7 +139,7 @@ export default function SampleReportPage() {
                   <strong>{x.stat}</strong> {x.statLine}
                 </p>
                 <p>&ldquo;{x.finding}&rdquo;</p>
-                <p className="sample-label">Labelled: limited evidence. Model output, not a measurement.</p>
+                <p className="sample-label">Model output, not a measurement.</p>
                 <div className="row" style={{ marginTop: 12 }}>
                   <a href={`#sample-${x.id}`} className="btn btn-accent">
                     Read it page by page <span className="arrow">→</span>
@@ -153,8 +153,8 @@ export default function SampleReportPage() {
           ))}
         </div>
         <p className="screening-note" style={{ marginTop: 28 }}>
-          <strong>Samples, not advice.</strong> These show what a report contains. They are screening reports: every
-          model finding is labelled exploratory or limited evidence, and nothing at either house was measured. These two
+          <strong>Samples, not advice.</strong> These show what a report contains. They are screening reports: no model
+          result was checked against a measurement at either house, and each report says so once, on its back pages. These two
           were made before ground movement and wind went into every report, so they show flood and heat only. See{" "}
           <Link href="/how-we-test">How we test</Link> for where each check stands.
         </p>
@@ -178,8 +178,7 @@ export default function SampleReportPage() {
           <figure className="pkg-item">
             <Image src="/samples/package/plate-flood.webp" alt="A print plate: where the water goes in a 100-year downpour, with the figures at the house beside the map." width={1400} height={1081} />
             <figcaption>
-              <strong>Prints.</strong> Seven print-ready maps and charts, as PDF and PNG, each with its source and its
-              evidence label at the foot.
+              <strong>Prints.</strong> Seven print-ready maps and charts, as PDF and PNG, each with its source at the foot.
             </figcaption>
           </figure>
           <figure className="pkg-item pkg-tall">
@@ -227,10 +226,10 @@ export default function SampleReportPage() {
           <div className="prose">
             <p>
               Every number in a report comes from a record: its source, its date, the method, the engine version and
-              its limits. The report is built from those records and nothing else. Nobody types a figure or a label
-              into it by hand.
+              its limits. The report is built from those records and nothing else. Nobody types a figure, a level or
+              a note into it by hand.
             </p>
-            <p>Each finding carries one of four labels, set by fixed rules from the kind of evidence behind it, never from whether the news is good:</p>
+            <p>No model result can be checked at the house it describes, so the report says that once, on its back pages, rather than beside every number. A note beside a number marks something unusual about that finding, such as a check that failed at that place. The back pages also give every finding one of four evidence levels, set by fixed rules from the kind of evidence behind it, never from whether the news is good:</p>
             <ul>
               {LABELS.map((l) => (
                 <li key={l}>

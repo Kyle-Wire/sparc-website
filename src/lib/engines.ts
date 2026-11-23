@@ -180,7 +180,7 @@ export const ENGINES: Engine[] = [
       "A ground section can be held for a person to review, for example when the ground at the house moves on its own or a new rate appears. The order then shows it as in review, not as failed. Our own full processing takes one to two days for a place and is shared by every property near it, so a paid order may wait on it.",
     selfServe: "run-for-you",
     status:
-      "In every house report. Each reading carries its range and its label; what it has been checked against, and how it did, is on How we test.",
+      "In every house report. Each reading carries its range; what it has been checked against, and how it did, is on How we test.",
     source: { repo: "Kyle-Wire/insar_pipeline", commit: "3612eda" },
   },
   {
@@ -205,7 +205,7 @@ export const ENGINES: Engine[] = [
       "Whether the house meets a building code",
     ],
     selfServe: "run-for-you",
-    status: "In every house report. Each finding carries its range and its label; what the model has been checked against, and how it did, is on How we test.",
+    status: "In every house report. Each finding carries its range; what the model has been checked against, and how it did, is on How we test.",
     source: { repo: "Kyle-Wire/WindSim", commit: "cc15851" },
   },
 ];

@@ -28,7 +28,7 @@ const MODES: { id: Mode; name: string; who: string; how: string[] }[] = [
     who: "For someone buying a home. Bought once.",
     how: [
       "We run every model you pick for the neighbourhood around the property",
-      "You get one report: findings first, how sure each one is, what to check at the house",
+      "You get one report: findings first, each with its range, then what to check at the house and how sure the findings are",
       "Nothing to install, and any computer will do",
     ],
   },
@@ -236,9 +236,9 @@ export function Journey({
               </div>
             ))}
             <p className="journey-aside">
-              Every modelled finding carries one of four labels, set by fixed rules: well supported, moderately
-              supported, limited evidence, insufficient information. Nothing is called validated unless it has
-              been compared with a measurement at that place. <Link href="/report/sample">See how a report is laid out</Link>
+              No model result is checked at the house it describes, and the report says so once, at the back, with an
+              evidence level for every finding set by fixed rules. A note beside a number marks anything unusual
+              about it. Nothing is called validated unless it has been compared with a measurement at that place. <Link href="/report/sample">See how a report is laid out</Link>
               {mode === "self" ? (
                 <>
                   {" "}

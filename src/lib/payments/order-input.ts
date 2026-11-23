@@ -67,6 +67,8 @@ export const ORDER_ERRORS: Record<string, string> = {
   deadline_invalid: "That inspection deadline is not a date we can read. Leave it blank if you are not sure. Nothing was charged.",
   deadline_past: "That inspection deadline has already passed. Leave it blank if your inspection period is over. Nothing was charged.",
   full: "We have as many reports as we can make well this week, so we are not taking new orders for a few days. Nothing was charged. Write to us and we will tell you when we can start.",
+  attempts:
+    "This account has started several orders today without saving a card, so to protect against card fraud we pause new ones for a day. Nothing was charged. If that was you having trouble with the card page, write to us and we will help.",
   checkout: "We could not open the checkout. Nothing was charged. Please try again in a minute.",
   unavailable: "Reports are not on sale yet. Nothing was charged.",
   unconfigured: "Checkout is not set up yet. Nothing was charged.",

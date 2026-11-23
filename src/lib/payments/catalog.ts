@@ -14,6 +14,13 @@
  * entitlement or buy button goes on a public page until every line can be
  * held to in a contract and the Terms publish the billing and refund terms.
  * The Terms' report section reads REPORT below, so the two cannot drift.
+ *
+ * 23 November 2026: ground movement came out of `includes`. Every ground
+ * reading in Climate Home Inspection is held (its evidence audit fails) and no
+ * place config enables the ground section, so the line was not true of any
+ * report that could be sold. The sample reports and /faq already said ground
+ * and wind are not in reports yet. Put the line back when the ground section
+ * ships in buyer reports.
  */
 
 export type ProductId = "home-report";
@@ -39,11 +46,10 @@ export const REPORT: Product = {
   name: "The house report",
   priceCents: 14900,
   currency: "USD",
-  tagline: "Flood, heat and ground movement around one house and its streets, in our models, with the receipts. Bought once.",
+  tagline: "Flood and heat around one house and its streets, in our models, with the receipts. Bought once.",
   includes: [
     "Flood: our 1 m flood model run for the streets around the house in design storms and a past storm, showing where water reaches and how deep it stands beside the house in each storm modelled",
     "Heat: modelled street air temperature around the house in a hot spell, afternoon and night, and modelled outdoor comfort (PET) in sun and in shade, with the satellite surface temperature of the block beside them",
-    "Ground movement: whether the ground under the block moves toward or away from the satellite differently from the ground around it, from NASA's satellite radar product, where it covers the place",
     "Every finding labelled with how much evidence stands behind it, the model's own error and where that was measured, and what to check at the house",
     "A PDF in your account, yours to keep and share",
   ],
@@ -52,7 +58,8 @@ export const REPORT: Product = {
     "Not a forecast: it shows what the models show in the storms and hot spells run, not what will happen",
     "No dollar figures: no expected loss, no premiums, no payback",
     "Model results are labelled exploratory unless they have been compared with a measurement at that place, and none has been yet",
-    "Nothing about the basement, the first floor or indoor temperature, and no wind until our wind model passes its checks",
+    "Nothing about the basement, the first floor or indoor temperature",
+    "No ground movement or wind yet: each joins the report only once it passes its checks, and the report says so on its first page",
   ],
   deliveryDays: 10,
 };
@@ -125,7 +132,7 @@ export function mayOrder(email: string | null | undefined, env: Record<string, s
  */
 export const AGREE_STATEMENT =
   "I have read what the report is and is not. It is a screening report, not an engineering survey.";
-export const REPORT_TERMS_VERSION = "2026-11-22-draft";
+export const REPORT_TERMS_VERSION = "2026-11-23-draft";
 
 /**
  * How many orders we take in any seven days, from ORDERS_WEEKLY_CAP. Unset or

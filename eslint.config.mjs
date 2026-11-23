@@ -16,6 +16,8 @@ const eslintConfig = [
       ".claude/**",
       // The map library's worker, copied from node_modules by scripts/copy-map-worker.mjs.
       "public/vendor/**",
+      // Print and social marketing files and their generator scripts; not part of the app.
+      "marketing/**",
     ],
   },
 ];

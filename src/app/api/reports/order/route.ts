@@ -72,6 +72,9 @@ export async function POST(req: NextRequest) {
       agreed_at: new Date().toISOString(),
       inspection_deadline: input.inspectionDeadline,
       deadline_acknowledged: input.deadlineAcknowledged,
+      // The buyer's answers about the house (migration 0010), in place of the
+      // City assessor's record, which is not cleared for commercial use.
+      house_facts: input.houseFacts,
     })
     .select("id")
     .single<{ id: string }>();

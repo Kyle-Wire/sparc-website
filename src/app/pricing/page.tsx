@@ -94,6 +94,7 @@ function OnSale() {
   return (
     <>
       <Nav active="pricing" />
+      <main id="main">
       <PageHero
         kicker="pricing"
         title="The public record is free. The house report is paid."
@@ -152,6 +153,7 @@ function OnSale() {
           the <Link href="/terms#reports">Terms of Service</Link>. Questions: {EMAIL_PRIMARY}.
         </p>
       </Section>
+      </main>
       <Footer />
     </>
   );
@@ -161,6 +163,7 @@ function NotOnSale() {
   return (
     <>
       <Nav active="pricing" />
+      <main id="main">
       <PageHero
         kicker="pricing · nothing on sale yet"
         title="The public record is free. The models will be paid."
@@ -226,6 +229,8 @@ function NotOnSale() {
           position as it stands.
         </p>
       </Section>
+
+      </main>
 
       <Footer />
     </>

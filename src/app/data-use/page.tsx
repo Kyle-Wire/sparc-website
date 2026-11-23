@@ -48,6 +48,7 @@ export default function DataUsePage() {
   return (
     <>
       <Nav />
+      <main id="main">
       <PageHero kicker="data use · explicit" title="What happens to your data." accent="var(--amber)" />
       <Section>
         <article style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 18, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
@@ -94,6 +95,7 @@ export default function DataUsePage() {
           </p>
         </article>
       </Section>
+      </main>
       <Footer />
     </>
   );

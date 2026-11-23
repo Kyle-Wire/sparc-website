@@ -208,6 +208,7 @@ export default function GlossaryPage() {
   return (
     <>
       <Nav />
+      <main id="main">
       <PageHero
         kicker="plain glossary · every term on a place page"
         title="What the words mean."
@@ -253,6 +254,7 @@ export default function GlossaryPage() {
           </div>
         </div>
       </section>
+      </main>
       <Footer />
     </>
   );

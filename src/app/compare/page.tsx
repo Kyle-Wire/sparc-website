@@ -191,6 +191,7 @@ export default async function ComparePage({ searchParams }: Props) {
   return (
     <>
       <Nav active="places" />
+      <main id="main">
       <PageHero
         kicker="compare · the public record, side by side"
         title="How the places you are weighing up differ on record."
@@ -249,6 +250,7 @@ export default async function ComparePage({ searchParams }: Props) {
           )}
         </div>
       </section>
+      </main>
       <Footer />
     </>
   );

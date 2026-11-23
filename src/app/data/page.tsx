@@ -143,6 +143,7 @@ export default function DataPage() {
   return (
     <>
       <Nav />
+      <main id="main">
       <PageHero
         kicker="data sources · where each record comes from"
         title="Where the data comes from, and how fresh it is."
@@ -193,6 +194,7 @@ export default function DataPage() {
           </div>
         </div>
       </section>
+      </main>
       <Footer />
     </>
   );

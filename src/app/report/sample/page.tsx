@@ -118,6 +118,7 @@ export default function SampleReportPage() {
   return (
     <>
       <Nav active="models" />
+      <main id="main">
       <PageHero
         kicker="sample reports · real homes · addresses withheld"
         title="What you get."
@@ -283,6 +284,8 @@ export default function SampleReportPage() {
           </Link>
         </div>
       </Section>
+
+      </main>
 
       <Footer />
     </>

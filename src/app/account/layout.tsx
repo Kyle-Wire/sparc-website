@@ -28,6 +28,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
   return (
     <>
       <Nav />
+      <main id="main">
       <section className="grid-bg" style={{ borderBottom: "1px solid var(--line)", padding: "32px 0 18px" }}>
         <div className="wrap">
           <div className="kicker">account</div>
@@ -43,6 +44,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
           <div style={{ minWidth: 0 }}>{children}</div>
         </div>
       </section>
+      </main>
       <Footer />
     </>
   );

@@ -273,6 +273,7 @@ export default function FaqPage() {
   return (
     <>
       <Nav />
+      <main id="main">
       <PageHero
         kicker="questions · straight answers"
         title="Before you decide."
@@ -289,6 +290,7 @@ export default function FaqPage() {
           <Link href="/contact">contact form</Link>. A person reads every message.
         </p>
       </Section>
+      </main>
       <Footer />
     </>
   );

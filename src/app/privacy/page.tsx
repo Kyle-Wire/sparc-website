@@ -47,6 +47,7 @@ export default function PrivacyPage() {
   return (
     <>
       <Nav />
+      <main id="main">
       <PageHero
         kicker="privacy · plain english"
         title="What happens to what you give this site."
@@ -195,6 +196,7 @@ export default function PrivacyPage() {
           <p style={{ fontSize: 13, color: "var(--muted)" }}>© {COPYRIGHT_YEAR} {COMPANY_LEGAL} · {OFFICE_FULL}</p>
         </article>
       </Section>
+      </main>
       <Footer />
     </>
   );

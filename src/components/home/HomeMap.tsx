@@ -605,7 +605,7 @@ export function HomeMap({ start }: { start: StartView }) {
   const toggle = (p: Exclude<Panel, null>) => setPanel(panel === p ? null : p);
 
   return (
-    <main className="home-full" aria-label="Map">
+    <main id="main" className="home-full" aria-label="Map">
       <div ref={boxRef} className="home-full-map" />
       {failed && <p className="home-map-failed">The map could not start in this browser. The search still works.</p>}
 

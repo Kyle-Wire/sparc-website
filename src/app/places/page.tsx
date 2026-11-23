@@ -16,6 +16,7 @@ export default function PlacesPage() {
   return (
     <>
       <Nav active="places" />
+      <main id="main">
       <PageHero
         kicker="your places · kept in this browser"
         title="The places you are weighing up."
@@ -31,6 +32,7 @@ export default function PlacesPage() {
           </p>
         </div>
       </section>
+      </main>
       <Footer />
     </>
   );

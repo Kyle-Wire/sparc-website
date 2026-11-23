@@ -62,7 +62,7 @@ function ContactForm() {
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 9999, background: "var(--purple)", color: "#fff", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 16 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} /> request received
         </div>
-        <h3 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 12px" }}>Thank you — we have it.</h3>
+        <h2 style={{ fontSize: 28, fontWeight: 800, letterSpacing: "-0.02em", margin: "0 0 12px" }}>Thank you — we have it.</h2>
         <p style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.6, maxWidth: 480, margin: "0 auto" }}>
           A person will read this and reply to <strong>{form.email}</strong>. To be
           straight with you about where we are: there is no download to send you
@@ -81,20 +81,20 @@ function ContactForm() {
   return (
     <form className="card" style={{ padding: 28 }} onSubmit={submit}>
       <div className="kicker">ask for a report · or anything else</div>
-      <h3 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.015em", margin: "8px 0 18px" }}>Tell us the place and the question.</h3>
+      <h2 style={{ fontSize: 22, fontWeight: 700, letterSpacing: "-0.015em", margin: "8px 0 18px" }}>Tell us the place and the question.</h2>
       <div className="grid-2" style={{ gap: 14 }}>
-        <div><label className="label">Name</label><input className="input" required value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Your name" /></div>
-        <div><label className="label">Email</label><input className="input" type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@org.org" /></div>
-        <div style={{ gridColumn: "1 / -1" }}><label className="label">Organization (optional)</label><input className="input" value={form.org} onChange={(e) => update("org", e.target.value)} placeholder="If you are writing for one" /></div>
+        <div><label className="label" htmlFor="ct-name">Name</label><input id="ct-name" className="input" required value={form.name} onChange={(e) => update("name", e.target.value)} placeholder="Your name" /></div>
+        <div><label className="label" htmlFor="ct-email">Email</label><input id="ct-email" className="input" type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="you@org.org" /></div>
+        <div style={{ gridColumn: "1 / -1" }}><label className="label" htmlFor="ct-organization-optiona">Organization (optional)</label><input id="ct-organization-optiona" className="input" value={form.org} onChange={(e) => update("org", e.target.value)} placeholder="If you are writing for one" /></div>
         <div style={{ gridColumn: "1 / -1" }}>
-          <label className="label">What is this about?</label>
-          <select className="input" value={form.domain} onChange={(e) => update("domain", e.target.value)}>
+          <label className="label" htmlFor="ct-what-is-this-about">What is this about?</label>
+          <select id="ct-what-is-this-about" className="input" value={form.domain} onChange={(e) => update("domain", e.target.value)}>
             {TOPICS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
         <div style={{ gridColumn: "1 / -1" }}>
-          <label className="label">The place, and what you are trying to decide</label>
-          <textarea className="input" style={{ minHeight: 100, resize: "vertical" }} value={form.reason} onChange={(e) => update("reason", e.target.value)} placeholder="City and state is enough for now. If we go ahead with a report we will ask for the address by email." />
+          <label className="label" htmlFor="ct-the-place-and-what-y">The place, and what you are trying to decide</label>
+          <textarea id="ct-the-place-and-what-y" className="input" style={{ minHeight: 100, resize: "vertical" }} value={form.reason} onChange={(e) => update("reason", e.target.value)} placeholder="City and state is enough for now. If we go ahead with a report we will ask for the address by email." />
         </div>
       </div>
       {state === "error" && <p style={{ color: "var(--crimson)", marginTop: 12, fontSize: 13 }}>{error}</p>}
@@ -112,6 +112,7 @@ export default function ContactPage() {
   return (
     <>
       <Nav active="contact" />
+      <main id="main">
       <PageHero
         kicker="contact · we read everything"
         title="Get in touch."
@@ -167,6 +168,8 @@ export default function ContactPage() {
           </p>
         </div>
       </Section>
+
+      </main>
 
       <Footer />
     </>

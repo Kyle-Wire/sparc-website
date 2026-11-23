@@ -206,8 +206,8 @@ export default async function BuyReportPage({ searchParams }: Props) {
                     You pay when your report is ready, within {REPORT.deliveryDays} working days, or not at all.
                   </strong>{" "}
                   We check what can be modelled at your place before we start. If something cannot be, we tell you;
-                  if the report cannot be made at all, we charge nothing. Changed your mind before it is ready? Tell
-                  us and we charge nothing. <Link href="/terms#reports">The terms</Link>
+                  if the report cannot be made at all, we charge nothing. Changed your mind before it is ready? Cancel
+                  from your account in two clicks and we charge nothing. <Link href="/terms#reports">The terms</Link>
                 </p>
               </div>
             </aside>

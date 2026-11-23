@@ -5,6 +5,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/brand";
 import { checkoutEnabled, mayOrder, paymentProvider, REPORT, REPORT_TERMS_VERSION } from "@/lib/payments";
 import { atCapacity } from "@/lib/payments/capacity";
+import { tooManyAttempts } from "@/lib/payments/attempts";
 import { checkOrder } from "@/lib/payments/order-input";
 
 export const runtime = "nodejs";
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
 
   const admin = createSupabaseAdminClient();
   if (await atCapacity(admin)) return back("full", input.placeSlug);
+  if (await tooManyAttempts(admin, user.id)) return back("attempts", input.placeSlug);
 
   const { data: order, error } = await admin
     .from("report_orders")

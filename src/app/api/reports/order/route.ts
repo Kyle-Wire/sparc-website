@@ -3,7 +3,8 @@ import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/sup
 import { isSameOrigin } from "@/lib/require-same-origin";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/brand";
-import { checkoutEnabled, mayOrder, paymentProvider, REPORT } from "@/lib/payments";
+import { checkoutEnabled, mayOrder, paymentProvider, REPORT, REPORT_TERMS_VERSION } from "@/lib/payments";
+import { atCapacity } from "@/lib/payments/capacity";
 import { checkOrder } from "@/lib/payments/order-input";
 
 export const runtime = "nodejs";
@@ -50,6 +51,8 @@ export async function POST(req: NextRequest) {
   if (!provider.configured()) return back("unconfigured", input.placeSlug);
 
   const admin = createSupabaseAdminClient();
+  if (await atCapacity(admin)) return back("full", input.placeSlug);
+
   const { data: order, error } = await admin
     .from("report_orders")
     .insert({
@@ -61,6 +64,12 @@ export async function POST(req: NextRequest) {
       address: input.address,
       note: input.note,
       provider: provider.id,
+      // What the buyer agreed to, and when (migration 0009): the evidence if a
+      // charge is ever disputed.
+      terms_version: REPORT_TERMS_VERSION,
+      agreed_at: new Date().toISOString(),
+      inspection_deadline: input.inspectionDeadline,
+      deadline_acknowledged: input.deadlineAcknowledged,
     })
     .select("id")
     .single<{ id: string }>();

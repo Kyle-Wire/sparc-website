@@ -30,12 +30,12 @@ import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { REPORT, formatPrice } from "../src/lib/payments/catalog";
+import { promisedBy, todayEastern } from "../src/lib/payments/turnaround";
 import { paymentProvider } from "../src/lib/payments/index";
 import { notifyReportEvent } from "../src/lib/payments/notify";
 import { noticeFor } from "../src/lib/payments/webhook";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sparclabs.co";
-const DAY_MS = 24 * 60 * 60 * 1000;
 const WAITING = ["card_saved", "in_progress", "charging", "payment_failed"];
 
 const USAGE = `npx tsx scripts/report-order.ts list [status]
@@ -125,16 +125,25 @@ async function main() {
     const statuses = a ? [a] : WAITING;
     const { data, error } = await db
       .from("report_orders")
-      .select("id,status,address,place_slug,test_mode,needs_review,card_saved_at,charge_error")
+      .select("id,status,address,place_slug,test_mode,needs_review,card_saved_at,charge_error,inspection_deadline,deadline_acknowledged")
       .in("status", statuses)
       .order("card_saved_at", { ascending: true });
     if (error) throw error;
-    for (const o of data ?? []) {
-      // Working days, roughly: the promise is in working days, so allow the weekends.
-      const due = o.card_saved_at ? new Date(new Date(o.card_saved_at).getTime() + Math.ceil(REPORT.deliveryDays * 1.4) * DAY_MS).toISOString().slice(0, 10) : "";
+    // Earliest of (the buyer's inspection deadline, our promise) first: that is
+    // the order to work on next (blind-spots review, 23 November 2026).
+    const rows = (data ?? []).map((o) => {
+      const ordered = o.card_saved_at ? todayEastern(new Date(o.card_saved_at)) : null;
+      const due = ordered ? promisedBy(ordered, REPORT.deliveryDays) : null;
+      const deadline = (o.inspection_deadline as string | null) ?? null;
+      const first = [due, deadline].filter((x): x is string => !!x).sort()[0] ?? "9999-12-31";
+      return { o, ordered, due, deadline, first };
+    });
+    rows.sort((a, b) => a.first.localeCompare(b.first));
+    for (const { o, ordered, due, deadline } of rows) {
       console.log(
-        [o.id, o.status, o.test_mode ? "TEST" : "live", `ordered ${String(o.card_saved_at ?? "").slice(0, 10)}`, `due by ~${due}`, o.address,
-          o.charge_error ? `CARD: ${o.charge_error}` : "", o.needs_review ? `REVIEW: ${o.needs_review}` : ""]
+        [o.id, o.status, o.test_mode ? "TEST" : "live", `ordered ${ordered ?? "?"}`, `promised by ${due ?? "?"}`,
+          deadline ? `INSPECTION DEADLINE ${deadline}${o.deadline_acknowledged ? " (before our promise; buyer said they understand)" : ""}` : "",
+          o.address, o.charge_error ? `CARD: ${o.charge_error}` : "", o.needs_review ? `REVIEW: ${o.needs_review}` : ""]
           .filter(Boolean)
           .join(" | "),
       );

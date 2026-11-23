@@ -29,6 +29,7 @@ before(async () => {
   await db.exec(`insert into public.report_orders (id, user_id, price_cents, address, status)
     values ('00000000-0000-0000-0000-000000000007', '${BUYER}', 14900, '7 Old St, Philadelphia, PA', 'awaiting_payment')`);
   await db.exec(sql("0008_charge_on_delivery.sql"));
+  await db.exec(sql("0009_order_agreement_and_deadline.sql"));
 });
 
 async function newOrder(price = 14900): Promise<string> {
@@ -276,4 +277,18 @@ test("the browser roles can write nothing", async () => {
     "select count(*)::int as n from information_schema.role_table_grants where grantee in ('anon','authenticated') and table_name in ('report_orders','payment_events') and privilege_type in ('INSERT','UPDATE','DELETE')",
   );
   assert.equal(grants.rows[0].n, 0);
+});
+
+test("0009: an order keeps what the buyer agreed to, when, and their inspection deadline", async () => {
+  const r = await db.query<{ terms_version: string; agreed: boolean; inspection_deadline: string; deadline_acknowledged: boolean }>(
+    `insert into public.report_orders (user_id, price_cents, address, terms_version, agreed_at, inspection_deadline, deadline_acknowledged)
+     values ($1, 14900, '9 Test St, Philadelphia, PA', '2026-11-22-draft', now(), '2026-12-03', true)
+     returning terms_version, agreed_at is not null as agreed, inspection_deadline::text, deadline_acknowledged`,
+    [BUYER],
+  );
+  assert.deepEqual(r.rows[0], { terms_version: "2026-11-22-draft", agreed: true, inspection_deadline: "2026-12-03", deadline_acknowledged: true });
+  const old = await db.query<{ deadline_acknowledged: boolean }>(
+    "select deadline_acknowledged from public.report_orders where id = '00000000-0000-0000-0000-000000000007'",
+  );
+  assert.equal(old.rows[0].deadline_acknowledged, false);
 });

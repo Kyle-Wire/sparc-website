@@ -29,6 +29,30 @@ test("the buyer must tick that they read what the report is not", () => {
   assert.deepEqual(checkOrder(form({ address: "1 Main St, Town, ST" })), { ok: false, error: "agree" });
 });
 
+test("an inspection deadline before the promise needs the buyer's yes", () => {
+  const base = { address: "1 Main St, Town, ST", agree: "yes" };
+  const today = "2026-11-23"; // promise: Tue 8 Dec 2026
+  assert.deepEqual(checkOrder(form({ ...base, deadline: "2026-12-03" }), today), { ok: false, error: "deadline" });
+  const r = checkOrder(form({ ...base, deadline: "2026-12-03", deadline_ack: "yes" }), today);
+  assert.ok(r.ok && r.value.inspectionDeadline === "2026-12-03" && r.value.deadlineAcknowledged === true);
+  const late = checkOrder(form({ ...base, deadline: "2026-12-20", deadline_ack: "yes" }), today);
+  assert.ok(late.ok && late.value.inspectionDeadline === "2026-12-20" && late.value.deadlineAcknowledged === false);
+  const none = checkOrder(form(base), today);
+  assert.ok(none.ok && none.value.inspectionDeadline === null && none.value.deadlineAcknowledged === false);
+  assert.deepEqual(checkOrder(form({ ...base, deadline: "2026-11-01" }), today), { ok: false, error: "deadline_past" });
+  assert.deepEqual(checkOrder(form({ ...base, deadline: "soon" }), today), { ok: false, error: "deadline_invalid" });
+});
+
+test("the weekly cap is off unless set to a positive whole number", async () => {
+  const { weeklyCap, REPORT_TERMS_VERSION, AGREE_STATEMENT } = await import("./catalog");
+  assert.equal(weeklyCap({}), null);
+  assert.equal(weeklyCap({ ORDERS_WEEKLY_CAP: "0" }), null);
+  assert.equal(weeklyCap({ ORDERS_WEEKLY_CAP: "2.5" }), null);
+  assert.equal(weeklyCap({ ORDERS_WEEKLY_CAP: "3" }), 3);
+  assert.match(REPORT_TERMS_VERSION, /^\d{4}-\d{2}-\d{2}/);
+  assert.match(AGREE_STATEMENT, /screening report/);
+});
+
 test("a place outside the US or garbage is dropped, not trusted", () => {
   const r = checkOrder(form({ address: "1 Main St, Town, ST", agree: "yes", place: "51.5,-0.12" }));
   assert.ok(r.ok && r.value.placeSlug === null);

@@ -199,9 +199,23 @@ export function setupSessionBody(req: CheckoutRequest, customerId: string): Reco
     metadata: tags(req.orderId, req.userId),
     // Sales tax is worked out from the billing address when we charge.
     billing_address_collection: "required",
+    // Cards only: the deliver step charges off-session and expects an answer
+    // at once. A bank debit or wallet saved here would settle days later or
+    // need the buyer present.
+    payment_method_types: ["card"],
+    // The SetupIntent carries the order too, so the Dashboard and Radar see it.
+    setup_intent_data: { description: `${REPORT.name}: card saved, charged on delivery`, metadata: tags(req.orderId, req.userId) },
+    // The buyer agrees to the later charge on the page where they save the card.
+    custom_text: { submit: { message: chargeAgreement() } },
     success_url: req.successUrl,
     cancel_url: req.cancelUrl,
   };
+}
+
+/** The words on the setup page above the Save button: what we charge, when, and when we don't. */
+export function chargeAgreement(): string {
+  const price = `$${(REPORT.priceCents / 100).toFixed(REPORT.priceCents % 100 ? 2 : 0)}`;
+  return `Nothing is charged today. When your report is ready, SPARC Labs charges this card once: ${price} plus any sales tax. If we cannot model your house, or you cancel first, nothing is charged and the card is removed.`;
 }
 
 /** The Checkout Session a buyer pays from after a failed charge. Exported for the test. */

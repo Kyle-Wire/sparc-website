@@ -44,6 +44,38 @@ const NEXT: Record<Notice, (id: string) => string | null> = {
   cancelled: () => "The buyer cancelled from their account: stop work on it. Nothing is charged. The site removes the saved card; if it is still on the Stripe customer, remove it there.",
 };
 
+/**
+ * A buyer's bank opened a dispute. It needs a person within Stripe's
+ * deadline, so the inbox hears at once. The order itself does not move:
+ * disputes are answered in the Stripe Dashboard.
+ */
+export async function notifyDispute(d: { id: string; amountCents: number | null; currency: string | null; reason: string | null; dueBy: number | null; paymentId: string | null; testMode: boolean }) {
+  const inbox = process.env.WAITLIST_NOTIFY_EMAIL;
+  const key = process.env.RESEND_API_KEY;
+  if (!inbox || !key) return;
+  const amount = d.amountCents !== null ? formatPrice(d.amountCents, (d.currency ?? "USD").toUpperCase()) : "(amount unknown)";
+  const due = d.dueBy ? new Date(d.dueBy * 1000).toISOString().slice(0, 10) : "see the Dashboard";
+  const lines = [
+    `A buyer's bank disputed a house report charge${d.testMode ? " (TEST MODE, no money moved)" : ""}.`,
+    `Dispute: ${d.id}`,
+    `Amount: ${amount}`,
+    `Reason given: ${d.reason ?? "not given"}`,
+    `Evidence due by: ${due}`,
+    d.paymentId ? `Payment: ${d.paymentId}` : null,
+    "Answer it in the Stripe Dashboard (Payments, Disputes) before the date above, with the order, the saved-card agreement and the delivered report.",
+  ].filter(Boolean);
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
+    body: JSON.stringify({
+      from: process.env.RESEND_FROM ?? "SPARC Labs <hello@sparclabs.co>",
+      to: [inbox],
+      subject: `${d.testMode ? "[TEST] " : ""}Dispute opened: ${amount}, evidence due ${due}`,
+      text: lines.join("\n"),
+    }),
+  });
+}
+
 export async function notifyReportEvent(admin: SupabaseClient, orderId: string, what: Notice, opts: { site?: string } = {}) {
   const { data: o } = await admin
     .from("report_orders")

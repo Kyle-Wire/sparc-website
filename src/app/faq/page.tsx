@@ -45,10 +45,10 @@ export default function FaqPage() {
       a: (
         <>
           <p>
-            Our own flood and heat models, run for the streets around one house, written up as a PDF. Findings come
-            first. Each one says, in words, how much evidence stands behind it. The reasons, the limits and every
-            source are at the back. Ground movement and wind are not in reports yet; each joins once it passes the
-            checks the report names.
+            Our own flood, heat, ground movement and wind models, run for the streets around one house, written up as
+            a PDF. Findings come first. Each one says, in words, how much evidence stands behind it. The reasons, the
+            limits and every source are at the back. <Link href="/how-we-test">How we test</Link> shows what each model has been
+            checked against, and how it did.
           </p>
           <p>
             <Link href="/report/sample">See how a report is laid out</Link>.
@@ -85,9 +85,9 @@ export default function FaqPage() {
         <>
           <p>
             Each finding carries a label set by fixed rules from the evidence behind it, never from whether the news
-            is good. Today every model result is exploratory, so it carries <strong>Limited evidence</strong> at
-            most: the models pass their own tests, and where they have been checked against real measurements
-            elsewhere, the report gives the model&apos;s own error and where it was measured. Nothing at your house has been measured, and the report
+            is good. A model result that has not been compared with a measurement at your place carries{" "}
+            <strong>Limited evidence</strong> at most, and the report gives the model&apos;s own error and where it
+            was measured. Nothing at your house has been measured, and the report
             says so on the cover.
           </p>
           <p>
@@ -109,13 +109,24 @@ export default function FaqPage() {
       ),
     },
     {
-      q: "Why is there no wind?",
+      q: "Where do the ground movement and wind sections come from?",
       a: (
-        <p>
-          Our wind model is being built and is not in reports. Storm gusts for the area come first, once that check
-          is merged. Wind between buildings comes only after the street model passes its wind-tunnel benchmark, which
-          it does not yet.
-        </p>
+        <>
+          <p>
+            Ground movement comes from NASA&apos;s satellite radar product, where it covers the place: whether the ground
+            under the block moves differently from the ground around it, as a rate with its range, checked against GPS
+            stations.
+          </p>
+          <p>
+            Wind comes in two parts: storm gusts for the area, carried in from long weather-station records, and how
+            wind moves between the buildings around the house, from our street model, scored against wind-tunnel
+            measurements.
+          </p>
+          <p>
+            Like every finding, each carries its range and a label for how much evidence stands behind it. What each
+            model has been checked against, and how it did, is on <Link href="/how-we-test">How we test</Link>.
+          </p>
+        </>
       ),
     },
     {

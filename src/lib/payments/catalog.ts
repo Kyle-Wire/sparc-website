@@ -15,12 +15,15 @@
  * held to in a contract and the Terms publish the billing and refund terms.
  * The Terms' report section reads REPORT below, so the two cannot drift.
  *
- * 23 November 2026: ground movement came out of `includes`. Every ground
- * reading in Climate Home Inspection is held (its evidence audit fails) and no
- * place config enables the ground section, so the line was not true of any
- * report that could be sold. The sample reports and /faq already said ground
- * and wind are not in reports yet. Put the line back when the ground section
- * ships in buyer reports.
+ * 23 November 2026, morning: ground movement came out of `includes` while
+ * its readings were held.
+ * 23 November 2026, afternoon: Kyle decided ground movement and wind are in
+ * every report, and that the site is written in its finished state, since
+ * sales are not pushed until every model passes its tests ("we can get the
+ * site to a place where we assume everything is good to go"). The lines
+ * describe what each section gives; none claims a validation. Where each
+ * model stands against its benchmarks lives on /how-we-test (test-runs.ts,
+ * receipts.ts), which is the one place that changes as checks finish.
  */
 
 export type ProductId = "home-report";
@@ -46,10 +49,12 @@ export const REPORT: Product = {
   name: "The house report",
   priceCents: 14900,
   currency: "USD",
-  tagline: "Flood and heat around one house and its streets, in our models, with the receipts. Bought once.",
+  tagline: "Flood, heat, ground movement and wind around one house and its streets, in our models, with the receipts. Bought once.",
   includes: [
     "Flood: our 1 m flood model run for the streets around the house in design storms and a past storm, showing where water reaches and how deep it stands beside the house in each storm modelled",
     "Heat: modelled street air temperature around the house in a hot spell, afternoon and night, and modelled outdoor comfort (PET) in sun and in shade, with the satellite surface temperature of the block beside them",
+    "Ground movement: whether the ground under the block moves differently from the ground around it, from NASA's satellite radar product where it covers the place, as a rate with its range",
+    "Wind: storm gusts for the area from long weather-station records, and how wind moves between the buildings around the house, each with its range",
     "Every finding labelled with how much evidence stands behind it, the model's own error and where that was measured, and what to check at the house",
     "A PDF in your account, yours to keep and share, with an atlas that opens with no internet, print-ready maps and the data files",
     "Corrections free for as long as SPARC Labs exists, and 12 months of updates when a finding changes or a hazard is added for your place",
@@ -58,9 +63,9 @@ export const REPORT: Product = {
     "Not an engineering survey, a home inspection, an elevation certificate or a flood determination",
     "Not a forecast: it shows what the models show in the storms and hot spells run, not what will happen",
     "No dollar figures: no expected loss, no premiums, no payback",
-    "Model results are labelled exploratory unless they have been compared with a measurement at that place, and none has been yet",
+    "Every model result is labelled by the evidence behind it: one not compared with a measurement at your place says so",
     "Nothing about the basement, the first floor or indoor temperature",
-    "No ground movement or wind yet: each joins the report only once it passes its checks, and the report says so on its first page",
+    "No figure without its range and its label; where a model has not been checked for your area, the report says so beside the figure",
   ],
   deliveryDays: 10,
 };
@@ -133,7 +138,7 @@ export function mayOrder(email: string | null | undefined, env: Record<string, s
  */
 export const AGREE_STATEMENT =
   "I have read what the report is and is not. It is a screening report, not an engineering survey.";
-export const REPORT_TERMS_VERSION = "2026-11-23-draft";
+export const REPORT_TERMS_VERSION = "2026-11-23b-draft";
 
 /**
  * How many orders we take in any seven days, from ORDERS_WEEKLY_CAP. Unset or

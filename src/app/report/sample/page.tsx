@@ -25,9 +25,8 @@ export const metadata: Metadata = withPage("/report/sample", {
 // house on any map. Files: public/samples/. The statements quoted below are
 // copied from page 3 of each report (finding F1), labels included.
 //
-// Ground movement and wind sit in the order as sections still to come: the
-// directive's §13 rule is that a new hazard is reported only once it has a
-// method, an evidence record and a label.
+// Ground movement and wind are in every report (Kyle, 23 November 2026). The
+// two samples were built before that and do not have the sections yet.
 
 const LABELS = ["Well supported", "Moderately supported", "Limited evidence", "Insufficient information"];
 
@@ -67,7 +66,7 @@ const PAGE_NAMES = [
   "Where each finding comes from",
 ];
 
-const SECTIONS: { title: string; what: string; cards: string[]; plot?: string; coming?: boolean }[] = [
+const SECTIONS: { title: string; what: string; cards: string[]; plot?: string; screening?: boolean }[] = [
   {
     title: "At a glance",
     what: "The property's reference, the headline findings for each hazard, and the names of the things the report does not cover.",
@@ -87,15 +86,15 @@ const SECTIONS: { title: string; what: string; cards: string[]; plot?: string; c
   },
   {
     title: "Ground movement",
-    what: "Free: whether the ground the house stands on moves toward or away from the satellite against the ground around it, labelled exploratory, and the map of ground prone to sinkholes. Paid: whether it moves with its surroundings or on its own, whether the rate is steady or new, the seasonal swing, and ten years ahead. A held section says it is in review; a refused reading shows no number and says why. Added once it has evidence records and labels.",
+    what: "Whether the ground the house stands on moves toward or away from the satellite against the ground around it, as a rate with its range, from NASA's satellite radar product where it covers the place; the map of ground prone to sinkholes; whether it moves with its surroundings or on its own, and whether the rate is steady or new. A refused reading shows no number and says why.",
     cards: ["Ground at the house, free", "Sinkhole-prone ground, free", "With its surroundings or on its own", "Steady or new", "Seasonal swing", "Ten years ahead"],
-    coming: true,
+    screening: true,
   },
   {
     title: "Wind",
-    what: "Wind is being built and is not in reports. Storm gusts for the area come first, once that check is merged; wind between the buildings only after the street model passes its wind-tunnel benchmark.",
+    what: "Storm gusts for the area from long weather-station records, and how wind moves between the buildings around the house, from our street model. Each with its range and its label.",
     cards: ["Storm gusts for the area", "Wind between the buildings"],
-    coming: true,
+    screening: true,
   },
   {
     title: "What to check at the house, and how sure each finding is",
@@ -155,8 +154,9 @@ export default function SampleReportPage() {
         </div>
         <p className="screening-note" style={{ marginTop: 28 }}>
           <strong>Samples, not advice.</strong> These show what a report contains. They are screening reports: every
-          model finding is labelled exploratory or limited evidence, and nothing at either house was measured. Ground
-          movement and wind are not in reports yet; page 1 of each says why.
+          model finding is labelled exploratory or limited evidence, and nothing at either house was measured. These two
+          were made before ground movement and wind went into every report, so they show flood and heat only. See{" "}
+          <Link href="/how-we-test">How we test</Link> for where each check stands.
         </p>
       </Section>
 
@@ -256,10 +256,10 @@ export default function SampleReportPage() {
       <Section sunken kicker="the sections, in order" title="Every report follows the same order.">
         <ol className="report-sections">
           {SECTIONS.map((s) => (
-            <li key={s.title} className="report-section" data-coming={s.coming ? "true" : undefined}>
+            <li key={s.title} className="report-section">
               <div className="report-section-head">
                 <h3>{s.title}</h3>
-                {s.coming && <span className="shelf-state" data-state="coming">Coming</span>}
+                {s.screening && <span className="shelf-state">New</span>}
               </div>
               <p>{s.what}</p>
             </li>

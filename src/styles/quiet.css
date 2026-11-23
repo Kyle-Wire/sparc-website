@@ -154,3 +154,141 @@
 .place-side { display: grid; gap: 14px; align-content: start; }
 .record-card[data-hazard="ground"] { border-left-color: var(--ground); }
 .record-card[data-hazard="wind"] { border-left-color: var(--wind); }
+
+/* ---------- place page: one layer at a time, its key on the map ----------
+   Kyle, 23 Nov 2026: the free block view's "layer selection, lack of legend
+   and presentation feels a bit off". The picker now sits on top of the map,
+   grouped by hazard, and shows one layer at a time so the colour on the map
+   always has exactly one key. The key sits on the map like a graphic's key,
+   in the publisher's own colours, with units and a source line. Hovering
+   names the class under the cursor; a click asks the agencies for the record. */
+
+.place-map-wrap { grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; }
+.pm-col { display: grid; gap: 10px; min-width: 0; }
+
+.pm-chips { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
+.pm-chip-group { display: flex; gap: 4px; align-items: center; }
+.pm-chip-hazard {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-right: 4px; display: inline-flex; align-items: center; gap: 5px;
+}
+.pm-chip-hazard::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.pm-chip-hazard[data-hazard="flood"]::before { background: var(--flood); }
+.pm-chip-hazard[data-hazard="heat"]::before { background: var(--heat); }
+.pm-chip-hazard[data-hazard="ground"]::before { background: var(--ground); }
+.pm-chip-hazard[data-hazard="storm"]::before { background: var(--wind); }
+.pm-chip {
+  font: inherit; font-size: 13px; line-height: 1; padding: 7px 11px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--bg-elevated); color: var(--ink);
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+}
+.pm-chip:hover:not(:disabled) { border-color: var(--ink); }
+.pm-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pm-chip[aria-checked="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.pm-chip:disabled { color: var(--muted); cursor: not-allowed; opacity: 0.55; }
+.pm-chip-quiet { border-style: dashed; }
+
+.place-map { height: clamp(560px, 76vh, 860px); border-radius: var(--float-radius); }
+.place-map .maplibregl-ctrl-top-left { top: 6px; left: 6px; }
+
+/* The key: a white card in the bottom-left corner of the map. */
+.pm-key {
+  position: absolute; left: 12px; bottom: 12px; z-index: 2; width: 300px; max-height: calc(100% - 24px); overflow-y: auto;
+  background: rgba(255, 255, 255, 0.96); border: 1px solid var(--rule); border-radius: var(--float-radius);
+  box-shadow: var(--float-shadow); padding: 12px 14px 10px; display: grid; gap: 10px;
+}
+.mk-legend { display: grid; gap: 7px; }
+.mk-legend-head { display: grid; gap: 2px; }
+.mk-legend-head strong { font-size: 16px; line-height: 1.2; letter-spacing: -0.01em; }
+.mk-hazard { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.mk-hazard[data-hazard="flood"] { color: var(--flood); }
+.mk-hazard[data-hazard="heat"] { color: var(--heat); }
+.mk-hazard[data-hazard="ground"] { color: var(--ground); }
+.mk-hazard[data-hazard="storm"] { color: var(--wind); }
+.mk-what { margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.mk-source { margin: 0; font-size: 11px; line-height: 1.4; color: var(--muted); }
+
+.mk-ramp { display: grid; gap: 3px; }
+.mk-ramp-bar { position: relative; height: 12px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12); }
+.mk-ramp-mark {
+  position: absolute; top: -4px; bottom: -4px; width: 0; transform: translateX(-1px);
+  border-left: 2px solid var(--ink); box-shadow: 0 0 0 1px var(--white);
+}
+.mk-ramp-ticks { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--ink-2); }
+.mk-unit { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); }
+
+.mk-steps { display: grid; gap: 3px; }
+.mk-steps-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; }
+.mk-step { height: 12px; border-radius: 1px; }
+.mk-step[data-on="true"] { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+.mk-classes { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 12.5px; line-height: 1.3; }
+.mk-classes li { display: grid; grid-template-columns: 14px 1fr; gap: 8px; align-items: center; padding: 1px 3px; margin: 0 -3px; border-radius: 3px; }
+.mk-classes li[data-on="true"] { background: var(--paper-2); font-weight: 600; }
+.mk-swatch { width: 14px; height: 14px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }
+.mk-classes[data-shape="line"] .mk-swatch { height: 3px; border-radius: 0; box-shadow: none; }
+.mk-swatch-clear { background: repeating-linear-gradient(45deg, transparent 0 3px, var(--line) 3px 4px); }
+.mk-swatch-track { background: var(--ink); }
+.mk-none { color: var(--muted); }
+
+.pm-key .place-seg { margin-top: 0; justify-self: start; }
+
+.mk-marks { display: flex; flex-wrap: wrap; gap: 4px 12px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+.mk-marks span { display: inline-flex; align-items: center; gap: 6px; }
+.mk-ring { width: 14px; height: 0; border-top: 2px dashed var(--ink); }
+.mk-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--ink); }
+.mk-pin { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--accent); background: var(--white); }
+
+/* The readout that follows the cursor. */
+.pm-hover {
+  position: absolute; z-index: 3; pointer-events: none; transform: translate(14px, -50%);
+  max-width: 260px; padding: 7px 10px; border-radius: 4px; background: rgba(20, 20, 20, 0.9); color: var(--paper);
+  display: grid; gap: 2px; font-size: 13px; line-height: 1.3;
+}
+.pm-hover strong { font-weight: 600; }
+.pm-hover small { font-family: var(--font-mono); font-size: 10px; color: var(--ban-muted); letter-spacing: 0.02em; }
+
+.pm-zoom-note {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 2; margin: 0; pointer-events: none;
+  padding: 6px 12px; border-radius: 999px; background: rgba(20, 20, 20, 0.85); color: var(--paper);
+  font-family: var(--font-mono); font-size: 12px; white-space: nowrap;
+}
+
+.pm-screening { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 72ch; }
+.pm-screening strong { color: var(--ink); font-weight: 600; }
+
+.spot-layer { margin: 10px 0 2px; padding: 8px 10px; background: var(--paper-2); border-radius: 4px; font-size: 14px; font-weight: 600; line-height: 1.35; display: grid; gap: 2px; }
+.spot-layer span { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+@media (max-width: 1100px) {
+  .place-map-wrap { grid-template-columns: 1fr; }
+}
+
+/* Phone: the chips scroll sideways above the map, and the key sits below it,
+   so nothing covers the map a thumb has to move. */
+@media (max-width: 720px) {
+  .pm-chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 2px 16px 6px; scrollbar-width: none; gap: 14px; }
+  .pm-chips::-webkit-scrollbar { display: none; }
+  .pm-chip-group { flex: none; }
+  .pm-chip { padding: 9px 12px; font-size: 14px; }
+  .place-map { height: 58vh; height: 58dvh; min-height: 340px; }
+  .place-map-frame { display: grid; gap: 10px; }
+  .pm-key { position: static; width: auto; max-height: none; box-shadow: none; background: var(--bg-elevated); }
+  .pm-zoom-note { top: 10px; }
+}
+
+@media print {
+  .pm-chips, .pm-hover { display: none !important; }
+  .pm-key { box-shadow: none; }
+}
+
+/* The home map's layers panel uses the same key, under each switched-on layer. */
+.map-layer-key { padding: 4px 0 4px 22px; }
+.map-layer-key .mk-legend-head { display: none; }
+.mk-legend-head { position: relative; }
+.mk-hide {
+  position: absolute; top: -2px; right: 0; font: inherit; font-family: var(--font-mono); font-size: 11px;
+  padding: 3px 7px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer;
+}
+.mk-hide:hover { border-color: var(--ink); color: var(--ink); }
+.mk-hide:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

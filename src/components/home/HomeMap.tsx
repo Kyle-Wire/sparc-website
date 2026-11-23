@@ -9,7 +9,8 @@ import { PlaceSearch, type FoundPlace } from "@/components/place/PlaceSearch";
 import { rememberPoint } from "@/components/place/place-point";
 import { placeSlug } from "@/lib/place/coords";
 import { BASE_STYLE, RASTERS, SpotList, needsTwoFingers, type Spot } from "@/components/place/PlaceMap";
-import FEMA_LEGEND from "@/data/fema-flood-zones-legend.json";
+import { MapLegend } from "@/components/map/MapLegend";
+import { layerInfo } from "@/lib/map-legends";
 import { DEFAULT_STORM, HAZARD_STATE_WORDS, floodSortName, type BlockReadings, type HazardState } from "@/lib/listings/blocks";
 import type { PublicListing } from "@/lib/listings/feed";
 
@@ -242,20 +243,11 @@ function LayersPanel(props: { on: Record<LayerId, boolean>; onToggle: (id: Layer
               <label className="map-legend-check map-legend-title">
                 <input type="checkbox" checked={props.on[l.id]} onChange={(e) => props.onToggle(l.id, e.target.checked)} /> {l.name}
               </label>
-              <p className="map-legend-note">
-                {l.note}
-                {props.on[l.id] && l.id === "fema" && props.zoom < femaMin && " Zoom in to a town to see it."}
-              </p>
-              {l.id === "fema" && props.on.fema && (
-                <div className="map-legend-swatches">
-                  {FEMA_LEGEND.items.map((it) => (
-                    <div key={it.label} className="map-legend-row">
-                      {/* FEMA's own swatch, copied from its legend by scripts/fetch-fema-legend.mjs. */}
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={it.image} alt="" width={16} height={16} />
-                      {it.label}
-                    </div>
-                  ))}
+              {!props.on[l.id] && <p className="map-legend-note">{l.note}</p>}
+              {props.on[l.id] && l.id === "fema" && props.zoom < femaMin && <p className="map-legend-note">Zoom in to a town to see it.</p>}
+              {props.on[l.id] && (
+                <div className="map-layer-key">
+                  <MapLegend layer={layerInfo(l.id)} />
                 </div>
               )}
             </div>

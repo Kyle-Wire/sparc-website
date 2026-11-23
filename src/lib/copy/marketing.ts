@@ -88,6 +88,10 @@ export const RECEIPTS = {
   lead:
     "A model is only as good as what it's been checked against. Here's where each of ours stands today, " +
     "including the parts that haven't passed yet. We'd rather you hear it from us.",
+  // The one line /how-it-works keeps; the full receipts are on /how-we-test.
+  short:
+    "Every model is checked against answers we already know, and every result is published, " +
+    "including the parts that haven't passed yet. We'd rather you hear it from us.",
 };
 
 export const NEVER = {

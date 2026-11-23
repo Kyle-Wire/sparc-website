@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
+import { ReceiptsSection } from "@/components/marketing/Receipts";
 import {
   AIJ_ROWS,
   GUST_BLIND,
@@ -16,7 +17,8 @@ import {
 
 // How we test: one dated run of every test suite and benchmark, as it came
 // out. Every figure is in src/lib/copy/test-runs.ts, which names the command
-// behind each row. The rungs per quantity stay on /how-it-works#receipts.
+// behind each row. The rungs per quantity (the receipts) are the second section,
+// from src/components/marketing/Receipts.tsx.
 
 export const metadata = {
   title: "How we test",
@@ -106,7 +108,9 @@ export default function HowWeTestPage() {
         </div>
       </Section>
 
-      <Section sunken kicker={`the run of ${TEST_RUN_DATE}`} title="Every suite, as it came out.">
+      <ReceiptsSection title="Where each reading in the report stands." />
+
+      <Section kicker={`the run of ${TEST_RUN_DATE}`} title="Every suite, as it came out.">
         <div className="table-scroll">
           <table className="tr-table">
             <thead>
@@ -144,7 +148,7 @@ export default function HowWeTestPage() {
         </p>
       </Section>
 
-      <Section kicker="wind, in detail" title="The two wind benchmarks, against their pass marks.">
+      <Section sunken kicker="wind, in detail" title="The two wind benchmarks, against their pass marks.">
         <div className="split-1-1" style={{ alignItems: "start", gap: 28 }}>
           <GateChart rows={AIJ_ROWS} gate={0.66} title="Wind tunnel (AIJ): share of points within 25 % of the measured speed" />
           <div style={{ display: "grid", gap: 18 }}>
@@ -187,7 +191,7 @@ export default function HowWeTestPage() {
             </ul>
             <p>
               What each result in a report has passed, quantity by quantity, is on{" "}
-              <Link href="/how-it-works#receipts">the receipts</Link>. What each model is: <Link href="/models">the models</Link>.
+              <a href="#receipts">the receipts</a>. What each model is: <Link href="/models">the models</Link>.
             </p>
           </div>
         </div>

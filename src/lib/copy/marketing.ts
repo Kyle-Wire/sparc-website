@@ -64,7 +64,7 @@ export const TWO_QUESTIONS = {
     tag: "paid · one house",
     question: "What do our models say about this house?",
     points: [
-      "Our flood, heat and ground movement models, run for the neighbourhood with your house in the middle. Wind joins once it passes its checks.",
+      "Our flood and heat models, run for the neighbourhood with your house in the middle. Ground movement and wind join once each passes its checks.",
       "Findings first, each labelled with how much evidence stands behind it. Today that label mostly says exploratory, and we print it at full size.",
       "What to check at the house, and the limits of every finding, one click away.",
     ],

@@ -1,13 +1,15 @@
+import type { Metadata } from "next";
+import { withPage } from "@/lib/seo";
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 import { EMAIL_PRIMARY } from "@/lib/brand";
 import { REPORT, formatPrice, salesMode } from "@/lib/payments";
 
-export const metadata = {
+export const metadata: Metadata = withPage("/pricing", {
   title: "Pricing",
   description: "The public record for any US address is free with no account. Our models, run for one house, are the paid part.",
-};
+});
 // The price shows only when checkout is switched on, so the page is rendered per request.
 export const dynamic = "force-dynamic";
 

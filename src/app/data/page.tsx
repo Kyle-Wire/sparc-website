@@ -1,13 +1,15 @@
+import type { Metadata } from "next";
+import { withPage } from "@/lib/seo";
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero } from "@/components/marketing/page-shell";
 import tracks from "@/data/hurricane-tracks.manifest.json";
 import { tableNote } from "@/lib/place/tables";
 
-export const metadata = {
+export const metadata: Metadata = withPage("/data", {
   title: "Data sources",
   description: "Every public source behind a place page: FEMA, USGS, NOAA, the Census Bureau and the national land cover survey, how the site reads each one and how fresh it is.",
-};
+});
 
 // Where each record on a place page comes from, how the site reads it, and
 // how fresh it is. The dates on this page are read from the manifests the

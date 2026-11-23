@@ -1,13 +1,15 @@
+import type { Metadata } from "next";
+import { withPage } from "@/lib/seo";
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 import { LockedShelf } from "@/components/place/cards";
 import { ENGINES, RUNS_ON_WORDS } from "@/lib/engines";
 
-export const metadata = {
+export const metadata: Metadata = withPage("/models", {
   title: "The models",
   description: "SPARC Labs' own flood, heat, ground movement and wind models: what each gives, what it has been checked against, and what it will never say.",
-};
+});
 
 // What this page may say about the models, and where each sentence comes
 // from. All four are SPARC Labs' own engines, kept in their own repositories.

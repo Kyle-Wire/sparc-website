@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { withPage } from "@/lib/seo";
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PlaceSearch } from "@/components/place/PlaceSearch";
@@ -16,10 +18,10 @@ import { engine } from "@/lib/engines";
 // in src/lib/copy/; nothing here holds a figure. The receipts come from
 // src/lib/copy/receipts.ts.
 
-export const metadata = {
+export const metadata: Metadata = withPage("/how-it-works", {
   title: "How it works",
   description: HERO.lead,
-};
+});
 
 function LotDrawing() {
   // A house inside its dashed property line, with the four hazards reaching

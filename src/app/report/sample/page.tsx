@@ -1,13 +1,14 @@
+import { withPage } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withPage("/report/sample", {
   title: "Sample reports",
   description: "Two real house reports for two Philadelphia rowhouses, addresses withheld: every page, every finding with its evidence label, and what a report will never say.",
-};
+});
 
 // The buyer report's structure, from the Climate Inspection repository's
 // docs/product/DIRECTIVE.md §7 ("The report"), opened 18 November 2026. The

@@ -1,12 +1,14 @@
+import type { Metadata } from "next";
+import { withPage } from "@/lib/seo";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
 import { COMPANY, COMPANY_LEGAL, EMAIL_PRIMARY, OFFICE_FULL, COPYRIGHT_YEAR } from "@/lib/brand";
 import { REPORT, checkoutEnabled, formatPrice } from "@/lib/payments";
 
-export const metadata = {
+export const metadata: Metadata = withPage("/terms", {
   title: "Terms of Service",
   description: "The terms for using SPARC Labs: a screening tool, not an engineering study, a home inspection or a flood determination.",
-};
+});
 export const dynamic = "force-dynamic";
 
 export default function TermsPage() {

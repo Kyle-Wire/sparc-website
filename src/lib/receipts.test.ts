@@ -23,5 +23,7 @@ test("nothing is field-checked here, and no banned word appears", () => {
 test("receipts waiting on unmerged work stay hidden until marked live", () => {
   const wind = RECEIPTS.find((q) => q.quantity.startsWith("Storm gusts"))!;
   assert.ok(visibleReceipts(wind).every((r) => !r.shipsWhen || r.live));
-  assert.ok(visibleReceipts(wind).length < wind.receipts.length);
+  // a receipt marked not live is dropped (none is waiting today, so check it on a copy)
+  const held = { ...wind, receipts: wind.receipts.map((r, i) => (i === 0 ? { ...r, shipsWhen: "x is merged", live: false } : r)) };
+  assert.equal(visibleReceipts(held).length, wind.receipts.length - 1);
 });

@@ -28,8 +28,8 @@ export type OrderDates = {
 };
 
 /** The dates a buyer sees on an order that is still being made. */
-export function orderDates(createdAt: string, deadline: string | null, workingDays: number): OrderDates {
-  const promised = promisedBy(todayEastern(new Date(createdAt)), workingDays);
+export function orderDates(orderedAt: string, deadline: string | null, workingDays: number): OrderDates {
+  const promised = promisedBy(todayEastern(new Date(orderedAt)), workingDays);
   const d = deadline && isDay(deadline.slice(0, 10)) ? deadline.slice(0, 10) : null;
   return { promised, deadline: d, tight: d !== null && d < promised };
 }

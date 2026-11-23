@@ -24,6 +24,7 @@ interface Order {
   paid_at: string | null;
   delivered_at: string | null;
   inspection_deadline: string | null;
+  card_saved_at: string | null;
 }
 
 // The card is charged when the report is ready (Kyle, 22 November 2026), so
@@ -101,7 +102,7 @@ export default async function ReportsPage({
   try {
     const { data, error } = await supabase
       .from("report_orders")
-      .select("id,status,address,place_slug,price_cents,amount_paid_cents,currency,receipt_url,test_mode,status_note,charge_error,created_at,paid_at,delivered_at,inspection_deadline")
+      .select("id,status,address,place_slug,price_cents,amount_paid_cents,currency,receipt_url,test_mode,status_note,charge_error,created_at,paid_at,delivered_at,inspection_deadline,card_saved_at")
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) throw error;
@@ -187,7 +188,8 @@ export default async function ReportsPage({
             </ol>
             <p className="order-note">{words(o, o.id === ordered, o.id === paying)}</p>
             {(o.status === "card_saved" || o.status === "in_progress") && (() => {
-              const d = orderDates(o.created_at, o.inspection_deadline, REPORT.deliveryDays);
+              // The promise counts from when the card was saved, as in scripts/report-order.ts list.
+              const d = orderDates(o.card_saved_at ?? o.created_at, o.inspection_deadline, REPORT.deliveryDays);
               return (
                 <p className="order-note">
                   <strong>Ready by {formatDay(d.promised)}</strong> at the latest.

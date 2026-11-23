@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PlaceSearch } from "@/components/place/PlaceSearch";
 import { HazardBar, Stamp } from "@/components/marketing/brand";
-import { CLOSER, HERO, NEVER, RECEIPTS, REMEMBERS, STEPS, TWO_QUESTIONS } from "@/lib/copy/marketing";
+import { AFTER, CLOSER, HERO, NEVER, RECEIPTS, REMEMBERS, SIMULATE, STEPS, TWO_QUESTIONS } from "@/lib/copy/marketing";
 
 // The marketing page. The home page is the map and nothing else (Kyle,
 // map-first-brief.md s.3), so this is where someone arriving from a link, a
@@ -127,7 +127,49 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      <section>
+      <section id="simulate">
+        <div className="wrap">
+          <div className="hiw-head">
+            <Stamp tone="accent">{SIMULATE.kicker}</Stamp>
+            <h2>{SIMULATE.title}</h2>
+            <p className="lead">{SIMULATE.lead}</p>
+          </div>
+          <div className="hiw-vs">
+            <div className="hiw-vs-col">
+              <h3>{SIMULATE.lookup.name}</h3>
+              <ul>
+                {SIMULATE.lookup.points.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="hiw-vs-col hiw-vs-ours">
+              <h3>{SIMULATE.simulation.name}</h3>
+              <ul>
+                {SIMULATE.simulation.points.map((p) => (
+                  <li key={p}>{p}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="steps3 steps4">
+            {SIMULATE.items.map((s) => (
+              <div key={s.n}>
+                <span className="n">{s.n}</span>
+                <h3>{s.t}</h3>
+                <p>{s.b}</p>
+              </div>
+            ))}
+          </div>
+          <p style={{ marginTop: 24 }}>
+            <Link href="/models">
+              {SIMULATE.more} <span className="arrow">→</span>
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      <section style={{ background: "var(--paper-2)" }}>
         <div className="wrap">
           <div className="hiw-head">
             <Stamp>{STEPS.kicker}</Stamp>
@@ -142,6 +184,26 @@ export default function HowItWorksPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section id="after">
+        <div className="wrap">
+          <div className="hiw-head">
+            <Stamp>{AFTER.kicker}</Stamp>
+            <h2>{AFTER.title}</h2>
+            <p className="lead">{AFTER.lead}</p>
+          </div>
+          <div className="steps3">
+            {AFTER.items.map((s) => (
+              <div key={s.n}>
+                <span className="n">{s.n}</span>
+                <h3>{s.t}</h3>
+                <p>{s.b}</p>
+              </div>
+            ))}
+          </div>
+          <p className="screening-note" style={{ marginTop: 24 }}>{AFTER.note}</p>
         </div>
       </section>
 

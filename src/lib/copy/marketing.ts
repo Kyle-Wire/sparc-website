@@ -72,6 +72,79 @@ export const TWO_QUESTIONS = {
   },
 };
 
+// Kyle, 23 November 2026 (a reviewer's note he passed on): say plainly that
+// the house report simulates physical processes rather than looking up a
+// zone, and give people a reason to come back after they buy. Each line below
+// is held to what the engine does today (src/lib/engines.ts and each repo's
+// README); ground movement is measured by satellite, so it is not called a
+// simulation.
+export const SIMULATE = {
+  kicker: "a lookup, or a simulation",
+  title: "A hazard map tells you the zone. We run the physics.",
+  lead:
+    "We don't just look up whether a house sits in a hazard zone. We simulate how water, heat and wind behave across the streets around it, then read what that means at the house. Where a satellite measures something directly, we say measured, not modelled.",
+  lookup: {
+    name: "A lookup gives you",
+    points: ["One label for a large area, drawn for insurance", "Nothing about which side of the house gets wet", "The same answer for every house on the block"],
+  },
+  simulation: {
+    name: "A simulation gives you",
+    points: [
+      "Where water runs and stands, metre by metre, storm by storm",
+      "How warm the street air stays at night, in sun and in shade",
+      "A different answer for houses a few doors apart, when the ground or the buildings differ",
+    ],
+  },
+  items: [
+    {
+      n: "flood · simulated",
+      t: "Rain on a 1 m model of the ground",
+      b: "Rain falls on the lidar ground, buildings and kerbs. Water runs downhill, pools and drains into the pipes, minute by minute, in design storms and a past storm.",
+    },
+    {
+      n: "heat · simulated",
+      t: "The street's energy balance, hour by hour",
+      b: "Sun, shade, pavement, trees and wind set the street air temperature through a hot spell, held to the nearest weather station each hour. Outdoor comfort in sun and in shade comes from the same run.",
+    },
+    {
+      n: "wind · simulated",
+      t: "Storm gusts, then the buildings",
+      b: "A storm's gusts are carried in from decades of airport records through the land cover upwind, then wind between the buildings is worked out on a 3D model of the block.",
+    },
+    {
+      n: "ground · measured",
+      t: "Read from satellite radar",
+      b: "Not a simulation. NASA's radar measures how the ground moves, pass after pass. We read it for the block against the ground around it.",
+    },
+  ],
+  more: "How each model works, and what it will never say",
+};
+
+export const AFTER = {
+  kicker: "after you move in",
+  title: "Then try the fixes before you pay for them.",
+  lead:
+    "The block record helps you find a house. The house report helps you decide on one. After you buy, the same models can show what a project around the house would change, before you spend on it.",
+  items: [
+    {
+      n: "in the report",
+      t: "A what-if page for flood",
+      b: "Move a slider for a French drain or a rain garden, and the modelled water at your walls changes with it. It is trained on your own house, and offered only where its own accuracy check passes there.",
+    },
+    {
+      n: "for 12 months",
+      t: "Updates when something changes",
+      b: "When a finding changes or a hazard is added for your place, you get the new version. Corrections are free for as long as we exist.",
+    },
+    {
+      n: "coming",
+      t: "Trees, cool roofs, lighter paving",
+      b: "Our heat model already runs these as projects. They join the report once their results can be shown with their limits, as a change across the neighbourhood, never a promise about one street.",
+    },
+  ],
+  note: "Every what-if result is modelled, not measured, and says so beside the number. It is a way to compare options, not a design or a guarantee.",
+};
+
 export const STEPS = {
   kicker: "three steps",
   title: "From an address to something you can act on.",

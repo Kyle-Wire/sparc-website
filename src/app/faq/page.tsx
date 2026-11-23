@@ -84,13 +84,13 @@ export default function FaqPage() {
         <>
           <p>
             Each finding carries a label set by fixed rules from the evidence behind it, never from whether the news
-            is good. Today every model result is labelled <strong>exploratory</strong>: the models pass their own
-            tests, and where they have been checked against real measurements elsewhere, the report gives the
-            model&apos;s own error and where it was measured. Nothing at your house has been measured, and the report
+            is good. Today every model result is exploratory, so it carries <strong>Limited evidence</strong> at
+            most: the models pass their own tests, and where they have been checked against real measurements
+            elsewhere, the report gives the model&apos;s own error and where it was measured. Nothing at your house has been measured, and the report
             says so on the cover.
           </p>
           <p>
-            Our public <Link href="/how-it-works">receipts board</Link> shows what each model has passed and failed,
+            Our public <Link href="/how-we-test">test record</Link> shows what each model has passed and failed,
             failures included.
           </p>
         </>
@@ -149,6 +149,35 @@ export default function FaqPage() {
           <Link href="/pricing">pricing page</Link> and in the <Link href="/terms">Terms</Link> before any charge is
           taken.
         </p>
+      ),
+    },
+    {
+      q: "My inspection period is short. Will it arrive in time?",
+      a: onSale ? (
+        <p>
+          Many buyers have about ten days to inspect after an offer is accepted, and we promise the report within{" "}
+          {REPORT.deliveryDays} working days. When you order, tell us your inspection deadline: we work on the
+          orders with the nearest deadlines first. If your deadline comes before our date, the order page says so
+          before you order, and you can write to us first for an honest answer. If we are late, you can cancel and
+          pay nothing.
+        </p>
+      ) : (
+        <p>
+          When reports go on sale, the order page will ask for your inspection deadline and say before you order
+          whether we can meet it.
+        </p>
+      ),
+    },
+    {
+      q: "Who handles my card?",
+      a: onSale ? (
+        <p>
+          Stripe. You enter your card on Stripe&apos;s page; we never see or keep the number. It is saved when you
+          order and charged once, when your report is ready. If you cancel first, or we cannot make the report, the
+          saved card is removed and nothing is charged.
+        </p>
+      ) : (
+        <p>Nothing is sold yet, so no card is taken.</p>
       ),
     },
     {

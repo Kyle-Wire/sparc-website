@@ -17,7 +17,7 @@ import { REPORT } from "./catalog";
 export type ApplyFn = (args: { provider: string; event: PaymentEvent }) => Promise<string>;
 
 /** Which note follows an order's move. */
-export type Notice = "card_saved" | "delivered" | "payment_failed" | "refunded";
+export type Notice = "card_saved" | "delivered" | "payment_failed" | "refunded" | "cancelled";
 
 export interface Decision {
   status: 200 | 500;

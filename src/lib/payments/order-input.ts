@@ -8,27 +8,39 @@ import { REPORT } from "./catalog";
 import { checkDeadline, todayEastern, type Day } from "./turnaround";
 
 /**
- * What the buyer can tell us about the house (migration 0010). Each is null
- * when not given. They replace the City of Philadelphia assessor's record,
- * whose terms forbid commercial use (Climate Home Inspection D53), and they
- * are printed in the report as the buyer's answers, not inspected.
+ * What the buyer can tell us about the house (migrations 0010 and 0011). Each
+ * is null when not given. They replace the City of Philadelphia assessor's
+ * record, whose terms forbid commercial use (Climate Home Inspection D53), and
+ * they are printed in the report as the buyer's answers, not inspected.
+ *
+ * first_floor_ft and basement_finished (0011) narrow the repair-cost range in
+ * the report's costs section (Climate Home Inspection D56): the first-floor
+ * height in whole feet above the ground outside, read there as plus or minus
+ * half a foot. basement_finished is null when there is no basement.
  */
 export interface HouseFacts {
   basement: "full" | "partial" | "none" | null;
   central_air: boolean | null;
   year_built: number | null;
   storeys: number | null;
+  first_floor_ft: number | null;
+  basement_finished: "finished" | "unfinished" | null;
 }
 
 export const BASEMENT_CHOICES = ["full", "partial", "none"] as const;
+export const FINISHED_CHOICES = ["finished", "unfinished"] as const;
 export const EARLIEST_YEAR = 1700;
 export const MAX_STOREYS = 6;
+/** The first-floor heights the form offers, in whole feet above the ground outside. */
+export const MAX_FIRST_FLOOR_FT = 8;
 
 export function checkHouseFacts(form: FormData, thisYear: number = new Date().getFullYear()): HouseFacts | "invalid" {
   const basement = clean(form.get("basement"));
   const air = clean(form.get("central_air"));
   const year = clean(form.get("year_built"));
   const storeys = clean(form.get("storeys"));
+  const ffh = clean(form.get("first_floor_ft"));
+  const finished = clean(form.get("basement_finished"));
   if (basement && !(BASEMENT_CHOICES as readonly string[]).includes(basement)) return "invalid";
   if (air && air !== "yes" && air !== "no") return "invalid";
   let y: number | null = null;
@@ -43,11 +55,21 @@ export function checkHouseFacts(form: FormData, thisYear: number = new Date().ge
     n = Number(storeys);
     if (n < 1 || n > MAX_STOREYS) return "invalid";
   }
+  let f: number | null = null;
+  if (ffh) {
+    if (!/^\d$/.test(ffh)) return "invalid";
+    f = Number(ffh);
+    if (f > MAX_FIRST_FLOOR_FT) return "invalid";
+  }
+  if (finished && !(FINISHED_CHOICES as readonly string[]).includes(finished)) return "invalid";
   return {
     basement: (basement || null) as HouseFacts["basement"],
     central_air: air === "yes" ? true : air === "no" ? false : null,
     year_built: y,
     storeys: n,
+    first_floor_ft: f,
+    // "Finished" means nothing for a house the buyer says has no basement.
+    basement_finished: basement === "none" ? null : ((finished || null) as HouseFacts["basement_finished"]),
   };
 }
 

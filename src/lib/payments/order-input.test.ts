@@ -91,11 +91,40 @@ test("the buyer's answers about the house are optional, checked and kept as null
   const today = "2026-11-23";
   const none = checkOrder(form(base), today);
   assert.ok(none.ok);
-  if (none.ok) assert.deepEqual(none.value.houseFacts, { basement: null, central_air: null, year_built: null, storeys: null });
-  const all = checkOrder(form({ ...base, basement: "partial", central_air: "no", year_built: "1925", storeys: "3" }), today);
+  if (none.ok) assert.deepEqual(none.value.houseFacts, { basement: null, central_air: null, year_built: null, storeys: null, first_floor_ft: null, basement_finished: null });
+  const all = checkOrder(
+    form({ ...base, basement: "partial", central_air: "no", year_built: "1925", storeys: "3", first_floor_ft: "2", basement_finished: "finished" }),
+    today,
+  );
   assert.ok(all.ok);
-  if (all.ok) assert.deepEqual(all.value.houseFacts, { basement: "partial", central_air: false, year_built: 1925, storeys: 3 });
-  const bads: Record<string, string>[] = [{ basement: "attic" }, { central_air: "maybe" }, { year_built: "1650" }, { year_built: "2028" }, { year_built: "19x5" }, { storeys: "7" }, { storeys: "0" }];
+  if (all.ok)
+    assert.deepEqual(all.value.houseFacts, {
+      basement: "partial",
+      central_air: false,
+      year_built: 1925,
+      storeys: 3,
+      first_floor_ft: 2,
+      basement_finished: "finished",
+    });
+  const level = checkOrder(form({ ...base, first_floor_ft: "0" }), today); // level with the ground is an answer, not a blank
+  assert.ok(level.ok);
+  if (level.ok) assert.equal(level.value.houseFacts.first_floor_ft, 0);
+  const noBasement = checkOrder(form({ ...base, basement: "none", basement_finished: "finished" }), today);
+  assert.ok(noBasement.ok);
+  if (noBasement.ok) assert.equal(noBasement.value.houseFacts.basement_finished, null);
+  const bads: Record<string, string>[] = [
+    { basement: "attic" },
+    { central_air: "maybe" },
+    { year_built: "1650" },
+    { year_built: "2028" },
+    { year_built: "19x5" },
+    { storeys: "7" },
+    { storeys: "0" },
+    { first_floor_ft: "9" },
+    { first_floor_ft: "-1" },
+    { first_floor_ft: "2.5" },
+    { basement_finished: "half" },
+  ];
   for (const bad of bads) {
     assert.deepEqual(checkOrder(form({ ...base, ...bad }), today), { ok: false, error: "house_facts" }, JSON.stringify(bad));
   }

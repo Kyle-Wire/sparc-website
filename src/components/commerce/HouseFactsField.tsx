@@ -1,7 +1,7 @@
-import { BASEMENT_CHOICES, EARLIEST_YEAR, MAX_STOREYS } from "@/lib/payments/order-input";
+import { BASEMENT_CHOICES, EARLIEST_YEAR, MAX_FIRST_FLOOR_FT, MAX_STOREYS } from "@/lib/payments/order-input";
 
 /**
- * Four optional questions about the house on /report/buy. We ask the buyer
+ * Six optional questions about the house on /report/buy. We ask the buyer
  * because the public records that hold these facts in Philadelphia are not
  * cleared for commercial use, and we use only open data. The report prints the
  * answers as the buyer's, not as something we inspected. The server checks the
@@ -19,6 +19,7 @@ export function HouseFactsField({ thisYear }: { thisYear: number }) {
       <legend className="label">About the house (optional)</legend>
       <p id="b-facts-hint" className="buy-hint">
         If you know them from the listing or the seller, these help us read the flood and heat results for this house.
+        The first-floor height and the basement also narrow what a flood could cost to repair.
         Leave any you are not sure of blank. The report shows them as your answers; we do not inspect the house.
       </p>
       <div className="buy-facts-grid">
@@ -32,6 +33,27 @@ export function HouseFactsField({ thisYear }: { thisYear: number }) {
               </option>
             ))}
           </select>
+        </label>
+        <label className="buy-fact">
+          <span>Is the basement finished?</span>
+          <select name="basement_finished" className="input" defaultValue="">
+            <option value="">Not sure, or no basement</option>
+            <option value="finished">Finished (walls, floor, living space)</option>
+            <option value="unfinished">Unfinished (bare walls and floor)</option>
+          </select>
+        </label>
+        <label className="buy-fact">
+          <span>First floor above the ground outside</span>
+          <select name="first_floor_ft" className="input" defaultValue="" aria-describedby="b-ffh-hint">
+            <option value="">Not sure</option>
+            <option value="0">Level with the ground</option>
+            {Array.from({ length: MAX_FIRST_FLOOR_FT }, (_, i) => i + 1).map((n) => (
+              <option key={n} value={String(n)}>
+                About {n} ft{n < MAX_FIRST_FLOOR_FT ? "" : " or more"} (about {Math.round((n * 12) / 7)} steps up)
+              </option>
+            ))}
+          </select>
+          <span id="b-ffh-hint" className="buy-hint">Count the steps up to the front door: each is about 7 inches.</span>
         </label>
         <label className="buy-fact">
           <span>Central air conditioning</span>

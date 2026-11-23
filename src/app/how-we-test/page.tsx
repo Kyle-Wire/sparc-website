@@ -1,3 +1,5 @@
+import type { Metadata } from "next";
+import { withPage } from "@/lib/seo";
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
@@ -18,10 +20,10 @@ import {
 // out. Every figure is in src/lib/copy/test-runs.ts, which names the command
 // behind each row. The rungs per quantity stay on /how-it-works#receipts.
 
-export const metadata = {
+export const metadata: Metadata = withPage("/how-we-test", {
   title: "How we test",
   description: PLAIN.lead,
-};
+});
 
 const pct = (v: number) => `${Math.round(v * 100)} %`;
 

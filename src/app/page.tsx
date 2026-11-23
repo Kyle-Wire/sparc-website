@@ -19,6 +19,9 @@ import { inUsBounds } from "@/lib/place/coords";
 // or a validation claim here.
 
 export const dynamic = "force-dynamic";
+// The home page keeps the site-wide title and share tags from the root layout
+// and names itself canonical, so "/?lat=..&lon=.." links count as the home page.
+export const metadata = { alternates: { canonical: "/" } };
 
 const NEAR_ZOOM = 10.5;
 

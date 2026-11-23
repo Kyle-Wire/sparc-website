@@ -1,3 +1,4 @@
+import { withPage } from "@/lib/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -6,11 +7,11 @@ import { PageHero, Section } from "@/components/marketing/page-shell";
 import { EMAIL_PRIMARY } from "@/lib/brand";
 import { REPORT, checkoutEnabled, formatPrice } from "@/lib/payments";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withPage("/faq", {
   title: "Questions",
   description:
     "What the house report is, how it differs from a home inspection and a flood zone, how sure its findings are, what it will never say, and what happens after you order.",
-};
+});
 // Price, delivery days and refund terms show only when checkout is on, read
 // from src/lib/payments/catalog.ts, so this page and the Terms cannot drift.
 export const dynamic = "force-dynamic";

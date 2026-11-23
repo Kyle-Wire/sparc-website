@@ -114,3 +114,30 @@ export function mayOrder(email: string | null | undefined, env: Record<string, s
   if (mode === "open") return true;
   return invitedEmails(env).has(email.trim().toLowerCase());
 }
+
+/**
+ * The sentence the buyer ticks on /report/buy, and the version of the terms
+ * they ticked it under. Both are saved with the order (migration 0009), so if
+ * a charge is ever disputed we can show what the buyer agreed to and when.
+ * Bump the version whenever this sentence, REPORT above or the Terms' report
+ * section changes. Form: the date of the change, plus "-draft" until a lawyer
+ * has read the Terms.
+ */
+export const AGREE_STATEMENT =
+  "I have read what the report is and is not. It is a screening report, not an engineering survey.";
+export const REPORT_TERMS_VERSION = "2026-11-22-draft";
+
+/**
+ * How many orders we take in any seven days, from ORDERS_WEEKLY_CAP. Unset or
+ * not a positive whole number means no cap. One person reads every report
+ * before it leaves (about two to three a week alongside other work,
+ * docs/report-ops.md), so after a storm in the news it is kinder to say "not
+ * this week" before a card is saved than to miss the promise after.
+ */
+export function weeklyCap(env: Record<string, string | undefined> = process.env): number | null {
+  const n = Number(env.ORDERS_WEEKLY_CAP);
+  return Number.isInteger(n) && n > 0 ? n : null;
+}
+
+/** The order states that count against the weekly cap: the ones we owe work on or have done. */
+export const CAP_STATUSES = ["card_saved", "in_progress", "charging", "payment_failed", "delivered", "refunded"] as const;

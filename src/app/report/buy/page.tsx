@@ -3,9 +3,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero } from "@/components/marketing/page-shell";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/supabase/server";
 import { parsePlaceSlug, placeSlug } from "@/lib/place/coords";
-import { REPORT, checkoutEnabled, formatPrice, mayOrder, salesMode } from "@/lib/payments";
+import { AGREE_STATEMENT, REPORT, checkoutEnabled, formatPrice, mayOrder, salesMode } from "@/lib/payments";
+import { atCapacity } from "@/lib/payments/capacity";
+import { formatDay, promisedBy, todayEastern } from "@/lib/payments/turnaround";
+import { DeadlineField } from "@/components/commerce/DeadlineField";
 import { EMAIL_PRIMARY } from "@/lib/brand";
 import { ORDER_ERRORS } from "@/lib/payments/order-input";
 import "@/components/commerce/commerce.css";
@@ -41,6 +44,18 @@ export default async function BuyReportPage({ searchParams }: Props) {
   const inviteOnly = salesMode() === "invite";
   const allowed = mayOrder(email);
   const error = sp.error ? ORDER_ERRORS[sp.error] ?? ORDER_ERRORS.checkout : null;
+  const today = todayEastern();
+  const by = promisedBy(today, REPORT.deliveryDays);
+
+  // Weekly cap (ORDERS_WEEKLY_CAP): say "not this week" before a card is saved.
+  let full = false;
+  if (onSale && email && allowed) {
+    try {
+      full = await atCapacity(createSupabaseAdminClient());
+    } catch {
+      full = false;
+    }
+  }
 
   return (
     <>
@@ -77,7 +92,17 @@ export default async function BuyReportPage({ searchParams }: Props) {
                   order.
                 </p>
               )}
-              {email && !allowed ? (
+              {email && allowed && full ? (
+                <div className="buy-signin">
+                  <p>
+                    We have as many reports as we can make well this week, so we are not taking new orders for a few
+                    days. Every report is read by a person before it leaves, and we would rather say so now than miss
+                    our promise later. Write to{" "}
+                    <a href={`mailto:${EMAIL_PRIMARY}?subject=${encodeURIComponent("House report: when can you start?")}`}>{EMAIL_PRIMARY}</a>{" "}
+                    with the property and your deadline, and we will tell you when we can start. Nothing is charged.
+                  </p>
+                </div>
+              ) : email && !allowed ? (
                 <div className="buy-signin">
                   <p>
                     This account ({email}) is not on the invitation list yet. Write to{" "}
@@ -133,12 +158,16 @@ export default async function BuyReportPage({ searchParams }: Props) {
                     style={{ minHeight: 84, resize: "vertical" }}
                     placeholder="For example: we close in three weeks and want to know which side of the house gets water."
                   />
+                  <DeadlineField
+                    today={today}
+                    promisedBy={by}
+                    promisedByText={formatDay(by)}
+                    workingDays={REPORT.deliveryDays}
+                    email={EMAIL_PRIMARY}
+                  />
                   <label className="buy-agree">
                     <input type="checkbox" name="agree" value="yes" required />
-                    <span>
-                      I have read what the report is and is not. It is a screening report, not an
-                      engineering survey.
-                    </span>
+                    <span>{AGREE_STATEMENT}</span>
                   </label>
                   <button type="submit" className="btn btn-accent buy-submit">
                     Save a card and order <span className="arrow">→</span>

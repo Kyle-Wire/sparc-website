@@ -33,3 +33,5 @@
 .order-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .pill[data-state="test"] { color: var(--amber-ink); }
 .pill[data-state="attention"] { color: var(--status-warn); border-color: currentColor; }
+.buy-deadline-warn { border-left: 3px solid var(--heat, #d9822b); background: var(--paper-2, #fdf9ef); padding: 10px 14px; margin: 4px 0; }
+.buy-deadline-warn p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--ink-2); }

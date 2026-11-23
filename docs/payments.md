@@ -34,7 +34,7 @@ What the code refuses, each with a test: a forged or stale signature (400); a re
 
 ## Kyle: set it up in test mode (about 25 minutes)
 
-1. **Supabase.** Apply `supabase/migrations/0007_report_orders.sql`, then `0008_charge_on_delivery.sql` (SQL editor, or `supabase db push` once the migration history is repaired, see `TIER1_HANDOFF.md` A). Check in Storage that `reports` exists and is **not public**.
+1. **Supabase.** Apply `supabase/migrations/0007_report_orders.sql`, then `0008_charge_on_delivery.sql`, then `0009_order_agreement_and_deadline.sql` (SQL editor, or `supabase db push` once the migration history is repaired, see `TIER1_HANDOFF.md` A). Check in Storage that `reports` exists and is **not public**.
 2. **Stripe, in test mode** (the toggle at the top of the Dashboard):
    - **Tax:** Settings → Tax: add the business address (head office) and turn Stripe Tax on. Registrations come later, with an accountant; until we register somewhere, Stripe Tax calculates no tax there.
    - **Product catalogue → Add product:** "The house report", one-off price **$149.00 USD**, and a tax code. Ask the accountant which code fits a hand-made report delivered as a PDF; `txcd_10000000` (General - Electronically Supplied Services) is Stripe's general one. Copy the **price id** (`price_…`).
@@ -63,6 +63,7 @@ Kyle's decision, 22 November 2026: open by invitation before anyone can order. O
 |---|---|
 | `ORDER_INVITE_EMAILS` | Comma-separated emails that may order. Anyone else signed in sees "open by invitation for now" on `/report/buy`, and a hand-made POST to `/api/reports/order` is refused |
 | `ORDERS_OPEN=true` | Anyone signed in may order, and the price and Order button appear on `/pricing`. Set only after the soft-launch reports are delivered on time |
+| `ORDERS_WEEKLY_CAP` | Optional. The most orders taken in any seven days (orders a card was saved for, or later). At the cap, `/report/buy` says "not this week" and asks the buyer to write, before any card is saved. Unset means no cap. Suggested: `3` while one person reads every report |
 
 During the invitation phase `/pricing` shows no price. Terms, privacy and the FAQ show the report terms as soon as checkout is on, because invited buyers need them.
 

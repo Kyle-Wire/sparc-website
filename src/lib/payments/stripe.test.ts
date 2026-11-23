@@ -133,6 +133,12 @@ test("the order's Checkout saves a card and charges nothing; the pay link charge
   assert.equal(setup.customer, "cus_1");
   assert.equal(setup.client_reference_id, ORDER);
   assert.equal(setup.billing_address_collection, "required");
+  assert.deepEqual(setup.payment_method_types, ["card"], "only a card can be charged off-session at once");
+  assert.equal((setup.setup_intent_data as { metadata: Record<string, string> }).metadata.order_id, ORDER);
+  const msg = (setup.custom_text as { submit: { message: string } }).submit.message;
+  assert.match(msg, /Nothing is charged today/);
+  assert.match(msg, /\$149 plus any sales tax/);
+  assert.ok(msg.length <= 1200, "Stripe caps custom text at 1,200 characters");
   assert.equal(setup.line_items, undefined);
   assert.equal(setup.managed_payments, undefined);
   const pay = payLinkBody({ orderId: ORDER, userId: "u-1", customerId: "cus_1", attempt: 1, successUrl: "https://s/ok", cancelUrl: "https://s/back" }, env);

@@ -10,9 +10,8 @@ import {
   Section,
   Text,
 } from "@react-email/components";
-import { color, font, GRADIENT_RAMP } from "./tokens";
+import { color, font, HAZARD_STRIP } from "./tokens";
 import {
-  BRAND_SHORT,
   COMPANY,
   COMPANY_LEGAL,
   COPYRIGHT_YEAR,
@@ -40,17 +39,26 @@ const main: React.CSSProperties = {
 
 const card: React.CSSProperties = {
   backgroundColor: color.white,
-  border: `1px solid ${color.line}`,
-  borderRadius: 12,
+  border: `1px solid ${color.rule}`,
+  borderRadius: 0,
   maxWidth: 560,
   margin: "0 auto",
   overflow: "hidden",
 };
 
-const stripe: React.CSSProperties = {
-  height: 6,
-  background: GRADIENT_RAMP,
-};
+function Strip() {
+  return (
+    <table role="presentation" width="100%" cellPadding={0} cellSpacing={0} style={{ borderCollapse: "collapse" }}>
+      <tbody>
+        <tr>
+          {HAZARD_STRIP.map((c) => (
+            <td key={c} style={{ height: 4, lineHeight: "4px", fontSize: 0, backgroundColor: c }}>&nbsp;</td>
+          ))}
+        </tr>
+      </tbody>
+    </table>
+  );
+}
 
 const headerSection: React.CSSProperties = {
   padding: "24px 28px 0",
@@ -66,7 +74,7 @@ const wordmark: React.CSSProperties = {
 };
 
 const wordmarkBrand: React.CSSProperties = {
-  color: color.crimson,
+  color: color.ink,
   fontWeight: 700,
 };
 
@@ -101,12 +109,10 @@ export function Layout({ preview, children, footerNote }: LayoutProps) {
       <Preview>{preview}</Preview>
       <Body style={main}>
         <Container style={card}>
-          <div style={stripe} />
+          <Strip />
           <Section style={headerSection}>
             <Text style={wordmark}>
-              <span style={wordmarkBrand}>{BRAND_SHORT}</span>
-              {"  ·  "}
-              {COMPANY.toLowerCase()}
+              <span style={wordmarkBrand}>{COMPANY}</span>
             </Text>
           </Section>
           <Section style={body}>{children}</Section>

@@ -14,6 +14,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email";
 import { SITE_URL } from "@/lib/brand";
 import { REPORT, formatPrice } from "./catalog";
+import { formatDay, isDay, promisedBy, todayEastern } from "./turnaround";
 import type { Notice } from "./webhook";
 
 interface OrderRow {
@@ -29,6 +30,9 @@ interface OrderRow {
   place_slug: string | null;
   status_note: string | null;
   charge_error: string | null;
+  created_at: string;
+  card_saved_at: string | null;
+  inspection_deadline: string | null;
 }
 
 const NEXT: Record<Notice, (id: string) => string | null> = {
@@ -41,7 +45,7 @@ const NEXT: Record<Notice, (id: string) => string | null> = {
 export async function notifyReportEvent(admin: SupabaseClient, orderId: string, what: Notice, opts: { site?: string } = {}) {
   const { data: o } = await admin
     .from("report_orders")
-    .select("id,user_id,address,amount_paid_cents,price_cents,currency,receipt_url,test_mode,needs_review,place_slug,status_note,charge_error")
+    .select("id,user_id,address,amount_paid_cents,price_cents,currency,receipt_url,test_mode,needs_review,place_slug,status_note,charge_error,created_at,card_saved_at,inspection_deadline")
     .eq("id", orderId)
     .maybeSingle<OrderRow>();
   if (!o) return;
@@ -53,10 +57,22 @@ export async function notifyReportEvent(admin: SupabaseClient, orderId: string, 
   const testMode = o.test_mode === true;
 
   if (email && what === "card_saved") {
+    // The promise counts from the day the card was saved, in US Eastern, as in scripts/report-order.ts list.
+    const by = promisedBy(todayEastern(new Date(o.card_saved_at ?? o.created_at)), REPORT.deliveryDays);
+    const dl = o.inspection_deadline && isDay(o.inspection_deadline.slice(0, 10)) ? o.inspection_deadline.slice(0, 10) : null;
     await sendEmail({
       to: email,
       template: "report-order-received",
-      props: { address: o.address, amount: price, deliveryDays: REPORT.deliveryDays, accountUrl, testMode },
+      props: {
+        address: o.address,
+        amount: price,
+        deliveryDays: REPORT.deliveryDays,
+        accountUrl,
+        testMode,
+        readyBy: formatDay(by),
+        deadline: dl ? formatDay(dl) : undefined,
+        tight: dl !== null && dl < by,
+      },
       refId: `report-ordered-${o.id}`,
     });
   } else if (email && what === "delivered") {
@@ -85,6 +101,7 @@ export async function notifyReportEvent(admin: SupabaseClient, orderId: string, 
       `Buyer: ${email ?? "(unknown)"}`,
       `Address: ${o.address}`,
       `Block: ${o.place_slug ?? "not given"}`,
+      o.inspection_deadline ? `Inspection deadline: ${o.inspection_deadline.slice(0, 10)}` : null,
       paid ? `Charged: ${paid}` : `Price: ${price} plus tax`,
       o.charge_error && what === "payment_failed" ? `Card said: ${o.charge_error}` : null,
       o.needs_review ? `REVIEW: ${o.needs_review}` : null,

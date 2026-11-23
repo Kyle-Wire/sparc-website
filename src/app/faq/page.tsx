@@ -226,6 +226,28 @@ export default function FaqPage() {
       ),
     },
     {
+      q: "What comes with it besides the PDF?",
+      a: (
+        <p>
+          An atlas: an interactive map of every storm and the heat that opens with a double-click, with no internet
+          and no account. Seven print-ready maps and charts. The findings and flood depth grids as data files, for an
+          engineer. Reports ordered during the invitation launch also come on a walnut drive in a box, posted to you.{" "}
+          <Link href="/report/sample">See them in the sample</Link>.
+        </p>
+      ),
+    },
+    {
+      q: "Will the report be updated?",
+      a: (
+        <p>
+          If we find a mistake in your report, we correct it and tell you, free, for as long as SPARC Labs exists. For
+          12 months after delivery we also send you an update when a finding in your report changes or a new hazard,
+          such as ground movement or wind, is added for your place. Your original never changes: each update sits
+          beside it, saying what changed and why.
+        </p>
+      ),
+    },
+    {
       q: "What happens to my address?",
       a: (
         <p>

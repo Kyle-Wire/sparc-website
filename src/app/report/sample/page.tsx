@@ -159,8 +159,50 @@ export default function SampleReportPage() {
         </p>
       </Section>
 
+
+      <Section sunken kicker="beyond the pdf" title="A report you can open, print and keep.">
+        <p className="lead" style={{ maxWidth: 760, margin: "0 0 28px" }}>
+          The PDF is the report. Around it comes everything you need to look closer, show someone else, or hand to an
+          engineer. Pictures below are from Sample A, with a sample pin where the house would be.
+        </p>
+        <div className="pkg-grid">
+          <figure className="pkg-item pkg-wide">
+            <Image src="/samples/package/atlas-flood.webp" alt="The atlas open on the flood map: a storm picker on the left, water depth over the block on the right, a sample pin in the middle." width={1440} height={900} />
+            <figcaption>
+              <strong>The atlas.</strong> Every storm and the heat on one interactive map. Pick a storm, compare two
+              side by side, and read the depth beside the house. It opens with a double-click, with no internet and no
+              account, and also online on your phone.
+            </figcaption>
+          </figure>
+          <figure className="pkg-item">
+            <Image src="/samples/package/plate-flood.webp" alt="A print plate: where the water goes in a 100-year downpour, with the figures at the house beside the map." width={1400} height={1081} />
+            <figcaption>
+              <strong>Prints.</strong> Seven print-ready maps and charts, as PDF and PNG, each with its source and its
+              evidence label at the foot.
+            </figcaption>
+          </figure>
+          <figure className="pkg-item pkg-tall">
+            <Image src="/samples/package/atlas-updates-panel.webp" alt="The atlas's updates tab: a version history, each update listed with what changed, and how updates work." width={760} height={1460} />
+            <figcaption>
+              <strong>Updates.</strong> If we find a mistake, we correct it for free for as long as SPARC Labs exists.
+              For 12 months, when a finding changes or a hazard is added, we email you the update too. Your original
+              never changes; each update sits beside it with what changed and why.
+            </figcaption>
+          </figure>
+          <div className="pkg-item pkg-text">
+            <strong>The data.</strong> The findings as CSV and JSON, and the flood depth grids as GeoTIFF, for an
+            engineer or anyone with mapping software. Every source, date and engine version comes with them.
+          </div>
+          <div className="pkg-item pkg-text">
+            <strong>In a box, during the invitation launch.</strong> Reports ordered by invitation also come on a walnut
+            drive in a box with a print of the block, posted to you. We ask for the address when the report is ready.
+            The download is yours either way.
+          </div>
+        </div>
+      </Section>
+
       {SAMPLES.map((x, n) => (
-        <Section key={x.id} sunken={n === 0} kicker={`${x.name} · nine pages`} title={x.place + "."}>
+        <Section key={x.id} sunken={n === 1} kicker={`${x.name} · nine pages`} title={x.place + "."}>
           <div id={`sample-${x.id}`} className="sample-pages" style={{ scrollMarginTop: 96 }}>
             {PAGE_NAMES.map((name, i) => (
               <a key={name} href={`/samples/${x.id}-page-${i + 1}.webp`} target="_blank" rel="noopener" className="sample-page">

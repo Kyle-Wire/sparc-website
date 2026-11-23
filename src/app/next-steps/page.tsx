@@ -25,8 +25,8 @@ const MEANS: { t: string; b: string }[] = [
     b: "A flood finding shows what our model shows in the storms we ran, which are larger than most storms a house meets in a few decades. It is not a forecast and not a record of what has happened.",
   },
   {
-    t: "Read the label first.",
-    b: "Every finding says how much evidence stands behind it. Exploratory or limited evidence means nobody has yet compared the model with a measurement of the same thing at this place.",
+    t: "Read the ranges, and any note.",
+    b: "No model result has been compared with a measurement at your house; the back pages say so once and give every finding its evidence level. A note beside a number marks something unusual about that finding, such as a check that failed at that place.",
   },
   {
     t: "It is about the outside.",

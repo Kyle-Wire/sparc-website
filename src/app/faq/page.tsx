@@ -84,11 +84,12 @@ export default function FaqPage() {
       a: (
         <>
           <p>
-            Each finding carries a label set by fixed rules from the evidence behind it, never from whether the news
-            is good. A model result that has not been compared with a measurement at your place carries{" "}
-            <strong>Limited evidence</strong> at most, and the report gives the model&apos;s own error and where it
-            was measured. Nothing at your house has been measured, and the report
-            says so on the cover.
+            Nothing at your house has been measured, and no model result has been compared with a measurement there.
+            That is true of any report on a single home, so the report says it once, on its back pages, instead of
+            beside every number. Each number carries its range and the model&apos;s own error where it was tested. The
+            back pages give every finding an evidence level, set by fixed rules from the evidence behind it, never from
+            whether the news is good, and a note beside a number marks anything unusual about it, such as a check
+            that failed at that place.
           </p>
           <p>
             Our public <Link href="/how-we-test">test record</Link> shows what each model has passed and failed,

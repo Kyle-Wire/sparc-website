@@ -19,7 +19,7 @@ const FLOW: Record<EngineId, string[]> = {
     "Pick a storm, or design one.",
     "The setup reads the terrain around the place and checks the area against what your computer can hold.",
     "Watch the water move through the streets as the model runs on your graphics card.",
-    "Read the findings, each with its label.",
+    "Read the findings, each with its range.",
     "Try a project and run it again, side by side with the first run.",
   ],
   heat: [
@@ -112,7 +112,7 @@ function HazardWorkspace({ id }: { id: EngineId }) {
 
             <Placeholder
               label={`${e.hazard.toLowerCase()} · findings`}
-              note="Layout only. Each finding would carry its figure, its sentence and one of the four evidence labels. No finding exists for any place."
+              note="Layout only. Each finding would carry its figure, its range and its sentence, with a note when something about it is unusual. No finding exists for any place."
             >
               <Slots items={e.findings} />
             </Placeholder>

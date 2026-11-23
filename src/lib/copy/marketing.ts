@@ -116,10 +116,10 @@ export const CLOSER = {
  *  what the record cannot say, and that the report models it
  *  (docs/design/map-first-brief.md s.7 rule 3). */
 export const OPEN_QUESTION: Record<"flood" | "heat" | "ground" | "wind", string> = {
-  flood: "The flood map shows the zone. It can't say where water goes around this house in a hard storm. The house report models that, with its range and its label.",
-  heat: "Land cover shows trees and pavement. It can't say how warm the street air stays here on a summer night. The house report models that, with its range and its label.",
-  ground: "Fault and landslide maps show what's nearby. They can't say whether the ground under this block moves differently from the ground around it. The house report reads that from satellite radar, with its range and its label.",
-  wind: "FEMA counts storms for the whole tract. It can't say how wind moves between these buildings. The house report models that, with its range and its label.",
+  flood: "The flood map shows the zone. It can't say where water goes around this house in a hard storm. The house report models that, with its range.",
+  heat: "Land cover shows trees and pavement. It can't say how warm the street air stays here on a summer night. The house report models that, with its range.",
+  ground: "Fault and landslide maps show what's nearby. They can't say whether the ground under this block moves differently from the ground around it. The house report reads that from satellite radar, with its range.",
+  wind: "FEMA counts storms for the whole tract. It can't say how wind moves between these buildings. The house report models that, with its range.",
 };
 
 /** The record meter at the top of a place page (endowed progress, honestly counted). */

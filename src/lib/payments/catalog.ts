@@ -55,7 +55,7 @@ export const REPORT: Product = {
     "Heat: modelled street air temperature around the house in a hot spell, afternoon and night, and modelled outdoor comfort (PET) in sun and in shade, with the satellite surface temperature of the block beside them",
     "Ground movement: whether the ground under the block moves differently from the ground around it, from NASA's satellite radar product where it covers the place, as a rate with its range",
     "Wind: storm gusts for the area from long weather-station records, and how wind moves between the buildings around the house, each with its range",
-    "Every finding labelled with how much evidence stands behind it, the model's own error and where that was measured, and what to check at the house",
+    "How much evidence stands behind every finding, the model's own error and where that was measured, and what to check at the house, set out once at the back",
     "A PDF in your account, yours to keep and share, with an atlas that opens with no internet, print-ready maps and the data files",
     "Corrections free for as long as SPARC Labs exists, and 12 months of updates when a finding changes or a hazard is added for your place",
   ],
@@ -63,9 +63,9 @@ export const REPORT: Product = {
     "Not an engineering survey, a home inspection, an elevation certificate or a flood determination",
     "Not a forecast: it shows what the models show in the storms and hot spells run, not what will happen",
     "No dollar figures: no expected loss, no premiums, no payback",
-    "Every model result is labelled by the evidence behind it: one not compared with a measurement at your place says so",
+    "Not checked at your house: no model result is compared with a measurement there, and the report says so once, at the back",
     "Nothing about the basement, the first floor or indoor temperature",
-    "No figure without its range and its label; where a model has not been checked for your area, the report says so beside the figure",
+    "No figure without its range; a check that failed at your place, or another open problem with a figure, is noted beside it",
   ],
   deliveryDays: 10,
 };
@@ -137,8 +137,8 @@ export function mayOrder(email: string | null | undefined, env: Record<string, s
  * has read the Terms.
  */
 export const AGREE_STATEMENT =
-  "I have read what the report is and is not. It is a screening report, not an engineering survey.";
-export const REPORT_TERMS_VERSION = "2026-11-23b-draft";
+  "I have read what the report is and is not. It is a screening report, not an engineering survey, and none of its model results has been checked against a measurement at the house.";
+export const REPORT_TERMS_VERSION = "2026-11-23c-draft";
 
 /**
  * How many orders we take in any seven days, from ORDERS_WEEKLY_CAP. Unset or

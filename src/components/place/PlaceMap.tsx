@@ -410,7 +410,7 @@ export function PlaceMap({
   const [shown, setShown] = useState<Shown>("fema");
   const [slrFeet, setSlrFeet] = useState<SlrFeet>(3);
   const [hover, setHover] = useState<Hover | null>(null);
-  const [clickReading, setClickReading] = useState<{ title: string; text: string } | null>(null);
+  const [clickReading, setClickReading] = useState<{ title: string; text: string; index?: number } | null>(null);
   const shownRef = useRef<{ shown: Shown; slrFeet: SlrFeet }>({ shown, slrFeet });
   useEffect(() => {
     shownRef.current = { shown, slrFeet };
@@ -438,7 +438,7 @@ export function PlaceMap({
       const { shown: s } = shownRef.current;
       if (map && s !== "none") {
         void readLayer(p.lon, p.lat, map.getZoom()).then((r) => {
-          if (asked === askRef.current && r) setClickReading({ title: layerInfo(s).title, text: r.text });
+          if (asked === askRef.current && r && shownRef.current.shown === s) setClickReading({ title: layerInfo(s).title, text: r.text, index: r.index });
         });
       }
       try {
@@ -636,6 +636,7 @@ export function PlaceMap({
     show("landslide", shown === "landslide");
     show("faults", shown === "faults");
     setHover(null);
+    setClickReading(null);
   }, [ready, shown, slrFeet]);
 
   // Storm tracks are a regional picture; the other layers are a neighbourhood one.
@@ -687,7 +688,7 @@ export function PlaceMap({
           )}
           <div className="pm-key">
             {info ? (
-              <MapLegend layer={info} active={hover?.exact ? hover.index : undefined} slrFeet={slrFeet} onHide={() => setShown("none")}>
+              <MapLegend layer={info} active={hover?.exact ? hover.index : clickReading?.title === info.title ? clickReading.index : undefined} slrFeet={slrFeet} onHide={() => setShown("none")}>
                 {info.key === "slr" && (
                   <div className="place-seg" role="radiogroup" aria-label="Sea level rise height">
                     {SLR_FEET.map((ft) => (

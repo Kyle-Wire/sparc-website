@@ -56,9 +56,7 @@ export function MapLegend({
       {lg.kind === "ramp" && (
         <div className="mk-ramp" role="img" aria-label={`${layer.title}: from ${lg.ticks[0]} to ${lg.ticks[lg.ticks.length - 1]} ${lg.unit}`}>
           <div className="mk-ramp-bar" style={{ backgroundImage: rampGradient([{ at: 0, color: lg.stops[0].color }, ...lg.stops]) }}>
-            {active !== undefined && active >= 0 && (
-              <span className="mk-ramp-mark" style={{ left: `${(lg.stops[active].at / lg.stops[lg.stops.length - 1].at) * 100}%` }} />
-            )}
+            {active !== undefined && active >= 0 && <span className="mk-ramp-mark" style={{ left: `${active}%` }} />}
           </div>
           <div className="mk-ramp-ticks">
             {lg.ticks.map((t) => (

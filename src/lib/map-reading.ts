@@ -9,10 +9,10 @@
 // Everything in this file is pure, so it can be tested without a browser.
 
 import {
-  CANOPY_STOPS,
+  CANOPY_MAP,
   FEMA_COLOURS,
   LANDSLIDE_CLASSES,
-  PAVING_STOPS,
+  PAVING_MAP,
   SLR_LOW_LYING,
   type LayerKey,
 } from "./map-legends";
@@ -88,7 +88,8 @@ function nearest<T extends { color: string }>(rgb: readonly number[], items: T[]
 export interface Reading {
   /** The legend class, in words: "About 40% tree canopy". */
   text: string;
-  /** Index into the layer's legend classes or stops, to highlight it. */
+  /** For a ramp, the percentage (0 to 100); otherwise the index of the
+   *  legend class. Used to mark it in the key. */
   index?: number;
 }
 
@@ -106,12 +107,22 @@ export function readPixel(layer: LayerKey, rgba: readonly [number, number, numbe
   switch (layer) {
     case "canopy":
     case "paving": {
-      const stops = layer === "canopy" ? CANOPY_STOPS : PAVING_STOPS;
+      const map = layer === "canopy" ? CANOPY_MAP : PAVING_MAP;
       const what = layer === "canopy" ? "tree canopy" : "paved or built";
-      if (a < 20) return { text: `No ${layer === "canopy" ? "tree canopy" : "paving"} mapped in this 30 m square`, index: -1 };
-      const { item, d } = nearest(rgb, stops);
-      if (d > TOO_FAR) return null;
-      return { text: `About ${item.at}% ${what}`, index: stops.indexOf(item) };
+      if (a < 20) return { text: `No ${layer === "canopy" ? "tree canopy" : "paving"} mapped in this 30 m square`, index: 0 };
+      // Neighbouring percentages can share a colour, so the reading is "about".
+      let best = 1;
+      let d = Infinity;
+      for (let pct = 1; pct <= 100; pct++) {
+        const c = map.slice((pct - 1) * 6, pct * 6);
+        const e = dist(rgb, [parseInt(c.slice(0, 2), 16), parseInt(c.slice(2, 4), 16), parseInt(c.slice(4, 6), 16)]);
+        if (e < d) {
+          d = e;
+          best = pct;
+        }
+      }
+      if (d > 24) return null;
+      return { text: `About ${best}% ${what} in this 30 m square`, index: best };
     }
     case "landslide": {
       if (a < 20) return { text: "Not rated here" };

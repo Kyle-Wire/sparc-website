@@ -67,6 +67,17 @@ export const HAZARD_WORDS: Record<Hazard, string> = {
   storm: "Storms",
 };
 
+/* NLCD's full colour maps, 1% to 100%, six hex digits per entry, exactly as
+   GetLegendGraphic returned them. The hover readout matches a tile pixel
+   against these to name the percentage the publisher drew. */
+export const CANOPY_MAP = "d1d2d1cfd1cfcdd0cdc9cfc9c7cec7c5cdc5c4ccc4c2c8c2c0c7c0bcc6bcbac5bab8c5b8b8c5b8b6c4b6b4c3b4afc1afadc0adacbdacabbcaba9bba9a7baa7a3b9a3a1b8a19fb89f9eb79e9cb69c9ab59a96b49694b39492b09292af9290ae908dad8d89ac8987ac8785ab8585aa8583a98381a8817da77d7aa67a79a37978a17876a076749f74709f706e9f6e6c9e6c6c9d6c699c69679a676399636196615f955f5f945f5d935d5b925b569256549254529052528f52508e504e8d4e4a8a4a4889484688464587454386434185413d853d3b843b398339398239378137348034307d302e7c2e2c7a2c2c792c2a792a2879282478242277221f761f1f751f1d731d1b701b176f17156e15136d13136c13106c100e6c0e0a6b0a086908066806066706046604026302006200";
+export const PAVING_MAP = "d1d1d1d3ccccd3ccccd3c9c9d3c6c6d3c1c1d3c1c1d6c1c1d6bfbfd6bcbcd6babad6babad8b5b5d8b2b2d8b2b2d8afafd8adadd8aaaad8aaaadba8a8dba5a5dba3a3dba0a0db9e9edb9b9bdb9b9bdd9999dd9696dd9393dd9393e09191e08c8ce08c8ce08989e08787e28282e28282e28282e27f7fe27c7ce27777e27777e27575e27575e57070e57070e56d6de56d6de86b6be86868e86666e86363e86060ea6060ea5b5bea5b5bea5959ea5959ea5454ea5151ed5151ed4f4fed4c4ced4949ed4949ed4444ed4444ef3f3fef3f3ff23d3df23d3df23a3af23838f23333f23333f23333f23030f22b2bf22828ed82edea7cede577ede270eddd6dedd868edd663edd15eedcc59edc954edc64fedc14cedbf44edba3fedb53dedb238edad33edaa2beda528eda323ed9e21ed";
+
+/** The colour NLCD draws for a whole percent, 1 to 100. */
+export function nlcdColour(map: string, pct: number): string {
+  return `#${map.slice((pct - 1) * 6, pct * 6)}`;
+}
+
 /* NLCD colour maps, every tenth entry of the publisher's 101-entry map. The
    entry for 0 is transparent in both, so "none" draws as no colour. */
 export const CANOPY_STOPS = [

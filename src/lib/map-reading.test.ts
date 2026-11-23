@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readPixel, tileBbox3857, tilePixel, tileUrl } from "./map-reading";
-import { CANOPY_STOPS, FAULT_CLASSES, LANDSLIDE_CLASSES, LAYERS, PAVING_STOPS, rampGradient } from "./map-legends";
+import { CANOPY_MAP, CANOPY_STOPS, FAULT_CLASSES, LANDSLIDE_CLASSES, LAYERS, PAVING_MAP, PAVING_STOPS, nlcdColour, rampGradient } from "./map-legends";
 
 test("tile and pixel under a point match the web-mercator scheme", () => {
   // Null Island sits on the corner of the four zoom-1 tiles.
@@ -29,16 +29,23 @@ test("tile URLs fill both kinds of template", () => {
   assert.match(tileUrl("https://a?bbox={bbox-epsg-3857}", { z: 0, x: 0, y: 0 }), /^https:\/\/a\?bbox=-20037508\.\d+,-20037508/);
 });
 
-test("canopy and paving colours read back as their own stop", () => {
-  CANOPY_STOPS.forEach((s, i) => {
-    const [r, g, b] = [1, 3, 5].map((k) => parseInt(s.color.slice(k, k + 2), 16));
-    assert.deepEqual(readPixel("canopy", [r, g, b, 255]), { text: `About ${s.at}% tree canopy`, index: i });
-  });
-  PAVING_STOPS.forEach((s, i) => {
-    const [r, g, b] = [1, 3, 5].map((k) => parseInt(s.color.slice(k, k + 2), 16));
-    assert.equal(readPixel("paving", [r, g, b, 255])?.index, i);
-  });
+test("canopy and paving colours read back as their own percentage", () => {
+  for (const [layer, map] of [["canopy", CANOPY_MAP], ["paving", PAVING_MAP]] as const) {
+    for (let pct = 1; pct <= 100; pct++) {
+      const hex = nlcdColour(map, pct);
+      const [r, g, b] = [1, 3, 5].map((k) => parseInt(hex.slice(k, k + 2), 16));
+      const got = readPixel(layer, [r, g, b, 255])!;
+      // Neighbouring entries can share a colour; the reading lands on the first.
+      assert.equal(nlcdColour(map, got.index!), hex, `${layer} ${pct}`);
+      assert.ok(Math.abs(got.index! - pct) <= 3, `${layer} ${pct} read as ${got.index}`);
+    }
+  }
+  // A pixel read from the live paving tile near 800 South St, 22 Nov 2026.
+  assert.match(readPixel("paving", [173, 51, 237, 255])!.text, /^About 9\d% paved or built/);
   assert.match(readPixel("canopy", [255, 255, 255, 0])!.text, /No tree canopy/);
+  // The ramp stops are entries of the full map.
+  CANOPY_STOPS.forEach((s) => assert.equal(nlcdColour(CANOPY_MAP, s.at), s.color));
+  PAVING_STOPS.forEach((s) => assert.equal(nlcdColour(PAVING_MAP, s.at), s.color));
 });
 
 test("landslide classes read back in order, and the ends say so", () => {
@@ -48,9 +55,12 @@ test("landslide classes read back in order, and the ends say so", () => {
   });
   assert.match(readPixel("landslide", [251, 213, 117, 255])!.text, /lowest/);
   assert.match(readPixel("landslide", [114, 16, 15, 255])!.text, /highest/);
+  // A pixel read from the live tile near Philadelphia, 22 Nov 2026 (alpha 191).
+  assert.equal(readPixel("landslide", [251, 214, 117, 191])?.index, 0);
 });
 
 test("FEMA's translucent zone colours read by their colour, not their alpha", () => {
+  // The first was read from FEMA's live export on the Delaware waterfront, 22 Nov 2026.
   assert.match(readPixel("fema", [0, 229, 255, 77])!.text, /^1% annual chance/);
   assert.match(readPixel("fema", [255, 129, 0, 77])!.text, /^0\.2% annual chance/);
   assert.match(readPixel("fema", [0, 0, 0, 0])!.text, /Click to read the zone/);
@@ -60,6 +70,8 @@ test("FEMA's translucent zone colours read by their colour, not their alpha", ()
 
 test("sea level rise reads water, low-lying ground and dry ground", () => {
   assert.match(readPixel("slr", [56, 20, 162, 255], { slrFeet: 3 })!.text, /Under water at 3 ft/);
+  // A pixel read from the live 6 ft tile on the Delaware waterfront, 22 Nov 2026.
+  assert.match(readPixel("slr", [9, 9, 145, 255], { slrFeet: 6 })!.text, /Under water at 6 ft/);
   assert.match(readPixel("slr", [183, 229, 242, 255], { slrFeet: 3 })!.text, /Under water/);
   assert.match(readPixel("slr", [85, 255, 0, 255])!.text, /Low-lying/);
   assert.match(readPixel("slr", [0, 0, 0, 0], { slrFeet: 6 })!.text, /Above the sea at 6 ft/);

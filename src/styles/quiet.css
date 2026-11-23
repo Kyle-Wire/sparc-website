@@ -292,3 +292,9 @@
 }
 .mk-hide:hover { border-color: var(--ink); color: var(--ink); }
 .mk-hide:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Stacked (tablet and phone): the readout for the tapped spot comes straight
+   after the map and its key, before the summary of the record. */
+@media (max-width: 1100px) {
+  .place-side .spot-panel { order: -1; }
+}

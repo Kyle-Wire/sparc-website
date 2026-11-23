@@ -16,6 +16,13 @@
 // no statement about loss.
 
 import { askJson, DAY_SECONDS, type Lookup } from "./lookup";
+
+// OpenFEMA's terms (fema.gov/about/openfema/terms-conditions, opened 23 Nov 2026)
+// ask every product that uses the API to state this, word for word. Shown on
+// /data and under each place page's sources.
+export const OPENFEMA_STATEMENT =
+  "This product uses the Federal Emergency Management Agency's OpenFEMA API, but is not endorsed by FEMA. " +
+  "The Federal Government or FEMA cannot vouch for the data or analyses derived from these data after the data have been retrieved from the Agency's website(s).";
 import { claimsFile, declarationsFile, tableNote, type DeclarationRow } from "./tables";
 
 const BASE = "https://www.fema.gov/api/open";

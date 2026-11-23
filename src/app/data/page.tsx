@@ -5,6 +5,7 @@ import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero } from "@/components/marketing/page-shell";
 import tracks from "@/data/hurricane-tracks.manifest.json";
 import { tableNote } from "@/lib/place/tables";
+import { OPENFEMA_STATEMENT } from "@/lib/place/openfema";
 
 export const metadata: Metadata = withPage("/data", {
   title: "Data sources",
@@ -191,6 +192,7 @@ export default function DataPage() {
               Nothing here is changed on the way through: counts, labels and ratings are the publisher&apos;s
               own. What each term means is in the <Link href="/glossary">plain glossary</Link>.
             </p>
+            <p>{OPENFEMA_STATEMENT}</p>
           </div>
         </div>
       </section>

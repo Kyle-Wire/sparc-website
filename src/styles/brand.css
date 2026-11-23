@@ -62,16 +62,8 @@
 
 /* The property line: a drawing of a house inside its lot, with the four
    hazards reaching in from outside it. Pure decoration; aria-hidden. */
-.hiw-lot { width: 100%; max-width: 440px; justify-self: end; }
-.hiw-lot svg { width: 100%; height: auto; display: block; }
-.hiw-lot .lot-line { stroke: var(--ban-muted); stroke-dasharray: 6 6; fill: none; }
-.hiw-lot .house { fill: var(--ban-ink); }
-.hiw-lot .label { fill: var(--ban-muted); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
-.hiw-lot .f { stroke: var(--flood); }
-.hiw-lot .h { stroke: var(--heat); }
-.hiw-lot .g { stroke: var(--ground); }
-.hiw-lot .w { stroke: var(--wind); }
-.hiw-lot .f, .hiw-lot .h, .hiw-lot .g, .hiw-lot .w { fill: none; stroke-width: 3; stroke-linecap: round; }
+.hiw-lot { width: 100%; max-width: 520px; justify-self: end; }
+.hiw-lot img { width: 100%; height: auto; display: block; }
 
 .hiw-head { display: grid; gap: 10px; margin-bottom: 28px; max-width: 760px; }
 .hiw-head h2 { font-size: clamp(28px, 3.6vw, 44px); line-height: 1.08; letter-spacing: -0.025em; }

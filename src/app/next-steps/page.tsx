@@ -1,3 +1,5 @@
+import { withPage } from "@/lib/seo";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
@@ -11,11 +13,11 @@ import { EMAIL_PRIMARY } from "@/lib/brand";
 // safe or unsafe, never says to buy or walk away, and names a kind of
 // professional, never a firm. Wording follows business/14-support-playbook.md.
 
-export const metadata = {
+export const metadata: Metadata = withPage("/next-steps", {
   title: "If your report has hard news",
   description:
     "What a hard finding in a house report means, who can check it, and the questions to take to each of them.",
-};
+});
 
 const MEANS: { t: string; b: string }[] = [
   {

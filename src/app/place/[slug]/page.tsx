@@ -16,7 +16,7 @@ import { KM_PER_MILE, parsePlaceSlug } from "@/lib/place/coords";
 import type { NearbyStorm } from "@/lib/place/hurricanes";
 import type { Lookup } from "@/lib/place/lookup";
 import type { TractRisk } from "@/lib/place/nri";
-import { claimsNotLocatedPct, type CountyDeclarations, type TractClaims } from "@/lib/place/openfema";
+import { claimsNotLocatedPct, OPENFEMA_STATEMENT, type CountyDeclarations, type TractClaims } from "@/lib/place/openfema";
 import type { FloodZones } from "@/lib/place/fema";
 import { finishPlace, glanceOf, startPlace } from "@/lib/place/summary";
 import type { Ground, LandCover } from "@/lib/place/surroundings";
@@ -714,6 +714,7 @@ export default async function PlacePage({ params }: Props) {
                 </tbody>
               </table>
             </div>
+            <p className="record-aside" style={{ marginTop: 12, maxWidth: 820 }}>{OPENFEMA_STATEMENT}</p>
           </details>
           <p className="record-aside" style={{ marginTop: 16, maxWidth: 820 }}>
             Your address: if you searched for one, it was sent to the Census Bureau&apos;s geocoder (or, if that

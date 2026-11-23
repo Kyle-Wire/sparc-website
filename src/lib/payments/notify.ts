@@ -31,6 +31,7 @@ interface OrderRow {
   status_note: string | null;
   charge_error: string | null;
   created_at: string;
+  card_saved_at: string | null;
   inspection_deadline: string | null;
 }
 
@@ -44,7 +45,7 @@ const NEXT: Record<Notice, (id: string) => string | null> = {
 export async function notifyReportEvent(admin: SupabaseClient, orderId: string, what: Notice, opts: { site?: string } = {}) {
   const { data: o } = await admin
     .from("report_orders")
-    .select("id,user_id,address,amount_paid_cents,price_cents,currency,receipt_url,test_mode,needs_review,place_slug,status_note,charge_error,created_at,inspection_deadline")
+    .select("id,user_id,address,amount_paid_cents,price_cents,currency,receipt_url,test_mode,needs_review,place_slug,status_note,charge_error,created_at,card_saved_at,inspection_deadline")
     .eq("id", orderId)
     .maybeSingle<OrderRow>();
   if (!o) return;
@@ -56,8 +57,8 @@ export async function notifyReportEvent(admin: SupabaseClient, orderId: string, 
   const testMode = o.test_mode === true;
 
   if (email && what === "card_saved") {
-    // The promise counts from the order day in US Eastern (src/lib/payments/turnaround.ts).
-    const by = promisedBy(todayEastern(new Date(o.created_at)), REPORT.deliveryDays);
+    // The promise counts from the day the card was saved, in US Eastern, as in scripts/report-order.ts list.
+    const by = promisedBy(todayEastern(new Date(o.card_saved_at ?? o.created_at)), REPORT.deliveryDays);
     const dl = o.inspection_deadline && isDay(o.inspection_deadline.slice(0, 10)) ? o.inspection_deadline.slice(0, 10) : null;
     await sendEmail({
       to: email,

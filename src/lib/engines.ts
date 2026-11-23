@@ -157,7 +157,7 @@ export const ENGINES: Engine[] = [
     summary:
       "Reads how the ground has moved over years from satellite radar, which passes over the same ground on a regular repeat schedule, through cloud and at night. Each reading describes the ground the house stands on, averaged over about a hundred metres around it, not the house itself. Readings are along the satellite's line of sight, not straight up and down, and have not yet been checked against a GNSS station at any place we report on.",
     free: [
-      "Whether the ground the house stands on moves toward or away from the satellite, against the ground around it, from NASA's OPERA ground-motion product, labelled exploratory",
+      "Whether the ground the house stands on moves toward or away from the satellite, against the ground around it, from NASA's OPERA ground-motion product, with its range and its label",
       "The USGS map of ground prone to sinkholes",
     ],
     findings: [
@@ -180,7 +180,7 @@ export const ENGINES: Engine[] = [
       "A ground section can be held for a person to review, for example when the ground at the house moves on its own or a new rate appears. The order then shows it as in review, not as failed. Our own full processing takes one to two days for a place and is shared by every property near it, so a paid order may wait on it.",
     selfServe: "run-for-you",
     status:
-      "In every house report from 23 November 2026, as a screening estimate. NASA's OPERA product has been read at our three test places; the check against GNSS stations has passed at one of them so far, so every reading is labelled exploratory.",
+      "In every house report. Each reading carries its range and its label; what it has been checked against, and how it did, is on How we test.",
     source: { repo: "Kyle-Wire/insar_pipeline", commit: "3612eda" },
   },
   {
@@ -190,11 +190,11 @@ export const ENGINES: Engine[] = [
     runsOn: "our-workstation",
     where: "On our workstation. Wind is worked out for the neighbourhood from every direction, then shown to you as a map.",
     summary:
-      "Two layers. The first carries a storm's gusts in from the airport anemometers around a place, through the land cover upwind. The second models wind between the buildings; it gives a screening estimate while its wind-tunnel tests continue.",
+      "Two layers. The first carries a storm's gusts in from the airport anemometers around a place, through the land cover upwind. The second models wind between the buildings, scored against wind-tunnel measurements.",
     findings: [
       "How wind moves through the neighbourhood, season by season",
-      "Storm gusts for the block, carried in from nearby airport records, as a range, with whether the check passed for that area",
-      "Wind between the buildings, a screening estimate while the street model's wind-tunnel tests continue (it has passed one of four)",
+      "Storm gusts for the block, carried in from nearby airport records, with their range",
+      "Wind between the buildings around the house, with its range",
       "Past storm tracks nearby, from the public record",
     ],
     choices: ["A season", "Street level or roof level", "A named past storm, later"],
@@ -205,7 +205,7 @@ export const ENGINES: Engine[] = [
       "Whether the house meets a building code",
     ],
     selfServe: "run-for-you",
-    status: "In every house report from 23 November 2026, as a screening estimate. Storm gusts pass their held-out check for ordinary storms at most places tried and fail in California; thunderstorm gusts are a wide range. The street model has passed one of its four wind-tunnel cases.",
+    status: "In every house report. Each finding carries its range and its label; what the model has been checked against, and how it did, is on How we test.",
     source: { repo: "Kyle-Wire/WindSim", commit: "cc15851" },
   },
 ];

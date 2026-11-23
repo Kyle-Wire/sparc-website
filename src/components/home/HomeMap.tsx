@@ -283,8 +283,7 @@ function InfoPanel() {
         it. It describes the area around your pin, not the house itself.
       </p>
       <p>
-        <strong>The house report</strong> is the paid part: our own flood, heat, ground movement and wind models, worked out for one house. Ground movement and
-        wind are included as screening estimates while their formal checks continue. <Link href="/report/sample">See a sample</Link>.
+        <strong>The house report</strong> is the paid part: our own flood, heat, ground movement and wind models, worked out for one house. <Link href="/report/sample">See a sample</Link>.
       </p>
       <p>
         <Link href="/how-it-works">How it works</Link> · <Link href="/about">Who we are</Link> · <Link href="/data">Every source</Link>

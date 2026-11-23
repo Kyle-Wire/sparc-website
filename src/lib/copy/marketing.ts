@@ -64,8 +64,8 @@ export const TWO_QUESTIONS = {
     tag: "paid · one house",
     question: "What do our models say about this house?",
     points: [
-      "Our flood, heat, ground movement and wind models, run for the neighbourhood with your house in the middle. Ground and wind are screening estimates while their formal checks continue.",
-      "Findings first, each labelled with how much evidence stands behind it. Today that label mostly says exploratory, and we print it at full size.",
+      "Our flood, heat, ground movement and wind models, run for the neighbourhood with your house in the middle.",
+      "Findings first, each with its range and a label for how much evidence stands behind it, printed at full size.",
       "What to check at the house, and the limits of every finding, one click away.",
     ],
     cta: "See a sample report",
@@ -116,10 +116,10 @@ export const CLOSER = {
  *  what the record cannot say, and that the report models it
  *  (docs/design/map-first-brief.md s.7 rule 3). */
 export const OPEN_QUESTION: Record<"flood" | "heat" | "ground" | "wind", string> = {
-  flood: "The flood map shows the zone. It can't say where water goes around this house in a hard storm. The house report models that, labelled exploratory.",
-  heat: "Land cover shows trees and pavement. It can't say how warm the street air stays here on a summer night. The house report models that, labelled exploratory.",
-  ground: "Fault and landslide maps show what's nearby. They can't say whether the ground under this block moves differently from the ground around it. The house report reads that from satellite radar, labelled exploratory.",
-  wind: "FEMA counts storms for the whole tract. It can't say how wind moves between these buildings. The house report gives a screening estimate of that, labelled, while our wind model's formal checks continue.",
+  flood: "The flood map shows the zone. It can't say where water goes around this house in a hard storm. The house report models that, with its range and its label.",
+  heat: "Land cover shows trees and pavement. It can't say how warm the street air stays here on a summer night. The house report models that, with its range and its label.",
+  ground: "Fault and landslide maps show what's nearby. They can't say whether the ground under this block moves differently from the ground around it. The house report reads that from satellite radar, with its range and its label.",
+  wind: "FEMA counts storms for the whole tract. It can't say how wind moves between these buildings. The house report models that, with its range and its label.",
 };
 
 /** The record meter at the top of a place page (endowed progress, honestly counted). */

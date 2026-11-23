@@ -17,11 +17,13 @@
  *
  * 23 November 2026, morning: ground movement came out of `includes` while
  * its readings were held.
- * 23 November 2026, afternoon: Kyle decided ground movement and wind go into
- * every report now, as screening estimates, while formal validation continues
- * ("I'd like ground to be there across the board along with wind"). The lines
- * below say exactly that: each is a range with its label, and /how-we-test
- * lists every check, passed and failed. A label, not a switch.
+ * 23 November 2026, afternoon: Kyle decided ground movement and wind are in
+ * every report, and that the site is written in its finished state, since
+ * sales are not pushed until every model passes its tests ("we can get the
+ * site to a place where we assume everything is good to go"). The lines
+ * describe what each section gives; none claims a validation. Where each
+ * model stands against its benchmarks lives on /how-we-test (test-runs.ts,
+ * receipts.ts), which is the one place that changes as checks finish.
  */
 
 export type ProductId = "home-report";
@@ -51,8 +53,8 @@ export const REPORT: Product = {
   includes: [
     "Flood: our 1 m flood model run for the streets around the house in design storms and a past storm, showing where water reaches and how deep it stands beside the house in each storm modelled",
     "Heat: modelled street air temperature around the house in a hot spell, afternoon and night, and modelled outdoor comfort (PET) in sun and in shade, with the satellite surface temperature of the block beside them",
-    "Ground movement: a screening estimate from NASA's satellite radar product, where it covers the place, of whether the ground under the block moves differently from the ground around it, given as a range and labelled exploratory",
-    "Wind: storm gusts for the area from long weather-station records, and a screening estimate of how wind moves between the buildings, each given as a range and labelled exploratory",
+    "Ground movement: whether the ground under the block moves differently from the ground around it, from NASA's satellite radar product where it covers the place, as a rate with its range",
+    "Wind: storm gusts for the area from long weather-station records, and how wind moves between the buildings around the house, each with its range",
     "Every finding labelled with how much evidence stands behind it, the model's own error and where that was measured, and what to check at the house",
     "A PDF in your account, yours to keep and share, with an atlas that opens with no internet, print-ready maps and the data files",
     "Corrections free for as long as SPARC Labs exists, and 12 months of updates when a finding changes or a hazard is added for your place",
@@ -61,9 +63,9 @@ export const REPORT: Product = {
     "Not an engineering survey, a home inspection, an elevation certificate or a flood determination",
     "Not a forecast: it shows what the models show in the storms and hot spells run, not what will happen",
     "No dollar figures: no expected loss, no premiums, no payback",
-    "Model results are labelled exploratory unless they have been compared with a measurement at that place, and none has been yet",
+    "Every model result is labelled by the evidence behind it: one not compared with a measurement at your place says so",
     "Nothing about the basement, the first floor or indoor temperature",
-    "Ground movement and wind are screening estimates while their formal checks continue. Where a check has not passed for your area, the report says so beside the figure, and How we test lists every check, passed and failed",
+    "No figure without its range and its label; where a model has not been checked for your area, the report says so beside the figure",
   ],
   deliveryDays: 10,
 };

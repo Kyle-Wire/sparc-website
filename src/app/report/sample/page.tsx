@@ -25,8 +25,7 @@ export const metadata: Metadata = withPage("/report/sample", {
 // house on any map. Files: public/samples/. The statements quoted below are
 // copied from page 3 of each report (finding F1), labels included.
 //
-// Ground movement and wind: in every report from 23 November 2026 (Kyle) as
-// screening estimates, ranges with labels, while formal checks continue. The
+// Ground movement and wind are in every report (Kyle, 23 November 2026). The
 // two samples were built before that and do not have the sections yet.
 
 const LABELS = ["Well supported", "Moderately supported", "Limited evidence", "Insufficient information"];
@@ -87,13 +86,13 @@ const SECTIONS: { title: string; what: string; cards: string[]; plot?: string; s
   },
   {
     title: "Ground movement",
-    what: "Whether the ground the house stands on moves toward or away from the satellite against the ground around it, as a range, from NASA's satellite radar product where it covers the place; the map of ground prone to sinkholes; whether it moves with its surroundings or on its own, and whether the rate is steady or new. A screening estimate, labelled exploratory, while the check against GPS stations continues. A refused reading shows no number and says why.",
+    what: "Whether the ground the house stands on moves toward or away from the satellite against the ground around it, as a rate with its range, from NASA's satellite radar product where it covers the place; the map of ground prone to sinkholes; whether it moves with its surroundings or on its own, and whether the rate is steady or new. A refused reading shows no number and says why.",
     cards: ["Ground at the house, free", "Sinkhole-prone ground, free", "With its surroundings or on its own", "Steady or new", "Seasonal swing", "Ten years ahead"],
     screening: true,
   },
   {
     title: "Wind",
-    what: "Storm gusts for the area from long weather-station records, as a range, and a screening estimate of how wind moves between the buildings from our street model. Each labelled exploratory while formal checks continue; where a check has not passed for the area, the section says so beside the figure.",
+    what: "Storm gusts for the area from long weather-station records, and how wind moves between the buildings around the house, from our street model. Each with its range and its label.",
     cards: ["Storm gusts for the area", "Wind between the buildings"],
     screening: true,
   },
@@ -260,7 +259,7 @@ export default function SampleReportPage() {
             <li key={s.title} className="report-section">
               <div className="report-section-head">
                 <h3>{s.title}</h3>
-                {s.screening && <span className="shelf-state">Screening estimate</span>}
+                {s.screening && <span className="shelf-state">New</span>}
               </div>
               <p>{s.what}</p>
             </li>

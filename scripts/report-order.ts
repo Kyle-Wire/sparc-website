@@ -57,6 +57,21 @@ import { versionsByOrder, nextVersion, versionPath, updateAllowed, UPDATE_KINDS,
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sparclabs.co";
 const WAITING = ["card_saved", "in_progress", "charging", "payment_failed"];
 
+/**
+ * Stop with an exit code. Throws instead of calling process.exit(): on Windows,
+ * process.exit() while fetch sockets are still open can crash Node in libuv
+ * ("Assertion failed ... async.c", exit 127), which a caller such as the order
+ * runner would read as a crash rather than a refusal.
+ */
+class Quit extends Error {
+  constructor(readonly code: number) {
+    super(`exit ${code}`);
+  }
+}
+function quit(code: number): never {
+  throw new Quit(code);
+}
+
 const USAGE = `npx tsx scripts/report-order.ts list [status]
 npx tsx scripts/report-order.ts show <order-id>
 npx tsx scripts/report-order.ts start <order-id> ["note"]
@@ -73,7 +88,7 @@ function admin(): SupabaseClient {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
     console.error("Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY first.");
-    process.exit(2);
+    quit(2);
   }
   return createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
 }
@@ -92,7 +107,7 @@ async function getOrder(db: SupabaseClient, id: string): Promise<Row> {
   if (error) throw error;
   if (!data) {
     console.error(`No order ${id}.`);
-    process.exit(1);
+    quit(1);
   }
   return data;
 }
@@ -102,7 +117,7 @@ async function advance(db: SupabaseClient, id: string, to: string, path: string 
   if (error) throw error;
   if (data !== to) {
     console.error(`Not moved: ${data}`);
-    process.exit(1);
+    quit(1);
   }
   console.log(`${id}: ${to}`);
 }
@@ -189,20 +204,20 @@ async function main() {
     const o = await getOrder(db, a);
     if (!b.toLowerCase().endsWith(".pdf")) {
       console.error("The report must be a PDF.");
-      process.exit(1);
+      quit(1);
     }
     if (!["card_saved", "in_progress", "charging", "payment_failed"].includes(o.status)) {
       console.error(`Order is ${o.status}; nothing to deliver or charge.`);
-      process.exit(1);
+      quit(1);
     }
     if (!o.provider_customer_id || !o.provider_setup_id) {
       console.error(`Order is ${o.status} with no saved card; nothing to charge.`);
-      process.exit(1);
+      quit(1);
     }
     const provider = paymentProvider();
     if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_PRICE_REPORT) {
       console.error("Set STRIPE_SECRET_KEY and STRIPE_PRICE_REPORT first: delivering charges the saved card.");
-      process.exit(2);
+      quit(2);
     }
     const bytes = readFileSync(b);
     const path = `${o.user_id}/${o.id}.pdf`;
@@ -232,13 +247,13 @@ async function main() {
     const due = feedbackDue(o.status, (o.delivered_at as string | null) ?? null, new Date());
     if (!due.ok) {
       console.error(`Not sent: ${due.why}`);
-      process.exit(1);
+      quit(1);
     }
     const { data: u } = await db.auth.admin.getUserById(o.user_id);
     const email = u?.user?.email;
     if (!email) {
       console.error("Not sent: the buyer's account has no email.");
-      process.exit(1);
+      quit(1);
     }
     const full = String((u?.user?.user_metadata as { full_name?: string } | undefined)?.full_name ?? "").trim();
     const r = await sendEmail({
@@ -258,20 +273,20 @@ async function main() {
     const o = await getOrder(db, a);
     if (["awaiting_card", "abandoned", "cancelled", "cannot_model", "refunded"].includes(o.status)) {
       console.error(`Order is ${o.status}; no package goes with it.`);
-      process.exit(1);
+      quit(1);
     }
     const bytes = readFileSync(b);
     if (!looksLikeZip(bytes)) {
       console.error("The package must be a zip of the buyer's package folder.");
-      process.exit(1);
+      quit(1);
     }
     if (!hasStartHere(bytes)) {
       console.error("No START-HERE.html in the zip: is this the package folder from tools/package/package.py --buyer?");
-      process.exit(1);
+      quit(1);
     }
     if (bytes.length > PACKAGE_MAX_BYTES) {
       console.error(`The zip is ${(bytes.length / 1048576).toFixed(1)} MB; the storage limit is ${PACKAGE_MAX_BYTES / 1048576} MB a file. Raise it in Supabase Storage settings, or leave the full-resolution rasters for the drive.`);
-      process.exit(1);
+      quit(1);
     }
     const path = packagePath(o.user_id, o.id);
     const up = await db.storage.from("reports").upload(path, bytes, { contentType: "application/zip", upsert: true });
@@ -287,11 +302,11 @@ async function main() {
     const whatChanged = process.argv[6]?.trim();
     if (!UPDATE_KINDS.includes(kind)) {
       console.error(`The kind is one of ${UPDATE_KINDS.join(", ")}.`);
-      process.exit(2);
+      quit(2);
     }
     if (!c.toLowerCase().endsWith(".pdf") || !whatChanged) {
       console.error('Give the new PDF and, in quotes, what changed in one or two plain sentences.');
-      process.exit(2);
+      quit(2);
     }
     const o = await getOrder(db, a);
     const { data: u } = await db.auth.admin.getUserById(o.user_id);
@@ -299,7 +314,7 @@ async function main() {
     const ok = updateAllowed(kind, o.status, (o.delivered_at as string | null) ?? null, new Date(), optedOut);
     if (!ok.ok) {
       console.error(`Not sent: ${ok.why}.`);
-      process.exit(1);
+      quit(1);
     }
     const { data: files, error: le } = await db.storage.from("reports").list(o.user_id, { limit: 1000 });
     if (le) throw le;
@@ -355,10 +370,14 @@ async function main() {
   }
 
   console.error(USAGE);
-  process.exit(2);
+  quit(2);
 }
 
 main().catch((e) => {
+  if (e instanceof Quit) {
+    process.exitCode = e.code;
+    return;
+  }
   console.error(e);
-  process.exit(1);
+  process.exitCode = 1;
 });

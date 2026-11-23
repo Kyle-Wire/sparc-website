@@ -32,6 +32,9 @@ export default async function AccountOverview() {
         <p style={{ color: "var(--ink-2)", margin: "8px 0 0", fontSize: 14, lineHeight: 1.6 }}>
           Your house reports live here. The public record for any place stays free, with or without an account.
         </p>
+        <p style={{ margin: "10px 0 0", fontSize: 13 }}>
+          <Link href="/account/password" style={{ color: "var(--ink-2)" }}>Change your password</Link>
+        </p>
       </div>
 
       <div className="grid-2" style={{ gap: 14 }}>

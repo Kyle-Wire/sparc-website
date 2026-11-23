@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Route } from "next";
+import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { SITE_URL } from "@/lib/brand";
 import { safeNext } from "@/lib/safe-redirect";
@@ -121,6 +122,11 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
       </form>
 
       {error && <p style={{ color: "var(--crimson)", marginTop: 12, fontSize: 13 }}>{error}</p>}
+      {mode === "signin" && (
+        <p style={{ marginTop: 14, fontSize: 13, textAlign: "center" }}>
+          <Link href="/login/forgot" style={{ color: "var(--ink-2)" }}>Forgot your password?</Link>
+        </p>
+      )}
     </div>
   );
 }

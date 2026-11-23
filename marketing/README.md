@@ -15,4 +15,4 @@ Nothing has been ordered.
 
 **Online kit (23 Nov):** `03-online-kit.md` (captions, bios, account setup, other channels) and `assets/online/` (LinkedIn and Instagram images). `assets/brand/` has the logo, hazard bar and art as separate SVG/PNG; `assets/street/` has every print piece as its own file. Rebuild the online set with `python3 src/social.py && node src/render_social.cjs`.
 
-**In this repo:** `marketing/` sits outside `src/` and `public/`, is listed in `.vercelignore` and ignored by ESLint, so nothing here is deployed to sparclabs.co. `build/` and `build-social/` (intermediate HTML) are not committed; the scripts in `src/` recreate them.
+**In this repo:** `marketing/` sits outside `src/` and `public/`, and is ignored by ESLint. Next.js serves only `public/` and the app in `src/`, so nothing here is reachable to sparclabs.co. `build/` and `build-social/` (intermediate HTML) are not committed; the scripts in `src/` recreate them.

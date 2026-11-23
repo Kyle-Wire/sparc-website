@@ -110,7 +110,8 @@ export default function PrivacyPage() {
               <h2 id="reports" style={h2}>Ordering a house report</h2>
               <p>
                 A report is about one house, so this is the one place the site keeps a street address. When you order,
-                we store the address you give, your note, your account and the order&apos;s progress in our database.
+                we store the address you give, your note, any answers you give about the house (basement, central air, year
+                built, storeys), your account and the order&apos;s progress in our database.
                 Only you (signed in) and the person making your report can read it. It is not put in any link.
               </p>
               <p>

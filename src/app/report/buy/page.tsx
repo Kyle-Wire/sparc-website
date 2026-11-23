@@ -9,6 +9,7 @@ import { AGREE_STATEMENT, REPORT, checkoutEnabled, formatPrice, mayOrder, salesM
 import { atCapacity } from "@/lib/payments/capacity";
 import { formatDay, promisedBy, todayEastern } from "@/lib/payments/turnaround";
 import { DeadlineField } from "@/components/commerce/DeadlineField";
+import { HouseFactsField } from "@/components/commerce/HouseFactsField";
 import { EMAIL_PRIMARY } from "@/lib/brand";
 import { ORDER_ERRORS } from "@/lib/payments/order-input";
 import "@/components/commerce/commerce.css";
@@ -159,6 +160,7 @@ export default async function BuyReportPage({ searchParams }: Props) {
                     style={{ minHeight: 84, resize: "vertical" }}
                     placeholder="For example: we close in three weeks and want to know which side of the house gets water."
                   />
+                  <HouseFactsField thisYear={Number(today.slice(0, 4))} />
                   <DeadlineField
                     today={today}
                     promisedBy={by}

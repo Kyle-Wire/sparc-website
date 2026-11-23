@@ -85,3 +85,20 @@ test("soft launch: checkout on means invitation only until ORDERS_OPEN", async (
   assert.equal(mayOrder("anyone@example.com", { CHECKOUT_ENABLED: "true" }), false);
   assert.equal(mayOrder("anyone@example.com", { CHECKOUT_ENABLED: "true", ORDERS_OPEN: "true" }), true);
 });
+
+test("the buyer's answers about the house are optional, checked and kept as null when blank (D53)", () => {
+  const base = { address: "1 Main St, Town, ST", agree: "yes" };
+  const today = "2026-11-23";
+  const none = checkOrder(form(base), today);
+  assert.ok(none.ok);
+  if (none.ok) assert.deepEqual(none.value.houseFacts, { basement: null, central_air: null, year_built: null, storeys: null });
+  const all = checkOrder(form({ ...base, basement: "partial", central_air: "no", year_built: "1925", storeys: "3" }), today);
+  assert.ok(all.ok);
+  if (all.ok) assert.deepEqual(all.value.houseFacts, { basement: "partial", central_air: false, year_built: 1925, storeys: 3 });
+  const bads: Record<string, string>[] = [{ basement: "attic" }, { central_air: "maybe" }, { year_built: "1650" }, { year_built: "2028" }, { year_built: "19x5" }, { storeys: "7" }, { storeys: "0" }];
+  for (const bad of bads) {
+    assert.deepEqual(checkOrder(form({ ...base, ...bad }), today), { ok: false, error: "house_facts" }, JSON.stringify(bad));
+  }
+  const nextYear = checkOrder(form({ ...base, year_built: "2027" }), today); // a new build finishing next year
+  assert.ok(nextYear.ok);
+});

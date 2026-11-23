@@ -180,7 +180,7 @@ export const ENGINES: Engine[] = [
       "A ground section can be held for a person to review, for example when the ground at the house moves on its own or a new rate appears. The order then shows it as in review, not as failed. Our own full processing takes one to two days for a place and is shared by every property near it, so a paid order may wait on it.",
     selfServe: "run-for-you",
     status:
-      "NASA's OPERA product has been read at our three test places. No GNSS station has checked it there yet, so every reading is exploratory.",
+      "In every house report from 23 November 2026, as a screening estimate. NASA's OPERA product has been read at our three test places; the check against GNSS stations has passed at one of them so far, so every reading is labelled exploratory.",
     source: { repo: "Kyle-Wire/insar_pipeline", commit: "3612eda" },
   },
   {
@@ -190,11 +190,11 @@ export const ENGINES: Engine[] = [
     runsOn: "our-workstation",
     where: "On our workstation. Wind is worked out for the neighbourhood from every direction, then shown to you as a map.",
     summary:
-      "Two layers. The first carries a storm's gusts in from the airport anemometers around a place, through the land cover upwind. The second models wind between the buildings, and stays in the wind tunnel until it passes there.",
+      "Two layers. The first carries a storm's gusts in from the airport anemometers around a place, through the land cover upwind. The second models wind between the buildings; it gives a screening estimate while its wind-tunnel tests continue.",
     findings: [
       "How wind moves through the neighbourhood, season by season",
-      "Storm gusts for the block, carried in from nearby airport records, once that check is published",
-      "Wind between the buildings, only after the street model passes its wind-tunnel tests (it does not yet)",
+      "Storm gusts for the block, carried in from nearby airport records, as a range, with whether the check passed for that area",
+      "Wind between the buildings, a screening estimate while the street model's wind-tunnel tests continue (it has passed one of four)",
       "Past storm tracks nearby, from the public record",
     ],
     choices: ["A season", "Street level or roof level", "A named past storm, later"],
@@ -205,7 +205,7 @@ export const ENGINES: Engine[] = [
       "Whether the house meets a building code",
     ],
     selfServe: "run-for-you",
-    status: "Storm gusts are being checked against airport records; the street model is still failing its wind-tunnel tests. Nothing about wind is in a report yet.",
+    status: "In every house report from 23 November 2026, as a screening estimate. Storm gusts pass their held-out check for ordinary storms at most places tried and fail in California; thunderstorm gusts are a wide range. The street model has passed one of its four wind-tunnel cases.",
     source: { repo: "Kyle-Wire/WindSim", commit: "cc15851" },
   },
 ];

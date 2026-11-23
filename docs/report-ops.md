@@ -1,6 +1,6 @@
 # Making and delivering a house report
 
-**22 November 2026, updated 23 November** (charge on delivery, ground movement not sold until it passes, the atlas download, the buyer's inspection deadline, the weekly cap). The steps from an order (card saved, nothing charged) to a paid report in the buyer's account, who does each, and how long each takes. Read with [`payments.md`](payments.md) (how money moves) and Climate Home Inspection's `CLAUDE.md` and `AGENTS.md` (how the models run). This repository is public: no address, parcel number or report ever goes in it.
+**22 November 2026, updated 23 November** (charge on delivery, ground movement and wind in every report as screening estimates (Kyle, 23 November, afternoon), the atlas download, the buyer's inspection deadline, the weekly cap). The steps from an order (card saved, nothing charged) to a paid report in the buyer's account, who does each, and how long each takes. Read with [`payments.md`](payments.md) (how money moves) and Climate Home Inspection's `CLAUDE.md` and `AGENTS.md` (how the models run). This repository is public: no address, parcel number or report ever goes in it.
 
 ## The promise we have to keep
 
@@ -18,7 +18,8 @@ From `src/lib/payments/catalog.ts`: the report is finished within **10 working d
 | 1 | Write the private property key in Climate Home Inspection (`private/property-key-<ID>.json`, synthetic ID) and the place config (`configs/places/<block>.json`) | person | 30 min |
 | 1 to 3 | **Flood:** set up the FloodSim project for the box, then `bash tools/gate2/stage_place.sh "<project>" <ida-event> "<ida-label>" <log>` (design storms, the site's past storm, sewer off). GPU, one job at a time; `wait_for_gpu.sh` queues it | machine, checked by a person | about 4 to 5 GPU hours a place (South Street: 29 runs in 4 h 12 min, `FLOOD-POC-RESULTS.md`) |
 | 1 to 3 | **Heat:** HeatSim from the pinned clone for the place's month, then `heatsim street` | machine | 12 to 22 min CPU, plus the street layer |
-| 1 to 3 | **Ground movement:** only once a reviewed ground reading exists and has passed its checks (Climate Home Inspection `tools/gate4`). Ground stays in the product (Kyle, 22 November 2026), but the site does not sell it before it ships: until then the report says on its first page that ground movement is not in it yet (`REPORT.isNot` in `catalog.ts`) | machine, checked by a person | depends on the InSAR stack |
+| 1 to 3 | **Ground movement:** the ground reading for the place (Climate Home Inspection `tools/gate4`), as a range and labelled exploratory. In every report from 23 November 2026 (Kyle: "I'd like ground to be there across the board along with wind"), while the GPS check continues. Where the radar product does not cover the place, or a reading is refused, the section says so and shows no number | machine, checked by a person | depends on the InSAR stack |
+| 1 to 3 | **Wind:** storm gusts for the area (WindSim Layer 1) as a range, and the street-level screening estimate, each labelled exploratory. Where the area's held-out check has not passed (California so far, thunderstorms everywhere), the section says so beside the figure | machine, checked by a person | Layer 1 minutes; street level depends on the GPU queue |
 | 3 to 4 | `bash tools/run_property.sh <ID>` (readings, evidence records, report), then `python tools/report/build_report.py <ID>` | machine | minutes |
 | 4 to 5 | **Read the report before it leaves.** Checklist below | person | 30 to 60 min |
 | 5 | Print to PDF, then `report-order.ts deliver <id> report.pdf`: **now** the card is charged $149 plus sales tax; the buyer gets an email and a download (or, if the card fails, a pay link in their account, and the report stays locked until paid) | person | 5 min |
@@ -43,8 +44,8 @@ Answer each from the address, and write the answers in the order note:
 1. **In the United States?** Outside it, `cancel`.
 2. **Flood:** 3DEP 1 m lidar covers the box? Buildings: OpenStreetMap, or the national footprints with `--buildings` where OSM has none (Climate Home Inspection D36). A historic storm the site's FloodSim list holds?
 3. **Heat:** not over snow, not in complex terrain, not where a sea breeze front dominates (HeatSim's own limits). If it is, the heat section says so.
-4. **Ground movement:** not sold yet. If a reviewed reading for the place has passed its checks, it may go in; otherwise the report says plainly that ground movement is not in it yet.
-5. **Wind** is not in reports until it passes its checks (Climate Home Inspection D43). Say so if the buyer asks.
+4. **Ground movement:** does the satellite radar product cover the place? If not, the ground section says so plainly, and the buyer is told before the work starts.
+5. **Wind:** did the area's storm-gust check pass (WindSim `docs/validation.md`, Layer 1)? Either way wind goes in, but the label and the sentence beside the figure follow that result.
 
 ## Read-before-delivery checklist
 

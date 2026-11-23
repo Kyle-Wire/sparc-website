@@ -15,12 +15,13 @@
  * held to in a contract and the Terms publish the billing and refund terms.
  * The Terms' report section reads REPORT below, so the two cannot drift.
  *
- * 23 November 2026: ground movement came out of `includes`. Every ground
- * reading in Climate Home Inspection is held (its evidence audit fails) and no
- * place config enables the ground section, so the line was not true of any
- * report that could be sold. The sample reports and /faq already said ground
- * and wind are not in reports yet. Put the line back when the ground section
- * ships in buyer reports.
+ * 23 November 2026, morning: ground movement came out of `includes` while
+ * its readings were held.
+ * 23 November 2026, afternoon: Kyle decided ground movement and wind go into
+ * every report now, as screening estimates, while formal validation continues
+ * ("I'd like ground to be there across the board along with wind"). The lines
+ * below say exactly that: each is a range with its label, and /how-we-test
+ * lists every check, passed and failed. A label, not a switch.
  */
 
 export type ProductId = "home-report";
@@ -46,10 +47,12 @@ export const REPORT: Product = {
   name: "The house report",
   priceCents: 14900,
   currency: "USD",
-  tagline: "Flood and heat around one house and its streets, in our models, with the receipts. Bought once.",
+  tagline: "Flood, heat, ground movement and wind around one house and its streets, in our models, with the receipts. Bought once.",
   includes: [
     "Flood: our 1 m flood model run for the streets around the house in design storms and a past storm, showing where water reaches and how deep it stands beside the house in each storm modelled",
     "Heat: modelled street air temperature around the house in a hot spell, afternoon and night, and modelled outdoor comfort (PET) in sun and in shade, with the satellite surface temperature of the block beside them",
+    "Ground movement: a screening estimate from NASA's satellite radar product, where it covers the place, of whether the ground under the block moves differently from the ground around it, given as a range and labelled exploratory",
+    "Wind: storm gusts for the area from long weather-station records, and a screening estimate of how wind moves between the buildings, each given as a range and labelled exploratory",
     "Every finding labelled with how much evidence stands behind it, the model's own error and where that was measured, and what to check at the house",
     "A PDF in your account, yours to keep and share, with an atlas that opens with no internet, print-ready maps and the data files",
     "Corrections free for as long as SPARC Labs exists, and 12 months of updates when a finding changes or a hazard is added for your place",
@@ -60,7 +63,7 @@ export const REPORT: Product = {
     "No dollar figures: no expected loss, no premiums, no payback",
     "Model results are labelled exploratory unless they have been compared with a measurement at that place, and none has been yet",
     "Nothing about the basement, the first floor or indoor temperature",
-    "No ground movement or wind yet: each joins the report only once it passes its checks, and the report says so on its first page",
+    "Ground movement and wind are screening estimates while their formal checks continue. Where a check has not passed for your area, the report says so beside the figure, and How we test lists every check, passed and failed",
   ],
   deliveryDays: 10,
 };
@@ -133,7 +136,7 @@ export function mayOrder(email: string | null | undefined, env: Record<string, s
  */
 export const AGREE_STATEMENT =
   "I have read what the report is and is not. It is a screening report, not an engineering survey.";
-export const REPORT_TERMS_VERSION = "2026-11-23-draft";
+export const REPORT_TERMS_VERSION = "2026-11-23b-draft";
 
 /**
  * How many orders we take in any seven days, from ORDERS_WEEKLY_CAP. Unset or

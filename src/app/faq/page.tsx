@@ -45,10 +45,10 @@ export default function FaqPage() {
       a: (
         <>
           <p>
-            Our own flood and heat models, run for the streets around one house, written up as a PDF. Findings come
-            first. Each one says, in words, how much evidence stands behind it. The reasons, the limits and every
-            source are at the back. Ground movement and wind are not in reports yet; each joins once it passes the
-            checks the report names.
+            Our own flood, heat, ground movement and wind models, run for the streets around one house, written up as
+            a PDF. Findings come first. Each one says, in words, how much evidence stands behind it. The reasons, the
+            limits and every source are at the back. Ground movement and wind are screening estimates while their
+            formal checks continue; <Link href="/how-we-test">How we test</Link> lists every check, passed and failed.
           </p>
           <p>
             <Link href="/report/sample">See how a report is laid out</Link>.
@@ -109,13 +109,25 @@ export default function FaqPage() {
       ),
     },
     {
-      q: "Why is there no wind?",
+      q: "How sure are the ground movement and wind sections?",
       a: (
-        <p>
-          Our wind model is being built and is not in reports. Storm gusts for the area come first, once that check
-          is merged. Wind between buildings comes only after the street model passes its wind-tunnel benchmark, which
-          it does not yet.
-        </p>
+        <>
+          <p>
+            Less sure than flood and heat, and the report says so. Both are screening estimates, given as ranges and
+            labelled exploratory, while their formal checks continue.
+          </p>
+          <p>
+            Ground movement comes from NASA&apos;s satellite radar product, where it covers the place. We are still
+            checking it against GPS stations, and the check has passed at one place so far. Storm gusts come from long
+            weather-station records; that check passes for ordinary storms at most places tried and fails in
+            California, and thunderstorm gusts are a wide range. Wind between buildings comes from our street model,
+            which has passed one of the four wind-tunnel cases it is scored on.
+          </p>
+          <p>
+            Where a check has not passed for your area, the report says so beside the figure. Every check, passed and
+            failed, is on <Link href="/how-we-test">How we test</Link>.
+          </p>
+        </>
       ),
     },
     {

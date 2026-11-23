@@ -174,7 +174,8 @@ function ListingPanel({ listing, onClose }: { listing: Listing; onClose: () => v
       <section className="listing-part">
         <h3>This house</h3>
         <p className="listing-note">
-          Our flood and heat models, worked out for this house. Built for you alone and never posted on the map.
+          Our flood, heat, ground movement and wind models, worked out for this house. Built for you alone and never
+          posted on the map.
         </p>
         <Link href={reportHref} className="btn btn-accent btn-sm">
           Get this house&apos;s report <span className="arrow">→</span>
@@ -282,8 +283,8 @@ function InfoPanel() {
         it. It describes the area around your pin, not the house itself.
       </p>
       <p>
-        <strong>The house report</strong> is the paid part: our own flood and heat models, worked out for one house. Ground movement and
-        wind join once each passes its checks. <Link href="/report/sample">See a sample</Link>.
+        <strong>The house report</strong> is the paid part: our own flood, heat, ground movement and wind models, worked out for one house. Ground movement and
+        wind are included as screening estimates while their formal checks continue. <Link href="/report/sample">See a sample</Link>.
       </p>
       <p>
         <Link href="/how-it-works">How it works</Link> · <Link href="/about">Who we are</Link> · <Link href="/data">Every source</Link>

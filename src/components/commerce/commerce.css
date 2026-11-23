@@ -35,3 +35,10 @@
 .pill[data-state="attention"] { color: var(--status-warn); border-color: currentColor; }
 .buy-deadline-warn { border-left: 3px solid var(--heat, #d9822b); background: var(--paper-2, #fdf9ef); padding: 10px 14px; margin: 4px 0; }
 .buy-deadline-warn p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--ink-2); }
+
+/* Self-serve cancel: a disclosure, so it takes two deliberate clicks and no script. */
+.order-cancel { width: 100%; order: 10; }
+.order-cancel > summary { cursor: pointer; font-size: 13px; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; width: fit-content; }
+.order-cancel > summary:hover { color: var(--ink); }
+.order-cancel > form { display: grid; gap: 10px; justify-items: start; margin-top: 10px; padding: 14px; border: 1px solid var(--rule); background: var(--paper); max-width: 560px; }
+.order-done { margin: 12px 0 0; font-size: 14px; color: var(--ink); border-left: 3px solid var(--status-ok, #2f6b3f); padding-left: 10px; }

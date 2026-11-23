@@ -8,6 +8,7 @@
  *   delivered       charged, report unlocked             buyer + inbox
  *   payment_failed  report done, card did not go through buyer + inbox
  *   refunded        refunded in full                     inbox
+ *   cancelled       the buyer cancelled from the account inbox (stop work)
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -40,6 +41,7 @@ const NEXT: Record<Notice, (id: string) => string | null> = {
   delivered: () => null,
   payment_failed: () => "The buyer has been asked to pay from their account. Nothing to do unless they write.",
   refunded: () => null,
+  cancelled: () => "The buyer cancelled from their account: stop work on it. Nothing is charged. The site removes the saved card; if it is still on the Stripe customer, remove it there.",
 };
 
 export async function notifyReportEvent(admin: SupabaseClient, orderId: string, what: Notice, opts: { site?: string } = {}) {
@@ -94,7 +96,7 @@ export async function notifyReportEvent(admin: SupabaseClient, orderId: string, 
   const inbox = process.env.WAITLIST_NOTIFY_EMAIL;
   const key = process.env.RESEND_API_KEY;
   if (inbox && key) {
-    const label = { card_saved: "ordered (card saved, nothing charged)", delivered: "paid and delivered", payment_failed: "ready but the card failed", refunded: "refunded" }[what];
+    const label = { card_saved: "ordered (card saved, nothing charged)", delivered: "paid and delivered", payment_failed: "ready but the card failed", refunded: "refunded", cancelled: "cancelled by the buyer" }[what];
     const lines = [
       `House report ${label}${testMode ? " (TEST MODE, no money moved)" : ""}`,
       `Order: ${o.id}`,

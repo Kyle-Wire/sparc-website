@@ -2,6 +2,8 @@ import type { Route } from "next";
 import Link from "next/link";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { formatPrice, REPORT, checkoutEnabled } from "@/lib/payments";
+import { mayCancel, orderDates } from "@/lib/payments/self-serve";
+import { formatDay } from "@/lib/payments/turnaround";
 import "@/components/commerce/commerce.css";
 
 export const dynamic = "force-dynamic";
@@ -21,6 +23,8 @@ interface Order {
   created_at: string;
   paid_at: string | null;
   delivered_at: string | null;
+  inspection_deadline: string | null;
+  card_saved_at: string | null;
 }
 
 // The card is charged when the report is ready (Kyle, 22 November 2026), so
@@ -86,9 +90,9 @@ const date = (iso: string | null) =>
 export default async function ReportsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ ordered?: string; paying?: string; error?: string }>;
+  searchParams: Promise<{ ordered?: string; paying?: string; error?: string; cancelled?: string }>;
 }) {
-  const { ordered, paying, error: payError } = await searchParams;
+  const { ordered, paying, error: payError, cancelled } = await searchParams;
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
@@ -98,7 +102,7 @@ export default async function ReportsPage({
   try {
     const { data, error } = await supabase
       .from("report_orders")
-      .select("id,status,address,place_slug,price_cents,amount_paid_cents,currency,receipt_url,test_mode,status_note,charge_error,created_at,paid_at,delivered_at")
+      .select("id,status,address,place_slug,price_cents,amount_paid_cents,currency,receipt_url,test_mode,status_note,charge_error,created_at,paid_at,delivered_at,inspection_deadline,card_saved_at")
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) throw error;
@@ -125,6 +129,23 @@ export default async function ReportsPage({
         {payError === "pay" && (
           <p className="journey-error" role="alert">
             The payment page did not open. Nothing was charged; please try again in a minute.
+          </p>
+        )}
+        {payError === "cancel" && (
+          <p className="journey-error" role="alert">
+            The order could not be cancelled just now. Nothing has been charged; please try again in a minute, or reply to
+            your order email and we will cancel it for you.
+          </p>
+        )}
+        {payError === "cancel-late" && (
+          <p className="journey-error" role="alert">
+            This order can no longer be cancelled here, because the report is finished or being charged. Reply to your
+            order email and a person will sort it out with you.
+          </p>
+        )}
+        {cancelled && (
+          <p className="order-done" role="status">
+            Cancelled. Nothing was charged, and your saved card has been removed.
           </p>
         )}
         {failed && (
@@ -166,6 +187,20 @@ export default async function ReportsPage({
               ))}
             </ol>
             <p className="order-note">{words(o, o.id === ordered, o.id === paying)}</p>
+            {(o.status === "card_saved" || o.status === "in_progress") && (() => {
+              // The promise counts from when the card was saved, as in scripts/report-order.ts list.
+              const d = orderDates(o.card_saved_at ?? o.created_at, o.inspection_deadline, REPORT.deliveryDays);
+              return (
+                <p className="order-note">
+                  <strong>Ready by {formatDay(d.promised)}</strong> at the latest.
+                  {d.deadline && !d.tight && <> Your inspection period ends {formatDay(d.deadline)}.</>}
+                  {d.tight && (
+                    <> Your inspection period ends {formatDay(d.deadline!)}, before that. We put orders with the nearest
+                    deadline first, and we will email you if we cannot make it.</>
+                  )}
+                </p>
+              );
+            })()}
             {o.status_note && <p className="order-note">{o.status_note}</p>}
             <div className="order-actions">
               {o.status === "payment_failed" && (
@@ -179,6 +214,18 @@ export default async function ReportsPage({
                 <a className="btn btn-accent" href={`/api/reports/${o.id}/download`}>
                   Download the report <span className="arrow">→</span>
                 </a>
+              )}
+              {mayCancel(o.status) && (
+                <details className="order-cancel">
+                  <summary>Cancel this order</summary>
+                  <form method="post" action={`/api/reports/${o.id}/cancel`}>
+                    <p className="order-note">
+                      Nothing has been charged and nothing will be. We stop work and remove your saved card. You can
+                      order again later.
+                    </p>
+                    <button type="submit" className="btn btn-sm">Yes, cancel the order</button>
+                  </form>
+                </details>
               )}
               {o.place_slug && (
                 <Link className="btn btn-sm" href={(`/place/${o.place_slug}`) as Route}>

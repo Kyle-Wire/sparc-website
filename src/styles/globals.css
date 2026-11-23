@@ -917,9 +917,3 @@ div.place-layer { grid-template-columns: 1fr; cursor: default; }
 @media (max-width: 640px) {
   .map-legend { position: static; width: auto; max-height: none; margin: 12px 16px 0; box-shadow: none; }
 }
-
-/* /how-it-works: the one-band pointer to the receipts on /how-we-test. */
-.hiw-proof { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px 48px; flex-wrap: wrap; }
-.hiw-proof > div { max-width: 720px; }
-.hiw-proof h2 { margin: 10px 0 10px; }
-.hiw-proof .lead { margin: 0; }

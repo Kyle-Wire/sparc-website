@@ -53,6 +53,13 @@
 .hiw-search .place-search-help { color: var(--muted); }
 .hiw-hero .hiw-small { color: var(--ban-muted); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; margin-top: 14px; }
 
+/* /how-it-works: the one-band pointer to the receipts on /how-we-test. */
+.hiw-proof { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px 48px; flex-wrap: wrap; }
+.hiw-proof > div { max-width: 720px; }
+.hiw-proof h2 { margin: 10px 0 10px; }
+.hiw-proof .lead { margin: 0; }
+
+
 /* The property line: a drawing of a house inside its lot, with the four
    hazards reaching in from outside it. Pure decoration; aria-hidden. */
 .hiw-lot { width: 100%; max-width: 440px; justify-self: end; }

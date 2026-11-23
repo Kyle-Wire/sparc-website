@@ -13,6 +13,7 @@
  *   npx tsx scripts/report-order.ts cannot-model <order-id> "why, in words the buyer reads"
  *   npx tsx scripts/report-order.ts cancel <order-id> ["note"]
  *   npx tsx scripts/report-order.ts feedback <order-id>     # 7+ days after delivery: the honest feedback ask
+ *   npx tsx scripts/report-order.ts package <order-id> <atlas.zip>   # the offline atlas, plates and data (D47)
  *
  * The buyer is charged when the report is ready (Kyle, 22 November 2026).
  * deliver uploads the PDF, charges the card saved at order (with sales tax
@@ -25,6 +26,11 @@
  * The report PDF comes from Climate Home Inspection (tools/report/build_report.py).
  * It goes into the private "reports" bucket at <user_id>/<order_id>.pdf; the
  * buyer downloads it through /api/reports/<id>/download once it is paid.
+ *
+ * package uploads the zip of Climate Home Inspection's buyer package
+ * (tools/package/package.py --buyer, zipped) to <user_id>/<order_id>-package.zip.
+ * Run it before or after deliver; running it again replaces the package (an
+ * update). The buyer sees a second download once the order is delivered.
  */
 
 import { readFileSync } from "node:fs";
@@ -37,6 +43,7 @@ import { notifyReportEvent } from "../src/lib/payments/notify";
 import { noticeFor } from "../src/lib/payments/webhook";
 import { sendEmail } from "../src/lib/email";
 import { feedbackDue } from "../src/lib/payments/feedback";
+import { packagePath, looksLikeZip, hasStartHere, PACKAGE_MAX_BYTES } from "../src/lib/payments/package";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sparclabs.co";
 const WAITING = ["card_saved", "in_progress", "charging", "payment_failed"];
@@ -47,7 +54,8 @@ npx tsx scripts/report-order.ts start <order-id> ["note"]
 npx tsx scripts/report-order.ts deliver <order-id> <report.pdf> ["note"]
 npx tsx scripts/report-order.ts cannot-model <order-id> "reason"
 npx tsx scripts/report-order.ts cancel <order-id> ["note"]
-npx tsx scripts/report-order.ts feedback <order-id>`;
+npx tsx scripts/report-order.ts feedback <order-id>
+npx tsx scripts/report-order.ts package <order-id> <atlas.zip>`;
 
 function admin(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -230,6 +238,35 @@ async function main() {
       refId: `report-feedback-${o.id}`,
     });
     console.log(r.ok ? `Sent the feedback ask to ${email} (${r.id}). Note it in the order time log.` : `Not sent: ${r.error}`);
+    return;
+  }
+
+  // The offline atlas, plates and data files (D47), as one zip. Not charged
+  // for separately and changes no state: the buyer sees it once delivered.
+  if (cmd === "package" && a && b) {
+    const o = await getOrder(db, a);
+    if (["awaiting_card", "abandoned", "cancelled", "cannot_model", "refunded"].includes(o.status)) {
+      console.error(`Order is ${o.status}; no package goes with it.`);
+      process.exit(1);
+    }
+    const bytes = readFileSync(b);
+    if (!looksLikeZip(bytes)) {
+      console.error("The package must be a zip of the buyer's package folder.");
+      process.exit(1);
+    }
+    if (!hasStartHere(bytes)) {
+      console.error("No START-HERE.html in the zip: is this the package folder from tools/package/package.py --buyer?");
+      process.exit(1);
+    }
+    if (bytes.length > PACKAGE_MAX_BYTES) {
+      console.error(`The zip is ${(bytes.length / 1048576).toFixed(1)} MB; the storage limit is ${PACKAGE_MAX_BYTES / 1048576} MB a file. Raise it in Supabase Storage settings, or leave the full-resolution rasters for the drive.`);
+      process.exit(1);
+    }
+    const path = packagePath(o.user_id, o.id);
+    const up = await db.storage.from("reports").upload(path, bytes, { contentType: "application/zip", upsert: true });
+    if (up.error) throw up.error;
+    console.log(`Uploaded ${basename(b)} (${(bytes.length / 1048576).toFixed(1)} MB) to reports/${path}.` +
+      (o.status === "delivered" ? " The buyer can download it now." : " The buyer sees it once the report is delivered and paid."));
     return;
   }
 

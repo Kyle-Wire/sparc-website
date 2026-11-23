@@ -1,6 +1,7 @@
 import type { Route } from "next";
 import Link from "next/link";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/supabase/server";
+import { ordersWithPackage } from "@/lib/payments/package";
 import { formatPrice, REPORT, checkoutEnabled } from "@/lib/payments";
 import { mayCancel, orderDates } from "@/lib/payments/self-serve";
 import { formatDay } from "@/lib/payments/turnaround";
@@ -112,6 +113,18 @@ export default async function ReportsPage({
     failed = true;
   }
 
+  // Which delivered orders have the offline atlas yet (one listing of the
+  // buyer's own folder). If storage is unreachable, only the PDF is offered.
+  let withPackage = new Set<string>();
+  if (orders.some((o) => o.status === "delivered")) {
+    try {
+      const { data: files } = await createSupabaseAdminClient().storage.from("reports").list(user.id, { limit: 1000 });
+      withPackage = ordersWithPackage((files ?? []).map((f) => f.name));
+    } catch {
+      /* the PDF is still offered */
+    }
+  }
+
   return (
     <div className="orders">
       <div className="card" style={{ padding: 24 }}>
@@ -202,6 +215,12 @@ export default async function ReportsPage({
               );
             })()}
             {o.status_note && <p className="order-note">{o.status_note}</p>}
+            {o.status === "delivered" && withPackage.has(o.id) && (
+              <p className="order-note">
+                The zip holds the atlas, print plates and data files. Unzip it and open START-HERE.html: it works with no
+                internet.
+              </p>
+            )}
             <div className="order-actions">
               {o.status === "payment_failed" && (
                 <form method="post" action={`/api/reports/${o.id}/pay`}>
@@ -213,6 +232,11 @@ export default async function ReportsPage({
               {o.status === "delivered" && (
                 <a className="btn btn-accent" href={`/api/reports/${o.id}/download`}>
                   Download the report <span className="arrow">→</span>
+                </a>
+              )}
+              {o.status === "delivered" && withPackage.has(o.id) && (
+                <a className="btn btn-sm" href={`/api/reports/${o.id}/download?file=package`}>
+                  Download the offline atlas, prints and data (zip)
                 </a>
               )}
               {mayCancel(o.status) && (

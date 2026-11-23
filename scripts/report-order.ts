@@ -12,6 +12,7 @@
  *   npx tsx scripts/report-order.ts deliver <order-id> <report.pdf> ["note"]
  *   npx tsx scripts/report-order.ts cannot-model <order-id> "why, in words the buyer reads"
  *   npx tsx scripts/report-order.ts cancel <order-id> ["note"]
+ *   npx tsx scripts/report-order.ts feedback <order-id>     # 7+ days after delivery: the honest feedback ask
  *
  * The buyer is charged when the report is ready (Kyle, 22 November 2026).
  * deliver uploads the PDF, charges the card saved at order (with sales tax
@@ -34,6 +35,8 @@ import { promisedBy, todayEastern } from "../src/lib/payments/turnaround";
 import { paymentProvider } from "../src/lib/payments/index";
 import { notifyReportEvent } from "../src/lib/payments/notify";
 import { noticeFor } from "../src/lib/payments/webhook";
+import { sendEmail } from "../src/lib/email";
+import { feedbackDue } from "../src/lib/payments/feedback";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sparclabs.co";
 const WAITING = ["card_saved", "in_progress", "charging", "payment_failed"];
@@ -43,7 +46,8 @@ npx tsx scripts/report-order.ts show <order-id>
 npx tsx scripts/report-order.ts start <order-id> ["note"]
 npx tsx scripts/report-order.ts deliver <order-id> <report.pdf> ["note"]
 npx tsx scripts/report-order.ts cannot-model <order-id> "reason"
-npx tsx scripts/report-order.ts cancel <order-id> ["note"]`;
+npx tsx scripts/report-order.ts cancel <order-id> ["note"]
+npx tsx scripts/report-order.ts feedback <order-id>`;
 
 function admin(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -198,6 +202,34 @@ async function main() {
     const notice = noticeFor(outcome);
     if (notice) await notifyReportEvent(db, o.id, notice, { site: SITE }).catch((e) => console.warn(`Email not sent (${(e as Error).message}).`));
     if (!notice && outcome !== "duplicate") console.log("Check the order: `show` it and look at needs_review.");
+    return;
+  }
+
+  // The feedback ask (business/17-reviews-and-consent.md): every buyer, once,
+  // about 7 days after delivery. Refuses earlier, and for undelivered orders.
+  // Resend has no send-once switch here, so log each send in the order time log.
+  if (cmd === "feedback" && a) {
+    const o = await getOrder(db, a);
+    const due = feedbackDue(o.status, (o.delivered_at as string | null) ?? null, new Date());
+    if (!due.ok) {
+      console.error(`Not sent: ${due.why}`);
+      process.exit(1);
+    }
+    const { data: u } = await db.auth.admin.getUserById(o.user_id);
+    const email = u?.user?.email;
+    if (!email) {
+      console.error("Not sent: the buyer's account has no email.");
+      process.exit(1);
+    }
+    const full = String((u?.user?.user_metadata as { full_name?: string } | undefined)?.full_name ?? "").trim();
+    const r = await sendEmail({
+      to: email,
+      replyTo: process.env.WAITLIST_NOTIFY_EMAIL ?? "hello@sparclabs.co",
+      template: "report-feedback",
+      props: { firstName: full.split(/\s+/)[0] || undefined, deliveredOn: due.deliveredOn },
+      refId: `report-feedback-${o.id}`,
+    });
+    console.log(r.ok ? `Sent the feedback ask to ${email} (${r.id}). Note it in the order time log.` : `Not sent: ${r.error}`);
     return;
   }
 

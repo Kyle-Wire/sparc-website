@@ -45,6 +45,10 @@ import ReportOrderReceived, {
   subject as reportOrderReceivedSubject,
   type ReportOrderReceivedProps,
 } from "@/emails/report-order-received";
+import ReportFeedback, {
+  subject as reportFeedbackSubject,
+  type ReportFeedbackProps,
+} from "@/emails/report-feedback";
 import ReportDelivered, {
   subject as reportDeliveredSubject,
   type ReportDeliveredProps,
@@ -69,7 +73,8 @@ export type EmailTemplate =
   | { template: "demo-request-received"; props: DemoRequestReceivedProps }
   | { template: "report-order-received"; props: ReportOrderReceivedProps }
   | { template: "report-delivered"; props: ReportDeliveredProps }
-  | { template: "report-payment-needed"; props: ReportPaymentNeededProps };
+  | { template: "report-payment-needed"; props: ReportPaymentNeededProps }
+  | { template: "report-feedback"; props: ReportFeedbackProps };
 
 type Registry = {
   [K in EmailTemplate as K["template"]]: {
@@ -119,6 +124,10 @@ const registry: Registry = {
   "report-payment-needed": {
     Component: ReportPaymentNeeded,
     subject: reportPaymentNeededSubject,
+  },
+  "report-feedback": {
+    Component: ReportFeedback,
+    subject: reportFeedbackSubject,
   },
 };
 

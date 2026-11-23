@@ -9,10 +9,13 @@ it. Where there is no gate yet, the page says so.
 
 | | |
 |---|---|
+| [`site-redesign-brief.md`](site-redesign-brief.md) | The site's direction from 17 November 2026: public records free for any US address, flood and heat models paid. What is built, what is not, and whose decision each point was. |
+| [`roadmap.md`](roadmap.md) | Everything a one-stop shop for buying and owning a home would need, by what it does for the visitor, with what is built, what is next and what waits on Kyle or the engines. |
 | [`placeholder-register.md`](placeholder-register.md) | A placeholder panel shows layout. It never shows digits. The register, the acceptance test, and the two CI gates. |
 | [`color-roles.md`](color-roles.md) | Three token layers, the decorative-vs-structural rule split, the AA failures and what each fix was worth. |
 | [`data-ramps.md`](data-ramps.md) | Why the brand ramp cannot encode severity, the two data ramps, and the greyscale legend test specified for Gate. |
 | [`type-scale.md`](type-scale.md) | One set of scale tokens, read at every breakpoint. |
+| [`cabinet-frame.md`](cabinet-frame.md) | The InSAR Pipeline app's look as a frame and labels (Kyle, 18 November 2026): pixel borders, one pixel font for labels, one inverted banner per page, the mist. The spacing pass, the research behind it, and the heights before and after. |
 
 ## The gates
 
@@ -38,9 +41,16 @@ workflow*).
 Before this work, "including in mockups" rested on a source comment. It now
 fails a build.
 
+Since the redesign of 17 November 2026 there is a third thing a displayed
+number may trace to: a public register, fetched live and named with its
+publisher on the card that shows it (`src/lib/place/`, and the source table in
+[`site-redesign-brief.md`](site-redesign-brief.md)). The rule is otherwise
+unchanged. A model result with no run behind it is still a placeholder panel,
+and the paid shelves on a place page are drawn that way.
+
 ## Not settled here
 
-The direction choice (instrument / field report / cabinet) is with the board.
+The direction choice (instrument / field report / cabinet) was made on 18 November 2026: cabinet, as a frame and labels only ([`cabinet-frame.md`](cabinet-frame.md)). The items below were waiting on it and are still open.
 Dark mode, the print stylesheet, the typeface fork, the nav and IA
 re-pointing, the evidence-room layout, the maturity chips
 ([SPA-37](/SPA/issues/SPA-37)) and the data-handling table all wait on it or on

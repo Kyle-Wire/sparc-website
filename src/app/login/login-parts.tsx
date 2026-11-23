@@ -3,19 +3,10 @@
 import * as React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Route } from "next";
+import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { SITE_URL } from "@/lib/brand";
 import { safeNext } from "@/lib/safe-redirect";
-
-const PROFESSIONS = [
-  "Researcher / Faculty",
-  "Graduate student",
-  "Undergraduate student",
-  "Industry / Practitioner",
-  "Public sector / Government",
-  "Journalist",
-  "Other",
-];
 
 export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
   const router = useRouter();
@@ -23,8 +14,6 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
   const next = safeNext(params.get("next"), "/account");
 
   const [fullName, setFullName] = React.useState("");
-  const [organization, setOrganization] = React.useState("");
-  const [profession, setProfession] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [state, setState] = React.useState<"idle" | "submitting" | "confirm-sent" | "error">("idle");
@@ -42,26 +31,12 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
           password,
           options: {
             emailRedirectTo: `${SITE_URL}/auth/callback?next=${encodeURIComponent(next)}`,
-            data: {
-              full_name: fullName.trim(),
-              organization: organization.trim(),
-              profession: profession.trim(),
-            },
+            data: { full_name: fullName.trim() },
           },
         });
         if (error) throw error;
-        // Fire-and-forget: notify the team and send a confirmation to the user.
-        // Don't block signup if the email provider is slow or down.
-        void fetch("/api/account/request-demo", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email,
-            full_name: fullName.trim(),
-            organization: organization.trim(),
-            profession: profession.trim(),
-          }),
-        }).catch(() => {});
+        // The old "request access" notification (/api/account/request-demo) is
+        // no longer sent: an account is now simply where a buyer's reports live.
         if (!data.session) {
           setState("confirm-sent");
           return;
@@ -84,7 +59,7 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
     return (
       <div className="card" style={{ padding: 28, textAlign: "center" }}>
         <div className="kicker" style={{ justifyContent: "center" }}>confirm your email</div>
-        <h3 style={{ fontSize: 22, fontWeight: 700, margin: "12px 0 8px" }}>Check your inbox.</h3>
+        <h2 style={{ fontSize: 22, fontWeight: 700, margin: "12px 0 8px" }}>Check your inbox.</h2>
         <p style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.55, margin: 0 }}>
           We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then sign in.
         </p>
@@ -95,60 +70,36 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
   return (
     <div className="card" style={{ padding: 28 }}>
       <div className="kicker">{mode === "signup" ? "create your account" : "sign in"}</div>
-      <h3 style={{ fontSize: 20, fontWeight: 700, margin: "10px 0 16px" }}>
-        {mode === "signup" ? "Tell us about yourself" : "Welcome back"}
-      </h3>
+      <h2 style={{ fontSize: 20, fontWeight: 700, margin: "10px 0 16px" }}>
+        {mode === "signup" ? "Make an account for your reports" : "Welcome back"}
+      </h2>
       <form onSubmit={submit}>
         {mode === "signup" && (
           <>
-            <label className="label">Full name</label>
-            <input
+            <label className="label" htmlFor="lg-your-name-optional">Your name (optional)</label>
+            <input id="lg-your-name-optional"
               className="input"
               type="text"
-              required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Naomi Schaal"
               autoComplete="name"
               maxLength={200}
             />
-            <label className="label" style={{ marginTop: 12 }}>Organization</label>
-            <input
-              className="input"
-              type="text"
-              value={organization}
-              onChange={(e) => setOrganization(e.target.value)}
-              placeholder="UC Berkeley · Geography"
-              autoComplete="organization"
-              maxLength={200}
-            />
-            <label className="label" style={{ marginTop: 12 }}>Profession</label>
-            <select
-              className="input"
-              required
-              value={profession}
-              onChange={(e) => setProfession(e.target.value)}
-            >
-              <option value="" disabled>Select one…</option>
-              {PROFESSIONS.map((p) => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
-            <label className="label" style={{ marginTop: 12 }}>Email</label>
+            <label className="label" htmlFor="lg-email" style={{ marginTop: 12 }}>Email</label>
           </>
         )}
-        {mode === "signin" && <label className="label">Email</label>}
-        <input
+        {mode === "signin" && <label className="label" htmlFor="lg-email">Email</label>}
+        <input id="lg-email"
           className="input"
           type="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@university.edu"
+          placeholder="you@example.com"
           autoComplete="email"
         />
-        <label className="label" style={{ marginTop: 12 }}>Password</label>
-        <input
+        <label className="label" htmlFor="lg-password" style={{ marginTop: 12 }}>Password</label>
+        <input id="lg-password"
           className="input"
           type="password"
           required
@@ -171,6 +122,11 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
       </form>
 
       {error && <p style={{ color: "var(--crimson)", marginTop: 12, fontSize: 13 }}>{error}</p>}
+      {mode === "signin" && (
+        <p style={{ marginTop: 14, fontSize: 13, textAlign: "center" }}>
+          <Link href="/login/forgot" style={{ color: "var(--ink-2)" }}>Forgot your password?</Link>
+        </p>
+      )}
     </div>
   );
 }

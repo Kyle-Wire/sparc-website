@@ -58,6 +58,10 @@
      for the first time. The brand ramp step itself is untouched above, so the
      gradient is unchanged and no brand review is implied. */
   --crimson: #cc331f;  /* 4.71:1 on paper · 5.17:1 under white text */
+  /* Crimson for small text on the sunken grounds (--paper-2), where --crimson
+     falls to 4.34:1 and misses AA. Same hue, darker: 5.11:1 on --paper-2,
+     5.59:1 on paper. Used by the heat and accent stamps. */
+  --crimson-ink: #b82e1c;
 
   /* Darkened amber, for the two places a warm hue was carrying text or a
      meaning-bearing boundary. 33.2° -> 33.0°, 2.27 -> 4.75:1 on paper.
@@ -66,14 +70,16 @@
      system needs them to. They are decoration and that is all they are. */
   --amber-ink: #9c5e12;  /* 4.75:1 on paper · 5.22:1 under white text */
 
-  /* Warm neutrals */
-  --ink:    #1a1416;
-  --ink-2:  #2b2327;
-  --paper:  #f7f4ee;
-  --paper-2:#ede8dd;
-  --paper-3:#d8d3c6;
-  --line:   #c9c2b3;
-  --muted:  #6e6358;
+  /* Neutrals: true greys, to sit with the black and white aerial (Kyle,
+     20 Nov 2026: "Mono plus one accent"; docs/design/map-first-brief.md s.2).
+     They were warm paper tones before. */
+  --ink:    #141414;
+  --ink-2:  #2a2a2a;
+  --paper:  #f5f5f4;
+  --paper-2:#ebebea;
+  --paper-3:#d6d6d5;
+  --line:   #c4c4c3;
+  --muted:  #5c5c5b;
   --white:  #ffffff;
 
   --bg: var(--paper);
@@ -100,9 +106,18 @@
      uses stay correct without being touched. If you are reaching for a border
      and a reader needs to find it, you want --rule. */
   --hairline: var(--line);
-  --rule: #7c7362;
+  --rule: #737372;
 
   --border: var(--rule);
+
+  /* The cabinet frame's banner: the page inverted, as in the InSAR Pipeline
+     app (docs/design/cabinet-frame.md). Ink ground, paper text. --ban-muted is
+     the banner's quiet text and must clear 4.5:1 on ink; scripts/check-colors.mjs
+     holds it to that. */
+  --ban: var(--ink);
+  --ban-ink: var(--paper);
+  --ban-muted: #bdbdbc;
+
   --accent: var(--crimson);
   --accent-2: var(--purple);
   --accent-warning: var(--amber-ink);
@@ -111,6 +126,18 @@
      beside a word or a glyph that says the same thing, so a reader who cannot
      resolve the hue loses nothing -- which is the pattern insar's deliverable
      verdicts already get right, and the reason it degrades gracefully. */
+  /* Hazard identity. One hue per hazard, the same two the report uses: flood is
+     FloodSim's blue-green, heat is the accent crimson. Like status colour it is
+     always the redundant channel -- every card it marks also says "flood" or
+     "heat" in words -- and both clear AA as text on paper. */
+  --flood: #0b6a88;  /* 5.57:1 on paper */
+  --heat: var(--crimson);
+  /* Ground movement and wind, the two hazards added after flood and heat. Same
+     rule: always beside the hazard's name in words, and AA as text on paper
+     (checked by scripts/check-colors.mjs). */
+  --ground: #7a4f12;
+  --wind: #3f6b4e;
+
   --status-live: var(--crimson);
   --status-warn: var(--amber-ink);
   --status-ai: var(--purple);

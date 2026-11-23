@@ -1,6 +1,6 @@
 # Embracing Uncertainty
 
-Every number in SPARC's output comes with a range. Not a single predicted temperature, but a range of plausible values. Not a single causal effect estimate, but a distribution over possible effect sizes. Not one scenario prediction, but a cloud of possibilities with quantified probability.
+The aim is for every number in SPARC's output to come with a range; not every one does yet. Not a single predicted temperature, but a range of plausible values. Not a single causal effect estimate, but a distribution over possible effect sizes. Not one scenario prediction, but a cloud of possibilities with quantified probability.
 
 If you're used to tools that give you clean single-point answers, this might feel like hedging. It isn't.
 

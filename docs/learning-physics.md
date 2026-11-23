@@ -32,7 +32,7 @@ Every time the model makes a prediction that contradicts the physics, it gets pe
 
 ## Why This Makes Models Better (Not Just More Constrained)
 
-Here's the part that surprises people: physics constraints typically *improve* predictive accuracy, not just physical plausibility.
+Here's the part that surprises people: physics constraints are often reported to improve accuracy, not just physical plausibility. That is a claim from the literature, not something measured for SPARC's models.
 
 Why? Because real physical relationships carry enormous information. If you know that heat diffuses according to a specific equation, that's equivalent to having thousands of additional training examples — all of them saying "a field that diffuses like this is more plausible than one that doesn't."
 
@@ -70,7 +70,7 @@ You don't need to understand the specific physics equations SPARC uses. You don'
 
 What matters is the *principle*: SPARC's predictions are constrained to be consistent with how heat, water, and air actually behave. When you see a scenario prediction, it's not just a number a model produced — it's a number that has been filtered through physical reality.
 
-That's a meaningful guarantee.
+That is a constraint on the model's form, not a guarantee that its answers are right.
 
 ---
 

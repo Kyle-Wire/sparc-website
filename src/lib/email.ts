@@ -41,6 +41,26 @@ import WaitlistConfirmation, {
   subject as waitlistConfirmationSubject,
   type WaitlistConfirmationProps,
 } from "@/emails/waitlist-confirmation";
+import ReportOrderReceived, {
+  subject as reportOrderReceivedSubject,
+  type ReportOrderReceivedProps,
+} from "@/emails/report-order-received";
+import ReportFeedback, {
+  subject as reportFeedbackSubject,
+  type ReportFeedbackProps,
+} from "@/emails/report-feedback";
+import ReportDelivered, {
+  subject as reportDeliveredSubject,
+  type ReportDeliveredProps,
+} from "@/emails/report-delivered";
+import ReportUpdated, {
+  subject as reportUpdatedSubject,
+  type ReportUpdatedProps,
+} from "@/emails/report-updated";
+import ReportPaymentNeeded, {
+  subject as reportPaymentNeededSubject,
+  type ReportPaymentNeededProps,
+} from "@/emails/report-payment-needed";
 import DemoRequestReceived, {
   subject as demoRequestReceivedSubject,
   type DemoRequestReceivedProps,
@@ -54,7 +74,12 @@ export type EmailTemplate =
   | { template: "subscription-renewing"; props: SubscriptionRenewingProps }
   | { template: "subscription-canceled"; props: SubscriptionCanceledProps }
   | { template: "waitlist-confirmation"; props: WaitlistConfirmationProps }
-  | { template: "demo-request-received"; props: DemoRequestReceivedProps };
+  | { template: "demo-request-received"; props: DemoRequestReceivedProps }
+  | { template: "report-order-received"; props: ReportOrderReceivedProps }
+  | { template: "report-delivered"; props: ReportDeliveredProps }
+  | { template: "report-payment-needed"; props: ReportPaymentNeededProps }
+  | { template: "report-feedback"; props: ReportFeedbackProps }
+  | { template: "report-updated"; props: ReportUpdatedProps };
 
 type Registry = {
   [K in EmailTemplate as K["template"]]: {
@@ -92,6 +117,26 @@ const registry: Registry = {
   "demo-request-received": {
     Component: DemoRequestReceived,
     subject: demoRequestReceivedSubject,
+  },
+  "report-order-received": {
+    Component: ReportOrderReceived,
+    subject: reportOrderReceivedSubject,
+  },
+  "report-delivered": {
+    Component: ReportDelivered,
+    subject: reportDeliveredSubject,
+  },
+  "report-payment-needed": {
+    Component: ReportPaymentNeeded,
+    subject: reportPaymentNeededSubject,
+  },
+  "report-feedback": {
+    Component: ReportFeedback,
+    subject: reportFeedbackSubject,
+  },
+  "report-updated": {
+    Component: ReportUpdated,
+    subject: reportUpdatedSubject,
   },
 };
 

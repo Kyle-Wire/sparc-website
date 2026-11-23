@@ -3,7 +3,14 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+
+// The Supabase client is about 250 KB of JavaScript, and this component sits in
+// the nav of every page. Most visitors have never signed in, so the client is
+// loaded only when the browser holds a Supabase session cookie (sb-<ref>-auth-
+// token, possibly split into .0, .1). Without one the visitor is signed out and
+// sees the button at once.
+const hasSessionCookie = () => /(?:^|;\s*)sb-[^=]+-auth-token/.test(document.cookie);
+const loadClient = () => import("@/lib/supabase/client").then((m) => m.createSupabaseBrowserClient());
 
 export function NavUserStatus() {
   const router = useRouter();
@@ -14,27 +21,39 @@ export function NavUserStatus() {
   const menuRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    const supabase = createSupabaseBrowserClient();
     let mounted = true;
+    if (!hasSessionCookie()) {
+      // After this render, not inside it (react-hooks/set-state-in-effect).
+      Promise.resolve().then(() => mounted && setLoading(false));
+      return () => {
+        mounted = false;
+      };
+    }
+    let unsubscribe = () => {};
 
-    supabase.auth.getUser().then(({ data }) => {
-      if (!mounted) return;
-      const u = data.user;
-      setEmail(u?.email ?? null);
-      setName((u?.user_metadata?.full_name as string | undefined) ?? null);
-      setLoading(false);
-    });
-
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      const u = session?.user;
-      setEmail(u?.email ?? null);
-      setName((u?.user_metadata?.full_name as string | undefined) ?? null);
-      setLoading(false);
-    });
+    loadClient()
+      .then((supabase) => {
+        if (!mounted) return;
+        supabase.auth.getUser().then(({ data }) => {
+          if (!mounted) return;
+          const u = data.user;
+          setEmail(u?.email ?? null);
+          setName((u?.user_metadata?.full_name as string | undefined) ?? null);
+          setLoading(false);
+        });
+        const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+          const u = session?.user;
+          setEmail(u?.email ?? null);
+          setName((u?.user_metadata?.full_name as string | undefined) ?? null);
+          setLoading(false);
+        });
+        unsubscribe = () => sub.subscription.unsubscribe();
+      })
+      .catch(() => mounted && setLoading(false));
 
     return () => {
       mounted = false;
-      sub.subscription.unsubscribe();
+      unsubscribe();
     };
   }, []);
 
@@ -48,7 +67,7 @@ export function NavUserStatus() {
   }, []);
 
   async function signOut() {
-    const supabase = createSupabaseBrowserClient();
+    const supabase = await loadClient();
     await supabase.auth.signOut();
     setOpen(false);
     router.push("/");
@@ -59,16 +78,18 @@ export function NavUserStatus() {
     return <span style={{ width: 80, height: 28, display: "inline-block" }} aria-hidden />;
   }
 
+  // Hidden on 2026-11-18, on Kyle's decision: there is no "Sign in" or "Sign
+  // up" link for a visitor who is not signed in. An account does nothing for a
+  // visitor yet (saved places live in the browser), and the sign-up page still
+  // reads "Request access to SPARC" from the old product. The pages themselves
+  // remain at /login and /signup for anyone who already has an account, and a
+  // signed-in visitor still gets the account menu below. Put the links back
+  // when an account does something: see docs/HANDOFF.md.
   if (!email) {
     return (
-      <>
-        <Link href="/login" className="btn btn-ghost btn-sm" style={{ fontWeight: 500, fontSize: 12 }}>
-          Sign in
-        </Link>
-        <Link href="/signup" className="btn btn-primary btn-sm">
-          Request access <span className="arrow">→</span>
-        </Link>
-      </>
+      <Link href="/start" className="btn btn-primary btn-sm">
+        Ask for a report <span className="arrow">→</span>
+      </Link>
     );
   }
 

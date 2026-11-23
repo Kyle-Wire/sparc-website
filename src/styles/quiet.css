@@ -1,0 +1,323 @@
+/* ============================================================
+   The quiet pass (docs/design/map-first-brief.md, 20 Nov 2026)
+
+   Kyle: "Tone it down" (the arcade look), "Mono plus one accent",
+   "Sans plus mono". This file loads after cabinet.css and turns it down
+   rather than deleting it, so the change reads, and reverts, in one place:
+
+     - frames are 1 px rules, not 2 px stepped sprite edges;
+     - labels are the mono face (JetBrains Mono), not the pixel font;
+     - the mist is gone from buttons, banners and links: it was the one
+       coloured decoration left, and the palette is now greys and one accent.
+
+   Then the map-first home: a full-screen map with the logo, one search bar
+   and a menu floating on it, chips that open panels, and the card a click
+   opens. On a phone the page stacks: search, map, then cards (brief s.4).
+   ============================================================ */
+
+:root {
+  --px: 1px;
+  --font-pixel: var(--font-mono);
+  --fs-pixel: 11px;
+  --float-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  --float-radius: 6px;
+}
+
+.kicker, .label, .pill, .shelf-state, .glance-item dt, .spot-row dt,
+.foot-grid h6, .foot-grid .foot-h, .foot-bottom, .plain-table th, .map-legend > summary,
+.dl dt, h6, .paid-strip-name, .step-no, .home-step-no {
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* No mist. */
+.btn:not(.btn-accent):not(.btn-primary):not(.btn-ghost):hover,
+.btn:not(.btn-accent):not(.btn-primary):not(.btn-ghost):focus-visible,
+.place-examples-strip a:hover, .place-examples-strip a:focus-visible {
+  background-image: none;
+  background-color: var(--paper-2);
+}
+.page-hero::after, .place-head::after { display: none; }
+.ramp-strip { display: none; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+/* ---------- the map is the page ---------- */
+
+.home-full { position: relative; height: 100vh; height: 100dvh; overflow: hidden; background: var(--paper-2); }
+.home-full .home-full-map { position: absolute; inset: 0; }
+
+.map-top {
+  position: absolute; top: 12px; left: 12px; right: 12px;
+  display: grid; grid-template-columns: auto minmax(0, 560px) auto; justify-content: space-between;
+  align-items: start; gap: 12px; pointer-events: none; z-index: 3;
+}
+.map-top > * { pointer-events: auto; }
+
+.map-logo {
+  display: inline-flex; align-items: center; padding: 6px 10px;
+  background: var(--bg-elevated); border: 1px solid var(--rule); border-radius: var(--float-radius); box-shadow: var(--float-shadow);
+}
+.map-logo img { display: block; height: 34px; width: auto; }
+
+.map-search { display: grid; gap: 8px; }
+.map-search .place-search {
+  padding: 8px; background: var(--bg-elevated); border: 1px solid var(--rule); border-radius: var(--float-radius); box-shadow: var(--float-shadow);
+}
+.map-search .place-search-help { margin: 6px 2px 0; font-size: 13px; }
+.map-search-note {
+  margin: 0; padding: 8px 10px; font-size: 13px; background: var(--bg-elevated);
+  border: 1px solid var(--rule); border-radius: var(--float-radius); box-shadow: var(--float-shadow);
+}
+
+.map-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.map-chip {
+  font: inherit; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em;
+  padding: 6px 11px; border: 1px solid var(--rule); border-radius: 999px;
+  background: var(--bg-elevated); color: var(--ink); cursor: pointer; box-shadow: var(--float-shadow);
+}
+.map-chip:hover { background: var(--paper-2); }
+.map-chip[aria-expanded="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.map-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.map-chip-round { width: 31px; padding: 6px 0; text-align: center; }
+
+.map-menu { position: relative; justify-self: end; }
+.map-menu > .map-chip { border-radius: var(--float-radius); padding: 9px 14px; }
+.map-menu-list {
+  position: absolute; right: 0; top: calc(100% + 6px); width: 240px; display: grid; padding: 8px;
+  background: var(--bg-elevated); border: 1px solid var(--rule); border-radius: var(--float-radius); box-shadow: var(--float-shadow);
+}
+.map-menu-list a { padding: 8px 10px; color: var(--ink); text-decoration: none; font-weight: 500; border-radius: 4px; }
+.map-menu-list a:hover, .map-menu-list a:focus-visible { background: var(--paper-2); }
+.map-menu-small { display: flex; flex-wrap: wrap; gap: 0 4px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
+.map-menu-small a { padding: 4px 6px; font-size: 12px; font-weight: 400; color: var(--muted); }
+
+.map-hint {
+  position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); margin: 0; z-index: 2;
+  padding: 7px 12px; font-family: var(--font-mono); font-size: 12px; color: var(--paper);
+  background: rgba(20, 20, 20, 0.82); border-radius: 999px; pointer-events: none; white-space: nowrap;
+}
+
+/* A panel from a chip, and the card a click opens: same box, left and right. */
+.map-panel, .spot-card, .home-full .listing-panel {
+  position: absolute; z-index: 2; top: 150px; bottom: 16px; width: min(380px, calc(100% - 24px));
+  overflow-y: auto; display: grid; align-content: start; gap: 12px; padding: 14px 16px;
+  background: var(--bg-elevated); border: 1px solid var(--rule); border-radius: var(--float-radius); box-shadow: var(--float-shadow);
+}
+.map-panel { left: 12px; }
+.spot-card, .home-full .listing-panel { right: 12px; bottom: auto; max-height: calc(100% - 166px); }
+.map-panel-body { display: grid; gap: 12px; font-size: 14px; }
+.map-panel-body .map-legend-group:first-child { border-top: 0; padding-top: 0; }
+.map-layer { display: grid; gap: 4px; }
+.map-legend-swatches { display: grid; gap: 4px; padding: 2px 0 0 22px; font-size: 12px; }
+.info-panel p { margin: 0; line-height: 1.55; }
+.spot-card-where { margin: 0; font-weight: 600; }
+.spot-card-links { display: grid; gap: 8px; font-size: 14px; }
+.spot-card-paid { font-size: 13px; color: var(--muted); }
+.home-full .home-map-sort { padding: 0; }
+.home-full .maplibregl-ctrl-bottom-right { margin-bottom: 6px; }
+.map-legend-dot { background: #141414; box-shadow: 0 0 0 2px #f5f5f4, 0 0 0 3px var(--rule); }
+
+/* Phone: stacked. Search on top, the map at a fixed height, cards below. */
+@media (max-width: 720px) {
+  .home-full { height: auto; overflow: visible; display: flex; flex-direction: column; }
+  .home-full .home-full-map { position: relative; inset: auto; height: 65vh; height: 65dvh; order: 1; }
+  .map-top { position: static; order: 0; grid-template-columns: auto 1fr; padding: 10px 12px; background: var(--bg-elevated); border-bottom: 1px solid var(--rule); }
+  .map-logo { box-shadow: none; padding: 4px 6px; }
+  .map-logo img { height: 28px; }
+  .map-search { grid-column: 1 / -1; grid-row: 2; }
+  .map-search .place-search, .map-chip, .map-menu > .map-chip, .map-search-note { box-shadow: none; }
+  .map-menu { grid-column: 2; grid-row: 1; }
+  .map-hint { position: static; order: 2; transform: none; margin: 10px 12px 0; white-space: normal; text-align: center; border-radius: 6px; }
+  .map-panel, .spot-card, .home-full .listing-panel {
+    position: static; order: 3; width: auto; max-height: none; margin: 12px; box-shadow: none;
+  }
+}
+
+/* ---------- place page: map plus verdicts (brief s.5) ---------- */
+
+.verdicts { border: 1px solid var(--rule); border-radius: var(--float-radius); background: var(--bg-elevated); padding: 14px 16px; display: grid; gap: 10px; }
+.verdicts ul { list-style: none; margin: 0; padding: 0; display: grid; }
+.verdicts li { border-top: 1px solid var(--line); }
+.verdicts li:first-child { border-top: 0; }
+.verdicts li a { display: grid; grid-template-columns: 96px 1fr; gap: 10px; padding: 9px 0; color: var(--ink); text-decoration: none; font-size: 14px; line-height: 1.45; }
+.verdicts li a:hover span, .verdicts li a:focus-visible span { text-decoration: underline; }
+.verdicts li strong { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; padding-top: 2px; }
+.verdicts-foot { margin: 0; font-size: 13px; line-height: 1.5; color: var(--muted); }
+.place-side { display: grid; gap: 14px; align-content: start; }
+.record-card[data-hazard="ground"] { border-left-color: var(--ground); }
+.record-card[data-hazard="wind"] { border-left-color: var(--wind); }
+
+/* ---------- place page: one layer at a time, its key on the map ----------
+   Kyle, 23 Nov 2026: the free block view's "layer selection, lack of legend
+   and presentation feels a bit off". The picker now sits on top of the map,
+   grouped by hazard, and shows one layer at a time so the colour on the map
+   always has exactly one key. The key sits on the map like a graphic's key,
+   in the publisher's own colours, with units and a source line. Hovering
+   names the class under the cursor; a click asks the agencies for the record. */
+
+.place-map-wrap { grid-template-columns: minmax(0, 1fr) 360px; gap: 24px; }
+.pm-col { display: grid; gap: 10px; min-width: 0; }
+
+.pm-chips { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; }
+.pm-chip-group { display: flex; gap: 4px; align-items: center; }
+.pm-chip-hazard {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); margin-right: 4px; display: inline-flex; align-items: center; gap: 5px;
+}
+.pm-chip-hazard::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.pm-chip-hazard[data-hazard="flood"]::before { background: var(--flood); }
+.pm-chip-hazard[data-hazard="heat"]::before { background: var(--heat); }
+.pm-chip-hazard[data-hazard="ground"]::before { background: var(--ground); }
+.pm-chip-hazard[data-hazard="storm"]::before { background: var(--wind); }
+.pm-chip {
+  font: inherit; font-size: 13px; line-height: 1; padding: 7px 11px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--bg-elevated); color: var(--ink);
+  transition: background-color 120ms, border-color 120ms, color 120ms;
+}
+.pm-chip:hover:not(:disabled) { border-color: var(--ink); }
+.pm-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pm-chip[aria-checked="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.pm-chip:disabled { color: var(--muted); cursor: not-allowed; opacity: 0.55; }
+.pm-chip-quiet { border-style: dashed; }
+
+.place-map { height: clamp(560px, 76vh, 860px); border-radius: var(--float-radius); }
+.place-map .maplibregl-ctrl-top-left { top: 6px; left: 6px; }
+
+/* The key: a white card in the bottom-left corner of the map. */
+.pm-key {
+  position: absolute; left: 12px; bottom: 12px; z-index: 2; width: 300px; max-height: calc(100% - 24px); overflow-y: auto;
+  background: rgba(255, 255, 255, 0.96); border: 1px solid var(--rule); border-radius: var(--float-radius);
+  box-shadow: var(--float-shadow); padding: 12px 14px 10px; display: grid; gap: 10px;
+}
+.mk-legend { display: grid; gap: 7px; }
+.mk-legend-head { display: grid; gap: 2px; }
+.mk-legend-head strong { font-size: 16px; line-height: 1.2; letter-spacing: -0.01em; }
+.mk-hazard { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.mk-hazard[data-hazard="flood"] { color: var(--flood); }
+.mk-hazard[data-hazard="heat"] { color: var(--heat); }
+.mk-hazard[data-hazard="ground"] { color: var(--ground); }
+.mk-hazard[data-hazard="storm"] { color: var(--wind); }
+.mk-what { margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--ink-2); }
+.mk-source { margin: 0; font-size: 11px; line-height: 1.4; color: var(--muted); }
+
+.mk-ramp { display: grid; gap: 3px; }
+.mk-ramp-bar { position: relative; height: 12px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12); }
+.mk-ramp-mark {
+  position: absolute; top: -4px; bottom: -4px; width: 0; transform: translateX(-1px);
+  border-left: 2px solid var(--ink); box-shadow: 0 0 0 1px var(--white);
+}
+.mk-ramp-ticks { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 11px; color: var(--ink-2); }
+.mk-unit { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); }
+
+.mk-steps { display: grid; gap: 3px; }
+.mk-steps-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; }
+.mk-step { height: 12px; border-radius: 1px; }
+.mk-step[data-on="true"] { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+.mk-classes { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 12.5px; line-height: 1.3; }
+.mk-classes li { display: grid; grid-template-columns: 14px 1fr; gap: 8px; align-items: center; padding: 1px 3px; margin: 0 -3px; border-radius: 3px; }
+.mk-classes li[data-on="true"] { background: var(--paper-2); font-weight: 600; }
+.mk-swatch { width: 14px; height: 14px; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }
+.mk-classes[data-shape="line"] .mk-swatch { height: 3px; border-radius: 0; box-shadow: none; }
+.mk-swatch-clear { background: repeating-linear-gradient(45deg, transparent 0 3px, var(--line) 3px 4px); }
+.mk-swatch-track { background: var(--ink); }
+.mk-none { color: var(--muted); }
+
+.pm-key .place-seg { margin-top: 0; justify-self: start; }
+
+.mk-marks { display: flex; flex-wrap: wrap; gap: 4px 12px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); }
+.mk-marks span { display: inline-flex; align-items: center; gap: 6px; }
+.mk-ring { width: 14px; height: 0; border-top: 2px dashed var(--ink); }
+.mk-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--ink); }
+.mk-pin { width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--accent); background: var(--white); }
+
+/* The readout that follows the cursor. */
+.pm-hover {
+  position: absolute; z-index: 3; pointer-events: none; transform: translate(14px, -50%);
+  max-width: 260px; padding: 7px 10px; border-radius: 4px; background: rgba(20, 20, 20, 0.9); color: var(--paper);
+  display: grid; gap: 2px; font-size: 13px; line-height: 1.3;
+}
+.pm-hover strong { font-weight: 600; }
+.pm-hover small { font-family: var(--font-mono); font-size: 10px; color: var(--ban-muted); letter-spacing: 0.02em; }
+
+.pm-zoom-note {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%); z-index: 2; margin: 0; pointer-events: none;
+  padding: 6px 12px; border-radius: 999px; background: rgba(20, 20, 20, 0.85); color: var(--paper);
+  font-family: var(--font-mono); font-size: 12px; white-space: nowrap;
+}
+
+.pm-screening { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 72ch; }
+.pm-screening strong { color: var(--ink); font-weight: 600; }
+
+.spot-layer { margin: 10px 0 2px; padding: 8px 10px; background: var(--paper-2); border-radius: 4px; font-size: 14px; font-weight: 600; line-height: 1.35; display: grid; gap: 2px; }
+.spot-layer span { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+
+@media (max-width: 1100px) {
+  .place-map-wrap { grid-template-columns: 1fr; }
+}
+
+/* Phone: the chips scroll sideways above the map, and the key sits below it,
+   so nothing covers the map a thumb has to move. */
+@media (max-width: 720px) {
+  .pm-chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px; padding: 2px 16px 6px; scrollbar-width: none; gap: 14px; }
+  .pm-chips::-webkit-scrollbar { display: none; }
+  .pm-chip-group { flex: none; }
+  .pm-chip { padding: 9px 12px; font-size: 14px; }
+  .place-map { height: 58vh; height: 58dvh; min-height: 340px; }
+  .place-map-frame { display: grid; gap: 10px; }
+  .pm-key { position: static; width: auto; max-height: none; box-shadow: none; background: var(--bg-elevated); }
+  .pm-zoom-note { top: 10px; }
+}
+
+@media print {
+  .pm-chips, .pm-hover { display: none !important; }
+  .pm-key { box-shadow: none; }
+}
+
+/* The home map's layers panel uses the same key, under each switched-on layer. */
+.map-layer-key { padding: 4px 0 4px 22px; }
+.map-layer-key .mk-legend-head { display: none; }
+.mk-legend-head { position: relative; }
+.mk-hide {
+  position: absolute; top: -2px; right: 0; font: inherit; font-family: var(--font-mono); font-size: 11px;
+  padding: 3px 7px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink-2); cursor: pointer;
+}
+.mk-hide:hover { border-color: var(--ink); color: var(--ink); }
+.mk-hide:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Stacked (tablet and phone): the readout for the tapped spot comes straight
+   after the map and its key, before the summary of the record. */
+@media (max-width: 1100px) {
+  .place-side .spot-panel { order: -1; }
+}
+
+/* One family with the report viewer (deliverables/tools/viewer.html): the map
+   carries its title top left, a hazard kicker in a ruled box over the layer
+   name, and the key says what kind of evidence it is above its source. */
+.pm-title { position: absolute; top: 12px; left: 12px; z-index: 2; display: grid; gap: 4px; justify-items: start; pointer-events: none; max-width: calc(100% - 80px); }
+.pm-title-kicker {
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 3px 7px; background: rgba(255, 255, 255, 0.94); border: 1px solid currentColor; color: var(--ink-2);
+}
+.pm-title-kicker[data-hazard="flood"] { color: var(--flood); }
+.pm-title-kicker[data-hazard="heat"] { color: var(--heat); }
+.pm-title-kicker[data-hazard="ground"] { color: var(--ground); }
+.pm-title-kicker[data-hazard="storm"] { color: var(--wind); }
+.pm-title strong { font-size: 20px; line-height: 1.2; letter-spacing: -0.01em; padding: 4px 9px; background: rgba(255, 255, 255, 0.94); border-radius: 3px; }
+.pm-zoom-note { top: auto; bottom: 14px; left: auto; right: 14px; transform: none; }
+.pm-key .mk-hazard { display: none; }
+.pm-key .mk-legend-head strong { font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; padding-right: 56px; }
+.mk-evidence { margin: 0; padding-top: 8px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+.mk-evidence + .mk-source { margin-top: -4px; }
+@media (max-width: 720px) {
+  .pm-title strong { font-size: 16px; }
+  .pm-zoom-note { bottom: 10px; right: 10px; }
+}

@@ -13,8 +13,8 @@ export function BrandButton({ href, children, variant = "primary" }: BrandButton
   const style: React.CSSProperties = {
     backgroundColor: isPrimary ? color.crimson : color.white,
     color: isPrimary ? color.white : color.ink,
-    border: isPrimary ? `1px solid ${color.crimson}` : `1px solid ${color.ink}`,
-    borderRadius: 999,
+    border: `1px solid ${color.ink}`,
+    borderRadius: 0,
     fontFamily: font.sans,
     fontSize: 14,
     fontWeight: 600,

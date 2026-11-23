@@ -2,25 +2,35 @@ import * as React from "react";
 import { Heading, Text } from "@react-email/components";
 import { Layout } from "./_components/Layout";
 import { color, font } from "./_components/tokens";
-import { BRAND_SHORT } from "@/lib/brand";
+import { COMPANY } from "@/lib/brand";
+
+// The automatic reply to anyone who sends the contact form.
+//
+// Rewritten 2026-11-18. It used to say "You're on the SPARC waitlist", that
+// spatial scientists were being onboarded in batches, that a seat would be
+// ready, and that build notes went out every other week. None of that is true
+// of the site today: the contact form is where someone asks for a flood and
+// heat report or asks a question, there is no waitlist, no seat and no
+// newsletter. An automatic email is a commitment made to each person who
+// writes in, so it says only what happens next: a person reads the message.
+//
+// The file and template keep the name "waitlist-confirmation" because the
+// route, the database table and the email registry use it. Do not add a
+// response time, a queue position or a promise of delivery here until someone
+// is accountable for meeting it (the same rule as on /contact).
 
 export interface WaitlistConfirmationProps {
   email: string;
+  /** No longer shown: there is no queue. Kept so existing callers type-check. */
   position?: number;
   ticket?: string;
 }
 
-export const subject = () => `You're on the ${BRAND_SHORT} waitlist`;
+export const subject = () => `${COMPANY}: we have your message`;
 
-export default function WaitlistConfirmation({
-  email,
-  position,
-  ticket,
-}: WaitlistConfirmationProps) {
+export default function WaitlistConfirmation({ email, ticket }: WaitlistConfirmationProps) {
   return (
-    <Layout
-      preview={`You're on the ${BRAND_SHORT} waitlist. We'll be in touch when your seat is ready.`}
-    >
+    <Layout preview={`${COMPANY} has your message. A person reads this inbox and will reply.`}>
       <Heading
         as="h1"
         style={{
@@ -31,19 +41,17 @@ export default function WaitlistConfirmation({
           color: color.ink,
         }}
       >
-        You&rsquo;re on the list.
+        We have your message.
       </Heading>
       <Text style={{ margin: "0 0 14px" }}>
-        Thanks for joining the {BRAND_SHORT} waitlist. We&rsquo;re onboarding
-        spatial scientists in batches as we expand sidecar capacity, and
-        we&rsquo;ll reach out at <strong>{email}</strong> when your seat is
-        ready.
+        Thank you for writing to {COMPANY}. One person reads this inbox, and we will reply to{" "}
+        <strong>{email}</strong>.
       </Text>
-      {typeof position === "number" ? (
-        <Text style={{ margin: "0 0 14px" }}>
-          You&rsquo;re currently <strong>#{position}</strong> in the queue.
-        </Text>
-      ) : null}
+      <Text style={{ margin: "0 0 14px" }}>
+        If you asked for a flood and heat report: the models are not on the site yet, so a report is run by
+        hand. We will tell you what we can and cannot model for the place before anything is agreed, and we
+        will ask for the property&rsquo;s address by email if we go ahead.
+      </Text>
       {ticket ? (
         <Text style={{ margin: "8px 0 14px", fontSize: 13, color: color.muted }}>
           Reference:{" "}
@@ -61,9 +69,7 @@ export default function WaitlistConfirmation({
         </Text>
       ) : null}
       <Text style={{ margin: "12px 0 0" }}>
-        In the meantime, we&rsquo;re sharing build notes and research updates
-        roughly every other week. If you have a specific use case in mind, just
-        reply to this email — it helps us prioritize.
+        You can reply to this email to add anything. If you did not send us a message, ignore this one.
       </Text>
     </Layout>
   );

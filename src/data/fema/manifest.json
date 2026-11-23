@@ -1,0 +1,27 @@
+{
+  "risk": {
+    "copied": "2026-11-17",
+    "source": "https://services.arcgis.com/XG15cJAlne2vxtgt/arcgis/rest/services/National_Risk_Index_Census_Tracts/FeatureServer/0",
+    "femaVersion": "December 2025",
+    "tracts": 85154,
+    "states": 56,
+    "unknownRatings": 0
+  },
+  "declarations": {
+    "copied": "2026-11-17",
+    "source": "https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries",
+    "femaLastRefresh": "2026-11-17T19:45:21.890Z",
+    "rowsRead": 70599,
+    "counties": 3324,
+    "states": 59
+  },
+  "claims": {
+    "copied": "2026-11-18",
+    "source": "https://www.fema.gov/api/open/v3/NfipClaims",
+    "femaLastRefresh": "2026-11-16T19:24:11.425Z",
+    "claimsRead": 2731064,
+    "claimsNotLocated": 137168,
+    "tractsWithClaims": 61593,
+    "states": 55
+  }
+}

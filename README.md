@@ -1,11 +1,43 @@
-# sparclabs.co — SPARC Labs marketing site & account portal
+# sparclabs.co — SPARC Labs
 
-Next.js 15 (App Router, TypeScript) site for **SPARC Labs** (_Spatial Research Labs_).
-Marketing pages, gated `/account/*` portal, Supabase auth, Lemon Squeezy billing.
+Next.js 16 (App Router, TypeScript) site for **SPARC Labs**. Environmental
+screening for home buyers: look up any US address and see the public record
+around it (flood zones, flood insurance claims, disaster declarations, storm
+tracks, sea level rise), free. The company's own flood and heat models are the
+paid part and are not on the site yet.
+
+The direction, what is built and what is not: [`docs/design/site-redesign-brief.md`](docs/design/site-redesign-brief.md).
+This is a first draft of the redesign. The gated `/account/*` portal, Supabase
+auth and Lemon Squeezy billing below are from the earlier site and unchanged.
+
+## Place pages
+
+- `/` is the search box. `POST /api/geocode` turns an address into a block
+  (coordinates rounded to three decimals) through the US Census Bureau's
+  geocoder. The address is not stored and never appears in a URL.
+- `/place/<lat>,<lon>` asks the public registers about that block from the
+  server ([`src/lib/place/`](src/lib/place)) and draws a map of public layers
+  ([`src/components/place/PlaceMap.tsx`](src/components/place/PlaceMap.tsx)).
+- A click on the map goes to `POST /api/inspect`, which reads the flood zone,
+  ground elevation, tree canopy and paving at that spot. Nothing is stored.
+- `/places` lists saved and recently viewed places and `/compare?p=…&p=…`
+  sets up to four side by side. Saved places live in the visitor's browser
+  ([`saved-places.ts`](src/components/place/saved-places.ts)); there is no
+  account behind them yet.
+- What comes next, and why: [`docs/design/roadmap.md`](docs/design/roadmap.md).
+- Claims, declarations and hazard ratings are read from the site's own copy
+  of FEMA's tables in `src/data/fema` (one file per state). `npm run data:fema`
+  rebuilds it; `.github/workflows/data-refresh.yml` does so monthly and opens a
+  pull request. `/data` shows what is copied, what is asked live, and the dates.
+- Storm tracks come from a committed file built from NOAA's HURDAT2:
+  `npm run data:hurricanes` rebuilds `src/data/hurricane-tracks.json` and its manifest.
+- The map library's worker is copied into `public/vendor/` before every `dev`
+  and `build` (`scripts/copy-map-worker.mjs`); that folder is git-ignored.
 
 ## Stack
 
-- **Next.js 15** (App Router · typed routes · server components by default)
+- **Next.js 16** (App Router · typed routes · server components by default)
+- **maplibre-gl 6** for the place map; public raster layers from USGS, FEMA, NOAA and MRLC
 - **Supabase** for auth (magic link + Google + Microsoft) and storage; Vault for BYOK secrets
 - **Lemon Squeezy** for billing (Pursue, Converge per-seat); Transcend = sales-assisted
 - **Plain CSS** with [`tokens.css`](src/styles/tokens.css) as the design source of truth
@@ -28,6 +60,8 @@ pnpm dev              # http://localhost:3000
 | `SUPABASE_SERVICE_ROLE_KEY` | Webhook + admin operations only — never exposed to the browser |
 | `LEMONSQUEEZY_API_KEY`, `LEMONSQUEEZY_STORE_ID` | Checkout creation |
 | `LEMONSQUEEZY_WEBHOOK_SECRET` | HMAC verification on `/api/lemonsqueezy/webhook` |
+| `CHECKOUT_ENABLED` | Switch house report checkout on (`true`) |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_REPORT` | The house report on Stripe: a card saved at order, charged with Stripe Tax when the report is delivered |
 | `LEMONSQUEEZY_VARIANT_PURSUE_{MONTHLY,YEARLY}` | Variant IDs for Pursue plan |
 | `LEMONSQUEEZY_VARIANT_CONVERGE_{MONTHLY,YEARLY}` | Variant IDs for Converge plan |
 | `RESEND_API_KEY`, `WAITLIST_NOTIFY_EMAIL` | Optional waitlist notifications |
@@ -51,10 +85,15 @@ to provision tables (`profiles`, `subscriptions`, `orders`, `seats`, `license_ke
 
 ## Billing flow
 
-1. User picks a plan on `/pricing` → `GET /api/checkout?tier=…&period=…`
-2. We create a Lemon Squeezy checkout with `custom_data.user_id`
-3. LS posts to `/api/lemonsqueezy/webhook` (HMAC-verified) and we upsert `subscriptions`
-4. User manages billing at `/account/subscription` → `/api/portal`
+The house report, bought once: [`docs/payments.md`](docs/payments.md). Off unless
+`CHECKOUT_ENABLED=true`. `/report/buy` → `POST /api/reports/order` → the provider's
+Stripe Checkout in setup mode (card saved, nothing charged) → `/api/stripe/webhook`
+(signature checked, applied once by `apply_payment_event`) → `scripts/report-order.ts
+deliver` (uploads the report, charges the saved card with Stripe Tax) → `/account/reports`
+(unlocks once paid; a failed card gets a pay button).
+
+The older subscription checkout (`/api/checkout`, Pursue/Converge, Lemon Squeezy)
+stays switched off. Lemon Squeezy stops processing payments on 31 March 2027.
 
 ## Account portal
 

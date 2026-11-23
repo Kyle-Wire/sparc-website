@@ -55,6 +55,7 @@ export function MobileNav({
         aria-modal="true"
         aria-label="Site menu"
         aria-hidden={!open}
+        inert={!open}
       >
         <div className="drawer-head">
           <span className="kicker">Menu</span>
@@ -92,14 +93,8 @@ export function MobileNav({
         <div className="drawer-divider" />
 
         <div className="drawer-cta">
-          <Link href="/contact" className="btn" onClick={close}>
-            Contact
-          </Link>
-          <Link href="/login" className="btn" onClick={close}>
-            Sign in
-          </Link>
-          <Link href="/signup" className="btn btn-primary" onClick={close}>
-            Request access →
+          <Link href="/start" className="btn btn-primary" onClick={close}>
+            Ask for a report →
           </Link>
         </div>
       </aside>

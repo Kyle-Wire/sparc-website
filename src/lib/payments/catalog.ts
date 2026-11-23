@@ -1,0 +1,151 @@
+/**
+ * What is for sale, in one place. /pricing, /report/buy, the order route, the
+ * account pages and the Terms all read this file, so a price or a promise is
+ * written once.
+ *
+ * PRICE: $149, Kyle's decision (pricing thread, 22 November 2026). The figure
+ * here must equal the report's Price in Stripe (STRIPE_PRICE_REPORT): the
+ * deliver step refuses to charge if they differ. The buyer is charged when the
+ * report is ready, plus sales tax (Kyle, 22 November 2026; migration 0008).
+ *
+ * Nothing in this file is shown to a visitor unless checkout is switched on
+ * (checkoutEnabled() below), and checkout is switched on only where Kyle sets
+ * CHECKOUT_ENABLED=true. The rule from 29 October 2026 still holds: no price,
+ * entitlement or buy button goes on a public page until every line can be
+ * held to in a contract and the Terms publish the billing and refund terms.
+ * The Terms' report section reads REPORT below, so the two cannot drift.
+ *
+ * 23 November 2026: ground movement came out of `includes`. Every ground
+ * reading in Climate Home Inspection is held (its evidence audit fails) and no
+ * place config enables the ground section, so the line was not true of any
+ * report that could be sold. The sample reports and /faq already said ground
+ * and wind are not in reports yet. Put the line back when the ground section
+ * ships in buyer reports.
+ */
+
+export type ProductId = "home-report";
+
+export interface Product {
+  id: ProductId;
+  name: string;
+  /** In US cents. */
+  priceCents: number;
+  currency: "USD";
+  /** One line under the name. */
+  tagline: string;
+  /** What the buyer gets. Each line must be true of every report sold. */
+  includes: string[];
+  /** What it is not. Shown beside the price, not in small print. */
+  isNot: string[];
+  /** Working days from order to the finished report; later, the buyer may cancel and pays nothing. */
+  deliveryDays: number;
+}
+
+export const REPORT: Product = {
+  id: "home-report",
+  name: "The house report",
+  priceCents: 14900,
+  currency: "USD",
+  tagline: "Flood and heat around one house and its streets, in our models, with the receipts. Bought once.",
+  includes: [
+    "Flood: our 1 m flood model run for the streets around the house in design storms and a past storm, showing where water reaches and how deep it stands beside the house in each storm modelled",
+    "Heat: modelled street air temperature around the house in a hot spell, afternoon and night, and modelled outdoor comfort (PET) in sun and in shade, with the satellite surface temperature of the block beside them",
+    "Every finding labelled with how much evidence stands behind it, the model's own error and where that was measured, and what to check at the house",
+    "A PDF in your account, yours to keep and share, with an atlas that opens with no internet, print-ready maps and the data files",
+    "Corrections free for as long as SPARC Labs exists, and 12 months of updates when a finding changes or a hazard is added for your place",
+  ],
+  isNot: [
+    "Not an engineering survey, a home inspection, an elevation certificate or a flood determination",
+    "Not a forecast: it shows what the models show in the storms and hot spells run, not what will happen",
+    "No dollar figures: no expected loss, no premiums, no payback",
+    "Model results are labelled exploratory unless they have been compared with a measurement at that place, and none has been yet",
+    "Nothing about the basement, the first floor or indoor temperature",
+    "No ground movement or wind yet: each joins the report only once it passes its checks, and the report says so on its first page",
+  ],
+  deliveryDays: 10,
+};
+
+export const PRODUCTS: Record<ProductId, Product> = { "home-report": REPORT };
+
+/** "$149" for whole dollars, "$149.50" otherwise. */
+export function formatPrice(cents: number, currency = "USD"): string {
+  const whole = cents % 100 === 0;
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+    minimumFractionDigits: whole ? 0 : 2,
+    maximumFractionDigits: whole ? 0 : 2,
+  }).format(cents / 100);
+}
+
+/**
+ * Self-serve checkout is off unless CHECKOUT_ENABLED is exactly "true".
+ * Set it in Vercel's Preview environment with the provider in test mode to try
+ * the flow; set it in Production only once Kyle has signed off the price,
+ * the Terms and a live store.
+ */
+export function checkoutEnabled(env: Record<string, string | undefined> = process.env): boolean {
+  return env.CHECKOUT_ENABLED === "true";
+}
+
+/**
+ * How the report is sold. Kyle, 22 November 2026: open by invitation first
+ * (a soft launch of 5 to 10 buyers, every report run by hand), then to anyone.
+ *
+ *   off     checkout is off (CHECKOUT_ENABLED is not "true"): nothing is sold.
+ *   invite  checkout is on, and only emails in ORDER_INVITE_EMAILS can order.
+ *           /pricing shows no price; /report/buy tells anyone else it is by
+ *           invitation. This is the default once checkout is on.
+ *   open    checkout is on and ORDERS_OPEN is "true": anyone signed in can order.
+ */
+export type SalesMode = "off" | "invite" | "open";
+
+export function salesMode(env: Record<string, string | undefined> = process.env): SalesMode {
+  if (!checkoutEnabled(env)) return "off";
+  return env.ORDERS_OPEN === "true" ? "open" : "invite";
+}
+
+/** The invited emails, lower-cased, from a comma- or whitespace-separated list. */
+export function invitedEmails(env: Record<string, string | undefined> = process.env): Set<string> {
+  return new Set(
+    (env.ORDER_INVITE_EMAILS ?? "")
+      .split(/[\s,;]+/)
+      .map((e) => e.trim().toLowerCase())
+      .filter((e) => e.includes("@")),
+  );
+}
+
+/** Whether this signed-in email may place an order now. */
+export function mayOrder(email: string | null | undefined, env: Record<string, string | undefined> = process.env): boolean {
+  const mode = salesMode(env);
+  if (mode === "off" || !email) return false;
+  if (mode === "open") return true;
+  return invitedEmails(env).has(email.trim().toLowerCase());
+}
+
+/**
+ * The sentence the buyer ticks on /report/buy, and the version of the terms
+ * they ticked it under. Both are saved with the order (migration 0009), so if
+ * a charge is ever disputed we can show what the buyer agreed to and when.
+ * Bump the version whenever this sentence, REPORT above or the Terms' report
+ * section changes. Form: the date of the change, plus "-draft" until a lawyer
+ * has read the Terms.
+ */
+export const AGREE_STATEMENT =
+  "I have read what the report is and is not. It is a screening report, not an engineering survey.";
+export const REPORT_TERMS_VERSION = "2026-11-23-draft";
+
+/**
+ * How many orders we take in any seven days, from ORDERS_WEEKLY_CAP. Unset or
+ * not a positive whole number means no cap. One person reads every report
+ * before it leaves (about two to three a week alongside other work,
+ * docs/report-ops.md), so after a storm in the news it is kinder to say "not
+ * this week" before a card is saved than to miss the promise after.
+ */
+export function weeklyCap(env: Record<string, string | undefined> = process.env): number | null {
+  const n = Number(env.ORDERS_WEEKLY_CAP);
+  return Number.isInteger(n) && n > 0 ? n : null;
+}
+
+/** The order states that count against the weekly cap: the ones we owe work on or have done. */
+export const CAP_STATUSES = ["card_saved", "in_progress", "charging", "payment_failed", "delivered", "refunded"] as const;

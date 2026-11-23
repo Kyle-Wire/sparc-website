@@ -45,7 +45,8 @@ export const REPORT: Product = {
     "Heat: modelled street air temperature around the house in a hot spell, afternoon and night, and modelled outdoor comfort (PET) in sun and in shade, with the satellite surface temperature of the block beside them",
     "Ground movement: whether the ground under the block moves toward or away from the satellite differently from the ground around it, from NASA's satellite radar product, where it covers the place",
     "Every finding labelled with how much evidence stands behind it, the model's own error and where that was measured, and what to check at the house",
-    "A PDF in your account, yours to keep and share",
+    "A PDF in your account, yours to keep and share, with an atlas that opens with no internet, print-ready maps and the data files",
+    "Corrections free for as long as SPARC Labs exists, and 12 months of updates when a finding changes or a hazard is added for your place",
   ],
   isNot: [
     "Not an engineering survey, a home inspection, an elevation certificate or a flood determination",

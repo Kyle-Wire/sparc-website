@@ -58,7 +58,7 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
     return (
       <div className="card" style={{ padding: 28, textAlign: "center" }}>
         <div className="kicker" style={{ justifyContent: "center" }}>confirm your email</div>
-        <h3 style={{ fontSize: 22, fontWeight: 700, margin: "12px 0 8px" }}>Check your inbox.</h3>
+        <h2 style={{ fontSize: 22, fontWeight: 700, margin: "12px 0 8px" }}>Check your inbox.</h2>
         <p style={{ color: "var(--ink-2)", fontSize: 14, lineHeight: 1.55, margin: 0 }}>
           We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then sign in.
         </p>
@@ -69,14 +69,14 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
   return (
     <div className="card" style={{ padding: 28 }}>
       <div className="kicker">{mode === "signup" ? "create your account" : "sign in"}</div>
-      <h3 style={{ fontSize: 20, fontWeight: 700, margin: "10px 0 16px" }}>
+      <h2 style={{ fontSize: 20, fontWeight: 700, margin: "10px 0 16px" }}>
         {mode === "signup" ? "Make an account for your reports" : "Welcome back"}
-      </h3>
+      </h2>
       <form onSubmit={submit}>
         {mode === "signup" && (
           <>
-            <label className="label">Your name (optional)</label>
-            <input
+            <label className="label" htmlFor="lg-your-name-optional">Your name (optional)</label>
+            <input id="lg-your-name-optional"
               className="input"
               type="text"
               value={fullName}
@@ -84,11 +84,11 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
               autoComplete="name"
               maxLength={200}
             />
-            <label className="label" style={{ marginTop: 12 }}>Email</label>
+            <label className="label" htmlFor="lg-email" style={{ marginTop: 12 }}>Email</label>
           </>
         )}
-        {mode === "signin" && <label className="label">Email</label>}
-        <input
+        {mode === "signin" && <label className="label" htmlFor="lg-email">Email</label>}
+        <input id="lg-email"
           className="input"
           type="email"
           required
@@ -97,8 +97,8 @@ export function LoginForm({ mode }: { mode: "signin" | "signup" }) {
           placeholder="you@example.com"
           autoComplete="email"
         />
-        <label className="label" style={{ marginTop: 12 }}>Password</label>
-        <input
+        <label className="label" htmlFor="lg-password" style={{ marginTop: 12 }}>Password</label>
+        <input id="lg-password"
           className="input"
           type="password"
           required

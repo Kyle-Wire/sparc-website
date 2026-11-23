@@ -43,18 +43,18 @@ export function ApiKeysClient({ initial }: { initial: ApiKeyRow[] }) {
         <div className="kicker">add a key</div>
         <div className="api-key-form" style={{ display: "grid", gridTemplateColumns: "160px 1fr 1fr auto", gap: 8, marginTop: 12, alignItems: "flex-end" }}>
           <div>
-            <label className="label">Provider</label>
-            <select className="input" value={provider} onChange={(e) => setProvider(e.target.value as typeof PROVIDERS[number])}>
+            <label className="label" htmlFor="ak-provider">Provider</label>
+            <select id="ak-provider" className="input" value={provider} onChange={(e) => setProvider(e.target.value as typeof PROVIDERS[number])}>
               {PROVIDERS.map((p) => <option key={p}>{p}</option>)}
             </select>
           </div>
           <div>
-            <label className="label">Label</label>
-            <input className="input" value={label} onChange={(e) => setLabel(e.target.value)} required />
+            <label className="label" htmlFor="ak-label">Label</label>
+            <input id="ak-label" className="input" value={label} onChange={(e) => setLabel(e.target.value)} required />
           </div>
           <div>
-            <label className="label">API key</label>
-            <input className="input mono" type="password" value={secret} onChange={(e) => setSecret(e.target.value)} required placeholder="sk-…" autoComplete="off" />
+            <label className="label" htmlFor="ak-api-key">API key</label>
+            <input id="ak-api-key" className="input mono" type="password" value={secret} onChange={(e) => setSecret(e.target.value)} required placeholder="sk-…" autoComplete="off" />
           </div>
           <button type="submit" className="btn btn-accent" disabled={busy}>{busy ? "Saving…" : "Save key"}</button>
         </div>

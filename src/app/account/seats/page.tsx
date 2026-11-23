@@ -33,8 +33,8 @@ export default async function SeatsPage() {
         <div className="kicker">invite teammate</div>
         <div className="row" style={{ marginTop: 12, gap: 8, alignItems: "flex-end" }}>
           <div style={{ flex: 1 }}>
-            <label className="label">Email</label>
-            <input className="input" type="email" name="email" required placeholder="teammate@university.edu" />
+            <label className="label" htmlFor="st-email">Email</label>
+            <input id="st-email" className="input" type="email" name="email" required placeholder="teammate@university.edu" />
           </div>
           <button type="submit" className="btn btn-accent" disabled={max === 0}>Send invite</button>
         </div>

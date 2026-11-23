@@ -17,6 +17,7 @@ export default function PlaceLoading() {
   return (
     <>
       <Nav active="home" />
+      <main id="main">
       <section className="place-head">
         <div className="wrap">
           <Kicker dot dotColor="var(--flood)">on the public record</Kicker>
@@ -32,6 +33,7 @@ export default function PlaceLoading() {
           </ul>
         </div>
       </section>
+      </main>
       <Footer />
     </>
   );

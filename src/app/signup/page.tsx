@@ -16,6 +16,7 @@ export default async function SignupPage({ searchParams }: Props) {
   return (
     <>
       <Nav />
+      <main id="main">
       <PageHero
         kicker="create account"
         title="Create an account."
@@ -32,6 +33,7 @@ export default async function SignupPage({ searchParams }: Props) {
           </p>
         </div>
       </Section>
+      </main>
       <Footer />
     </>
   );

@@ -24,6 +24,7 @@ export default async function StartPage({ searchParams }: Props) {
   return (
     <>
       <Nav active="models" />
+      <main id="main">
       <PageHero
         kicker={checkoutEnabled() ? "the models · paid" : "the models · paid · not on sale yet"}
         title="Get a report, or run the models yourself."
@@ -33,6 +34,7 @@ export default async function StartPage({ searchParams }: Props) {
       <div className="wrap-narrow" style={{ padding: "40px var(--wrap-pad) 72px" }}>
         <Journey slug={slug} initialHazards={hazards} reportOnSale={checkoutEnabled()} />
       </div>
+      </main>
       <Footer />
     </>
   );

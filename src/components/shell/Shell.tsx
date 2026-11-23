@@ -37,6 +37,7 @@ function LogoLockup({ height = 56 }: { height?: number }) {
 export function Nav({ active }: { active?: NavKey }) {
   return (
     <header className="nav">
+      <a className="skip-link" href="#main">Skip to content</a>
       <div className="nav-inner">
         <Link className="nav-logo" href="/" aria-label={`${COMPANY} — home`}>
           <span className="hide-mobile"><LogoLockup height={56} /></span>
@@ -66,7 +67,7 @@ export function Nav({ active }: { active?: NavKey }) {
 
 export function Footer() {
   return (
-    <footer>
+    <footer aria-label="Site footer">
       <div className="wrap">
         <div className="foot-grid">
           <div>
@@ -77,7 +78,7 @@ export function Footer() {
             <p className="foot-tag" style={{ marginTop: 10 }}>A screening tool. Not for engineering decisions.</p>
           </div>
           <div>
-            <h6>The site</h6>
+            <h2 className="foot-h">The site</h2>
             <Link href="/">Look up a place</Link>
             <Link href="/how-it-works">How it works</Link>
             <Link href="/places">Your places</Link>
@@ -89,13 +90,13 @@ export function Footer() {
             <Link href="/faq">Questions</Link>
           </div>
           <div>
-            <h6>Company</h6>
+            <h2 className="foot-h">Company</h2>
             <Link href="/about">About</Link>
             <Link href="/about#principles">Principles</Link>
             <Link href="/contact">Contact</Link>
           </div>
           <div>
-            <h6>Legal</h6>
+            <h2 className="foot-h">Legal</h2>
             <Link href="/privacy">Privacy</Link>
             <Link href={{ pathname: "/privacy", hash: "cookies" }}>Cookies</Link>
             <Link href="/terms">Terms</Link>

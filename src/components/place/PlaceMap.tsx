@@ -741,10 +741,10 @@ export function PlaceMap({
         </p>
       </div>
 
-      <aside className="place-side">
+      <section className="place-side" aria-label="About this place">
         {aside}
         <SpotPanel state={spot} onCentre={readCentre} layerReading={clickReading} />
-      </aside>
+      </section>
     </div>
   );
 }

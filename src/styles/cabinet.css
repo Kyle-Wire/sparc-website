@@ -161,7 +161,7 @@ body { overflow-x: clip; }
 /* ---------- the labels ---------- */
 
 .kicker, .label, .pill, .shelf-state, .glance-item dt, .spot-row dt,
-.foot-grid h6, .foot-bottom, .plain-table th, .map-legend > summary,
+.foot-grid h6, .foot-grid .foot-h, .foot-bottom, .plain-table th, .map-legend > summary,
 .dl dt, h6, .paid-strip-name, .step-no {
   font-family: var(--font-pixel);
   font-size: var(--fs-pixel);

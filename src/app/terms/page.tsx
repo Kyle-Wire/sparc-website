@@ -14,6 +14,7 @@ export default function TermsPage() {
   return (
     <>
       <Nav />
+      <main id="main">
       <PageHero kicker="terms · honest" title="Terms of Service." accent="var(--crimson)" />
       <Section>
         <article style={{ maxWidth: 760, margin: "0 auto", display: "grid", gap: 18, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
@@ -64,6 +65,7 @@ export default function TermsPage() {
           <p style={{ fontSize: 13, color: "var(--muted)" }}>© {COPYRIGHT_YEAR} {COMPANY_LEGAL} · {OFFICE_FULL}</p>
         </article>
       </Section>
+      </main>
       <Footer />
     </>
   );

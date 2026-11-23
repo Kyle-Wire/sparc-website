@@ -135,6 +135,7 @@ export default function WorkspacePage() {
   return (
     <>
       <Nav active="models" />
+      <main id="main">
       <PageHero
         kicker="preview · nothing runs here yet"
         title="The workspace a subscriber would use."
@@ -190,6 +191,8 @@ export default function WorkspacePage() {
           </div>
         </div>
       </section>
+
+      </main>
 
       <Footer />
     </>

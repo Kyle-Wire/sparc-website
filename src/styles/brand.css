@@ -35,10 +35,10 @@
   padding: 5px 8px; border: 1px solid currentColor; border-radius: 2px;
   color: var(--ink); background: transparent; white-space: nowrap;
 }
-.stamp[data-tone="accent"] { color: var(--accent); }
+.stamp[data-tone="accent"] { color: var(--crimson-ink); }
 .stamp[data-tone="muted"] { color: var(--muted); }
 .stamp[data-tone="flood"] { color: var(--flood); }
-.stamp[data-tone="heat"] { color: var(--heat); }
+.stamp[data-tone="heat"] { color: var(--crimson-ink); }
 .stamp[data-tone="ground"] { color: var(--ground); }
 .stamp[data-tone="wind"] { color: var(--wind); }
 .ink-band .stamp { color: var(--ban-ink); }

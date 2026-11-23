@@ -60,6 +60,7 @@ export default async function BuyReportPage({ searchParams }: Props) {
   return (
     <>
       <Nav active="pricing" />
+      <main id="main">
       <PageHero
         kicker={onSale ? "the house report · bought once" : "the house report · not on sale yet"}
         title={onSale ? "Order the house report." : "The house report is not on sale yet."}
@@ -214,6 +215,7 @@ export default async function BuyReportPage({ searchParams }: Props) {
           </div>
         )}
       </div>
+      </main>
       <Footer />
     </>
   );

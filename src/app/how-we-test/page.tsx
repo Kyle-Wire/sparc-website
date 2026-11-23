@@ -92,6 +92,7 @@ export default function HowWeTestPage() {
   return (
     <>
       <Nav />
+      <main id="main">
       <PageHero kicker={`${PLAIN.kicker} · run of ${TEST_RUN_DATE}`} title={PLAIN.title} lead={PLAIN.lead} accent="var(--wind)" />
 
       <Section kicker="three kinds of test" title="What each kind of test can and can't tell you.">
@@ -195,6 +196,8 @@ export default function HowWeTestPage() {
           <strong>A screening tool.</strong> Not an engineering study, and not for engineering decisions.
         </p>
       </Section>
+
+      </main>
 
       <Footer />
     </>

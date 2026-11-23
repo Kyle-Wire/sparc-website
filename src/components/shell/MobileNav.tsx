@@ -55,6 +55,7 @@ export function MobileNav({
         aria-modal="true"
         aria-label="Site menu"
         aria-hidden={!open}
+        inert={!open}
       >
         <div className="drawer-head">
           <span className="kicker">Menu</span>

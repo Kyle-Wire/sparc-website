@@ -51,6 +51,7 @@ export default function AboutPage() {
   return (
     <>
       <Nav active="about" />
+      <main id="main">
       <PageHero
         kicker={`about · ${COMPANY.toLowerCase()}`}
         title="Making planning available to everyone."
@@ -120,6 +121,8 @@ export default function AboutPage() {
           {COMPANY_LEGAL} · {OFFICE_FULL}
         </p>
       </Section>
+
+      </main>
 
       <Footer />
     </>

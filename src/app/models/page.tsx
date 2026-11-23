@@ -32,6 +32,7 @@ export default function ModelsPage() {
   return (
     <>
       <Nav active="models" />
+      <main id="main">
       <PageHero
         kicker="the models · paid · not on sale yet"
         title="What the public record can’t tell you."
@@ -156,6 +157,8 @@ export default function ModelsPage() {
           <Link href="/" className="btn">Look up the public record</Link>
         </div>
       </Section>
+
+      </main>
 
       <Footer />
     </>

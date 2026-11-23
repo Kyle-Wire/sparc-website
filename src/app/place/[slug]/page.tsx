@@ -380,6 +380,7 @@ export default async function PlacePage({ params }: Props) {
   return (
     <>
       <Nav active="home" />
+      <main id="main">
 
       <section className="place-head">
         <div className="wrap">
@@ -722,6 +723,8 @@ export default async function PlacePage({ params }: Props) {
           </p>
         </div>
       </section>
+
+      </main>
 
       <Footer />
     </>

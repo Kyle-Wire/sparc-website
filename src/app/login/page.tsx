@@ -16,6 +16,7 @@ export default async function LoginPage({ searchParams }: Props) {
   return (
     <>
       <Nav />
+      <main id="main">
       {/*
         The lead previously read "Sign in to manage your subscription, seats, license
         keys, and downloads." All four of those are things that do not exist: nothing
@@ -41,6 +42,7 @@ export default async function LoginPage({ searchParams }: Props) {
           </p>
         </div>
       </Section>
+      </main>
       <Footer />
     </>
   );

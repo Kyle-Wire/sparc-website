@@ -61,6 +61,7 @@ export default function HowItWorksPage() {
   return (
     <>
       <Nav active="how" />
+      <main id="main">
 
       <section className="hiw-hero" id="search">
         <div className="wrap hiw-hero-grid">
@@ -247,6 +248,8 @@ export default function HowItWorksPage() {
           </div>
         </div>
       </section>
+
+      </main>
 
       <Footer />
     </>

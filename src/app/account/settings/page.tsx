@@ -14,10 +14,10 @@ export default async function SettingsPage() {
         <div className="kicker">profile</div>
         <h2 style={{ fontSize: 22, fontWeight: 700, margin: "8px 0 16px" }}>Display name</h2>
         <div className="grid-2" style={{ gap: 12 }}>
-          <div><label className="label">Email</label><input className="input mono" value={user.email ?? ""} readOnly /></div>
-          <div><label className="label">Full name</label><input className="input" name="full_name" defaultValue={user.user_metadata?.full_name ?? ""} placeholder="Naomi Schaal" /></div>
-          <div><label className="label">Profession</label>
-            <select className="input" name="profession" defaultValue={user.user_metadata?.profession ?? ""}>
+          <div><label className="label" htmlFor="ac-email">Email</label><input id="ac-email" className="input mono" value={user.email ?? ""} readOnly /></div>
+          <div><label className="label" htmlFor="ac-full-name">Full name</label><input id="ac-full-name" className="input" name="full_name" defaultValue={user.user_metadata?.full_name ?? ""} placeholder="Naomi Schaal" /></div>
+          <div><label className="label" htmlFor="ac-profession">Profession</label>
+            <select id="ac-profession" className="input" name="profession" defaultValue={user.user_metadata?.profession ?? ""}>
               <option value="">Select one…</option>
               <option>Researcher / Faculty</option>
               <option>Graduate student</option>
@@ -28,7 +28,7 @@ export default async function SettingsPage() {
               <option>Other</option>
             </select>
           </div>
-          <div><label className="label">Organization</label><input className="input" name="organization" defaultValue={user.user_metadata?.organization ?? ""} placeholder="UC Berkeley · Geography" /></div>
+          <div><label className="label" htmlFor="ac-organization">Organization</label><input id="ac-organization" className="input" name="organization" defaultValue={user.user_metadata?.organization ?? ""} placeholder="UC Berkeley · Geography" /></div>
         </div>
         <div className="row" style={{ marginTop: 16, justifyContent: "flex-end" }}><button type="submit" className="btn btn-primary">Save</button></div>
       </form>

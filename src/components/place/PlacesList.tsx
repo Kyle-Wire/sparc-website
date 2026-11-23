@@ -32,7 +32,7 @@ export function PlacesList() {
     <>
       {saved.length === 0 ? (
         <div className="card dashed" style={{ padding: 28, maxWidth: 720 }}>
-          <h3 style={{ margin: "0 0 8px" }}>Nothing saved yet.</h3>
+          <h2 style={{ margin: "0 0 8px", fontSize: 20 }}>Nothing saved yet.</h2>
           <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6, margin: "0 0 16px" }}>
             Look up an address and press <strong>Save this place</strong>. It will be kept here, in this
             browser, with your note and a snapshot of what the record said that day.

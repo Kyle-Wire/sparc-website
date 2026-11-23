@@ -232,6 +232,9 @@ export default function SampleReportPage() {
           <Link href="/faq" className="btn">
             Questions
           </Link>
+          <Link href="/next-steps" className="btn">
+            If a report has hard news
+          </Link>
           <Link href="/models" className="btn">
             The models behind it
           </Link>

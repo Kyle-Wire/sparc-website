@@ -162,6 +162,16 @@ export default function FaqPage() {
       ),
     },
     {
+      q: "What if the report shows water at the house?",
+      a: (
+        <p>
+          Read the label on the finding first, then take the report&apos;s questions to the people who can check the
+          house: your inspector, an engineer, an insurance agent. We will not tell you whether to buy.{" "}
+          <Link href="/next-steps">What to do next, step by step</Link>.
+        </p>
+      ),
+    },
+    {
       q: "What if I change my mind?",
       a: onSale ? (
         <p>

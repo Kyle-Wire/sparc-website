@@ -917,3 +917,12 @@ div.place-layer { grid-template-columns: 1fr; cursor: default; }
 @media (max-width: 640px) {
   .map-legend { position: static; width: auto; max-height: none; margin: 12px 16px 0; box-shadow: none; }
 }
+
+/* /next-steps: who to ask, numbered. */
+.next-who { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.next-who > li { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 16px; padding: 22px 0; border-bottom: 1px solid var(--hairline); }
+.next-n { font-size: 13px; font-weight: 700; color: var(--flood); padding-top: 4px; }
+.next-who h3 { margin: 0 0 4px; font-size: 19px; }
+.next-when { margin: 0 0 10px; font-size: 14px; color: var(--muted); }
+.next-who ul { margin: 0; padding-left: 18px; font-size: 15px; line-height: 1.65; color: var(--ink-2); max-width: 760px; }
+.next-who ul li { margin-bottom: 6px; }

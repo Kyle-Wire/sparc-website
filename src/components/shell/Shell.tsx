@@ -87,6 +87,7 @@ export function Footer() {
             <Link href="/how-we-test">How we test</Link>
             <Link href="/pricing">Pricing</Link>
             <Link href="/faq">Questions</Link>
+            <Link href="/next-steps">After your report</Link>
           </div>
           <div>
             <h6>Company</h6>

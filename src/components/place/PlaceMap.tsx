@@ -6,6 +6,10 @@ import type { Map as MlMap, Marker, GeoJSONSource, StyleSpecification } from "ma
 import type { LatLon } from "@/lib/place/coords";
 import { recallPoint, type PlacePoint } from "./place-point";
 import { FAULT_SEARCH_KM, SLIDE_RADIUS_KM, perYear } from "@/lib/place/readings";
+import { HAZARD_WORDS, LAYERS, layerInfo, type Hazard, type LayerKey } from "@/lib/map-legends";
+import { readPixel, type Reading } from "@/lib/map-reading";
+import { MapLegend } from "@/components/map/MapLegend";
+import { samplePixel } from "@/components/map/tile-sampler";
 
 /**
  * The neighbourhood map: the place at the centre, public layers on top, and
@@ -163,15 +167,6 @@ export interface TrackLine {
   lines: [number, number][][];
 }
 
-type Slr = "off" | "slr1" | "slr3" | "slr6";
-
-const SLR_OPTIONS: { value: Slr; label: string }[] = [
-  { value: "off", label: "Off" },
-  { value: "slr1", label: "1 ft" },
-  { value: "slr3", label: "3 ft" },
-  { value: "slr6", label: "6 ft" },
-];
-
 /* ---- what /api/inspect returns ---- */
 type Item<T> = { value: T } | { error: string };
 export interface Spot {
@@ -309,28 +304,82 @@ export function SpotList({ spot }: { spot: Spot }) {
   );
 }
 
-function SpotPanel({ state, onCentre }: { state: SpotState; onCentre: () => void }) {
+function SpotPanel({ state, onCentre, layerReading }: { state: SpotState; onCentre: () => void; layerReading: { title: string; text: string } | null }) {
   return (
     <section className="spot-panel" aria-live="polite">
-      <div className="kicker">at this spot</div>
+      <div className="kicker">at this spot · free</div>
       {state.status === "idle" && (
         <p className="spot-hint">
-          <strong>Click anywhere on the map</strong> to read the flood zone, the ground&apos;s height, the tree
-          canopy and the paving at that spot.
+          <strong>Click or tap the map</strong> to read the flood zone, ground height, tree canopy, paving, soil and
+          nearby faults at that spot, from the agencies that keep them.
+        </p>
+      )}
+      {state.status !== "idle" && layerReading && (
+        <p className="spot-layer">
+          <span>{layerReading.title}, read from the map</span>
+          {layerReading.text}
         </p>
       )}
       {state.status === "loading" && <p className="spot-hint">Asking FEMA, USGS, the soil survey and the land cover survey…</p>}
       {state.status === "failed" && <p className="spot-hint">{state.reason}</p>}
-      {state.status === "done" && (
-        <SpotList spot={state.spot} />
-      )}
+      {state.status === "done" && <SpotList spot={state.spot} />}
       <div className="spot-foot">
         <button type="button" className="btn btn-sm" onClick={onCentre}>
           Read the middle of this place
         </button>
-        <small>Read from public sources as published. The spot you click is not stored.</small>
+        <small>Public sources, as published. They describe the area, not a house. The spot you click is not stored.</small>
       </div>
     </section>
+  );
+}
+
+type Shown = LayerKey | "none";
+const SLR_FEET = [1, 3, 6] as const;
+type SlrFeet = (typeof SLR_FEET)[number];
+const HAZARD_ORDER: Hazard[] = ["flood", "heat", "ground", "storm"];
+
+/** Which map source draws each layer key. */
+function sourceOf(key: LayerKey, slrFeet: SlrFeet): RasterDef | null {
+  if (key === "tracks") return null;
+  if (key === "slr") return RASTERS.find((r) => r.id === `slr${slrFeet}`) ?? null;
+  return RASTERS.find((r) => r.id === key) ?? null;
+}
+
+interface Hover {
+  x: number;
+  y: number;
+  text: string;
+  index?: number;
+  exact: boolean;
+}
+
+/** The layer picker: one layer at a time, grouped by hazard, so the colour on
+ *  the map always has exactly one key. */
+function LayerChips({ shown, onShow, tracks }: { shown: Shown; onShow: (s: Shown) => void; tracks: number }) {
+  return (
+    <div className="pm-chips" role="radiogroup" aria-label="Map layer">
+      {HAZARD_ORDER.map((h) => (
+        <div key={h} className="pm-chip-group">
+          <span className="pm-chip-hazard" data-hazard={h}>
+            {HAZARD_WORDS[h]}
+          </span>
+          {LAYERS.filter((l) => l.hazard === h).map((l) => (
+            <button
+              key={l.key}
+              type="button"
+              role="radio"
+              aria-checked={shown === l.key}
+              className="pm-chip"
+              disabled={l.key === "tracks" && tracks === 0}
+              title={l.key === "tracks" && tracks === 0 ? "NOAA's record has no storm track near this place" : l.what}
+              onClick={() => onShow(shown === l.key ? "none" : l.key)}
+            >
+              {l.chip}
+            </button>
+          ))}
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -350,38 +399,64 @@ export function PlaceMap({
   const mapRef = useRef<MlMap | null>(null);
   const pinRef = useRef<Marker | null>(null);
   const askRef = useRef(0);
+  const hoverRef = useRef(0);
   const centreRef = useRef<LatLon>(place);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [mine, setMine] = useState<PlacePoint | null>(null);
   const [spot, setSpot] = useState<SpotState>({ status: "idle" });
+  const [zoom, setZoom] = useState(NEAR_ZOOM);
 
-  const [fema, setFema] = useState(true);
-  const [slr, setSlr] = useState<Slr>("off");
-  const [canopy, setCanopy] = useState(false);
-  const [paving, setPaving] = useState(false);
-  const [showTracks, setShowTracks] = useState(false);
-  const [landslide, setLandslide] = useState(false);
-  const [faults, setFaults] = useState(false);
+  const [shown, setShown] = useState<Shown>("fema");
+  const [slrFeet, setSlrFeet] = useState<SlrFeet>(3);
+  const [hover, setHover] = useState<Hover | null>(null);
+  const [clickReading, setClickReading] = useState<{ title: string; text: string; index?: number } | null>(null);
+  const shownRef = useRef<{ shown: Shown; slrFeet: SlrFeet }>({ shown, slrFeet });
+  useEffect(() => {
+    shownRef.current = { shown, slrFeet };
+  }, [shown, slrFeet]);
+
+  const info = shown === "none" ? null : layerInfo(shown);
+
+  /** Name the legend class under a point, from the publisher's tile. */
+  const readLayer = useCallback(async (lon: number, lat: number, z: number): Promise<Reading | null | undefined> => {
+    const { shown: s, slrFeet: ft } = shownRef.current;
+    if (s === "none" || !layerInfo(s).hoverable) return undefined;
+    const src = sourceOf(s, ft);
+    if (!src || (src.minzoom && z < src.minzoom - 0.5)) return undefined;
+    const px = await samplePixel(src, lon, lat, z);
+    return px ? readPixel(s, px, { slrFeet: ft }) : null;
+  }, []);
 
   /** Ask the server about one spot. Only the newest question's answer is shown. */
-  const inspect = useCallback(async (p: LatLon) => {
-    const asked = ++askRef.current;
-    setSpot({ status: "loading" });
-    try {
-      const res = await fetch("/api/inspect", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(p),
-      });
-      const body = (await res.json()) as Spot & { error?: string };
-      if (asked !== askRef.current) return;
-      if (!res.ok) setSpot({ status: "failed", reason: body.error ?? "That spot could not be read. Try again." });
-      else setSpot({ status: "done", spot: body });
-    } catch {
-      if (asked === askRef.current) setSpot({ status: "failed", reason: "That spot could not be read. Check your connection." });
-    }
-  }, []);
+  const inspect = useCallback(
+    async (p: LatLon) => {
+      const asked = ++askRef.current;
+      setSpot({ status: "loading" });
+      setClickReading(null);
+      const map = mapRef.current;
+      const { shown: s } = shownRef.current;
+      if (map && s !== "none") {
+        void readLayer(p.lon, p.lat, map.getZoom()).then((r) => {
+          if (asked === askRef.current && r && shownRef.current.shown === s) setClickReading({ title: layerInfo(s).title, text: r.text, index: r.index });
+        });
+      }
+      try {
+        const res = await fetch("/api/inspect", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(p),
+        });
+        const body = (await res.json()) as Spot & { error?: string };
+        if (asked !== askRef.current) return;
+        if (!res.ok) setSpot({ status: "failed", reason: body.error ?? "That spot could not be read. Try again." });
+        else setSpot({ status: "done", spot: body });
+      } catch {
+        if (asked === askRef.current) setSpot({ status: "failed", reason: "That spot could not be read. Check your connection." });
+      }
+    },
+    [readLayer],
+  );
 
   useEffect(() => {
     let dead = false;
@@ -415,7 +490,8 @@ export function PlaceMap({
         });
         mapRef.current = map;
         map.addControl(new maplibre.NavigationControl({ showCompass: false }), "top-right");
-        map.addControl(new maplibre.ScaleControl({ unit: "imperial" }), "bottom-left");
+        map.addControl(new maplibre.ScaleControl({ unit: "imperial" }), "bottom-right");
+        map.on("zoomend", () => map && setZoom(map.getZoom()));
 
         const pinEl = document.createElement("div");
         pinEl.className = "place-map-pin";
@@ -429,6 +505,34 @@ export function PlaceMap({
           pin.setLngLat([p.lon, p.lat]).addTo(map);
           void inspect(p);
         });
+
+        // Hover: name the legend class under the cursor, read from the
+        // publisher's own tile (src/lib/map-reading.ts). Mouse only; a touch
+        // screen gets the same reading on tap, in the panel.
+        if (!needsTwoFingers()) {
+          let timer: ReturnType<typeof setTimeout> | null = null;
+          map.on("mousemove", (e) => {
+            const { x, y } = e.point;
+            const at = e.lngLat;
+            if (timer) clearTimeout(timer);
+            setHover((h) => (h ? { ...h, x, y } : h));
+            timer = setTimeout(async () => {
+              if (!map) return;
+              const id = ++hoverRef.current;
+              const r = await readLayer(at.lng, at.lat, map.getZoom());
+              if (id !== hoverRef.current) return;
+              if (r === undefined) setHover({ x, y, text: "Click to read the records here", exact: false });
+              else if (r === null) setHover({ x, y, text: "Click to read the record here", exact: false });
+              else setHover({ x, y, text: r.text, index: r.index, exact: true });
+            }, 70);
+          });
+          map.on("mouseout", () => {
+            if (timer) clearTimeout(timer);
+            hoverRef.current++;
+            setHover(null);
+          });
+          map.on("movestart", () => setHover(null));
+        }
 
         map.on("load", () => {
           if (dead || !map) return;
@@ -462,11 +566,18 @@ export function PlaceMap({
             },
           });
           map.addLayer({
+            id: "tracks-halo",
+            type: "line",
+            source: "tracks",
+            layout: { visibility: "none", "line-join": "round", "line-cap": "round" },
+            paint: { "line-color": PAPER, "line-width": 3.5, "line-opacity": 0.7 },
+          });
+          map.addLayer({
             id: "tracks",
             type: "line",
             source: "tracks",
             layout: { visibility: "none", "line-join": "round", "line-cap": "round" },
-            paint: { "line-color": INK, "line-width": 1.2, "line-opacity": 0.55 },
+            paint: { "line-color": INK, "line-width": 1.4, "line-opacity": 0.85 },
           });
 
           map.addSource("ring", { type: "geojson", data: ring(centre, RING_METRES) });
@@ -489,6 +600,8 @@ export function PlaceMap({
             el.setAttribute("aria-hidden", "true");
             new maplibre.Marker({ element: el }).setLngLat([point.lon, point.lat]).addTo(map);
           }
+          // The credits fold to an (i): the legend names each layer's source.
+          box.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show");
           setReady(true);
         });
 
@@ -514,23 +627,27 @@ export function PlaceMap({
     const map = mapRef.current;
     if (!ready || !map) return;
     const show = (id: string, on: boolean) => map.setLayoutProperty(id, "visibility", on ? "visible" : "none");
-    show("fema", fema);
-    show("canopy", canopy);
-    show("paving", paving);
-    show("slr1", slr === "slr1");
-    show("slr3", slr === "slr3");
-    show("slr6", slr === "slr6");
-    show("tracks", showTracks);
-    show("landslide", landslide);
-    show("faults", faults);
-  }, [ready, fema, canopy, paving, slr, showTracks, landslide, faults]);
+    show("fema", shown === "fema");
+    show("canopy", shown === "canopy");
+    show("paving", shown === "paving");
+    for (const ft of SLR_FEET) show(`slr${ft}`, shown === "slr" && slrFeet === ft);
+    show("tracks", shown === "tracks");
+    show("tracks-halo", shown === "tracks");
+    show("landslide", shown === "landslide");
+    show("faults", shown === "faults");
+    setHover(null);
+    setClickReading(null);
+  }, [ready, shown, slrFeet]);
 
   // Storm tracks are a regional picture; the other layers are a neighbourhood one.
+  const wasTracks = useRef(false);
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
-    map.easeTo({ zoom: showTracks ? TRACK_ZOOM : NEAR_ZOOM, duration: 600 });
-  }, [ready, showTracks]);
+    const isTracks = shown === "tracks";
+    if (isTracks !== wasTracks.current) map.easeTo({ zoom: isTracks ? TRACK_ZOOM : NEAR_ZOOM, center: [centreRef.current.lon, centreRef.current.lat], duration: 600 });
+    wasTracks.current = isTracks;
+  }, [ready, shown]);
 
   // Keep the ring on the exact point when there is one.
   useEffect(() => {
@@ -546,100 +663,87 @@ export function PlaceMap({
     void inspect(c);
   }, [inspect]);
 
+  const tooFar = info?.minZoom !== undefined && zoom < info.minZoom;
+
   return (
     <div className="place-map-wrap">
-      <div className="place-map-frame">
-        <div ref={boxRef} className="place-map" role="region" aria-label="Map of the neighbourhood with public map layers. Click a spot to read what is on record there." />
-        {failed && (
-          <p className="place-map-failed">
-            The map could not start in this browser. The records below do not depend on it.
-          </p>
-        )}
+      <div className="pm-col">
+        <LayerChips shown={shown} onShow={setShown} tracks={tracks.length} />
+        <div className="place-map-frame">
+          <div
+            ref={boxRef}
+            className="place-map"
+            role="region"
+            aria-label="Map of the neighbourhood with public map layers. Click a spot to read what is on record there."
+          />
+          {failed && (
+            <p className="place-map-failed">The map could not start in this browser. The records below do not depend on it.</p>
+          )}
+          {info && (
+            <div className="pm-title" aria-hidden>
+              <span className="pm-title-kicker" data-hazard={info.hazard}>
+                {HAZARD_WORDS[info.hazard]} · public record
+              </span>
+              <strong>
+                {info.title}
+                {info.key === "slr" ? `, ${slrFeet} ft higher` : ""}
+              </strong>
+            </div>
+          )}
+          {tooFar && <p className="pm-zoom-note">Zoom in to see {info?.title}</p>}
+          {hover && (
+            <div className="pm-hover" style={{ left: hover.x, top: hover.y }} data-exact={hover.exact ? "true" : undefined} aria-hidden>
+              <strong>{hover.text}</strong>
+              {hover.exact && <small>Read from the map&apos;s colour · click for the record</small>}
+            </div>
+          )}
+          <div className="pm-key">
+            {info ? (
+              <MapLegend layer={info} active={hover?.exact ? hover.index : clickReading?.title === info.title ? clickReading.index : undefined} slrFeet={slrFeet} onHide={() => setShown("none")}>
+                {info.key === "slr" && (
+                  <div className="place-seg" role="radiogroup" aria-label="Sea level rise height">
+                    {SLR_FEET.map((ft) => (
+                      <label key={ft} data-on={slrFeet === ft ? "true" : undefined}>
+                        <input type="radio" name="slr" value={ft} checked={slrFeet === ft} onChange={() => setSlrFeet(ft)} />
+                        {ft} ft
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </MapLegend>
+            ) : (
+              <div className="mk-legend">
+                <div className="mk-legend-head">
+                  <strong>Aerial photograph only</strong>
+                </div>
+                <p className="mk-what">Pick a layer above to colour the map.</p>
+                <p className="mk-source">USDA and USGS, The National Map orthoimagery, in black and white.</p>
+              </div>
+            )}
+            <div className="mk-marks">
+              <span>
+                <i className="mk-ring" aria-hidden /> 500 m around {mine ? "your address" : "the block"}
+              </span>
+              {mine && (
+                <span>
+                  <i className="mk-dot" aria-hidden /> Your address, seen only in this tab
+                </span>
+              )}
+              <span>
+                <i className="mk-pin" aria-hidden /> Where you clicked
+              </span>
+            </div>
+          </div>
+        </div>
+        <p className="pm-screening">
+          <strong>Screening, not a survey.</strong> Every layer is a public map, drawn and coloured by the agency that
+          publishes it. None of it is SPARC Labs model output, and none of it describes a single house.
+        </p>
       </div>
 
       <aside className="place-side">
         {aside}
-        <SpotPanel state={spot} onCentre={readCentre} />
-
-        <section className="place-layers">
-          <div className="kicker">public map layers</div>
-          <label className="place-layer">
-            <input type="checkbox" checked={fema} onChange={(e) => setFema(e.target.checked)} />
-            <span>
-              <strong>FEMA flood zones</strong>
-              <small>FEMA&apos;s flood map, in FEMA&apos;s own colours and labels. Shown when zoomed in.</small>
-            </span>
-          </label>
-          <div className="place-layer">
-            <span>
-              <strong id="slr-label">Sea level rise</strong>
-              <small>Where NOAA maps the sea at the highest tides if it stood this much higher than today.</small>
-              <span className="place-seg" role="radiogroup" aria-labelledby="slr-label">
-                {SLR_OPTIONS.map((o) => (
-                  <label key={o.value} data-on={slr === o.value ? "true" : undefined}>
-                    <input
-                      type="radio"
-                      name="slr"
-                      value={o.value}
-                      checked={slr === o.value}
-                      onChange={() => setSlr(o.value)}
-                    />
-                    {o.label}
-                  </label>
-                ))}
-              </span>
-            </span>
-          </div>
-          <label className="place-layer">
-            <input type="checkbox" checked={showTracks} onChange={(e) => setShowTracks(e.target.checked)} />
-            <span>
-              <strong>Storm tracks</strong>
-              <small>
-                {tracks.length
-                  ? "Paths of the tropical storms and hurricanes listed below. The map zooms out to show them."
-                  : "NOAA's record has no tropical storm or hurricane track near this place."}
-              </small>
-            </span>
-          </label>
-          <label className="place-layer">
-            <input type="checkbox" checked={canopy} onChange={(e) => setCanopy(e.target.checked)} />
-            <span>
-              <strong>Tree canopy</strong>
-              <small>National land cover survey, 2021. Lower 48 states.</small>
-            </span>
-          </label>
-          <label className="place-layer">
-            <input type="checkbox" checked={paving} onChange={(e) => setPaving(e.target.checked)} />
-            <span>
-              <strong>Paving and buildings</strong>
-              <small>Share of ground that sheds water, national land cover survey, 2021. Lower 48 states.</small>
-            </span>
-          </label>
-          <label className="place-layer">
-            <input type="checkbox" checked={landslide} onChange={(e) => setLandslide(e.target.checked)} />
-            <span>
-              <strong>Landslide susceptibility</strong>
-              <small>USGS, 2024: how prone the slopes are, yellow (lower) to red (higher), at 90 m.</small>
-            </span>
-          </label>
-          <label className="place-layer">
-            <input type="checkbox" checked={faults} onChange={(e) => setFaults(e.target.checked)} />
-            <span>
-              <strong>Faults</strong>
-              <small>USGS: faults that have moved in the last 1.6 million years.</small>
-            </span>
-          </label>
-
-          <p className="place-map-note">
-            The dashed ring is 500 m (about a third of a mile) out from the middle of this place.{" "}
-            {mine
-              ? `The dot marks ${mine.matched || "the address you searched"}. Only this browser tab can see it.`
-              : "It is centred on the block, not on a house."}
-          </p>
-          <p className="place-map-note">
-            Every layer is a public map as its publisher draws it. None of it is SPARC Labs model output.
-          </p>
-        </section>
+        <SpotPanel state={spot} onCentre={readCentre} layerReading={clickReading} />
       </aside>
     </div>
   );

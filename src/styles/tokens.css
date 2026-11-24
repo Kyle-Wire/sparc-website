@@ -137,6 +137,9 @@
      (checked by scripts/check-colors.mjs). */
   --ground: #7a4f12;
   --wind: #3f6b4e;
+  /* Wildfire, the fifth hazard (24 Nov 2026): a burnt orange kept clear of
+     the heat crimson. Same rule as the others. */
+  --fire: #9a3f0c;
 
   --status-live: var(--crimson);
   --status-warn: var(--amber-ink);

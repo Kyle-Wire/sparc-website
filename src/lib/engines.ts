@@ -36,6 +36,11 @@
  *                  this site is "a map of seasonal movement, not a detailed
  *                  model" (brief §4).
  *
+ *   FireSim        README and sandbox/REPORT.md at 8bca734 (24 Nov 2026):
+ *                  fire spread (level set with Rothermel surface fire and
+ *                  Scott and Reinhardt crown fire), embers and house ignition,
+ *                  written fresh. Not yet scored against a real fire's spread.
+ *
  * What this file may NOT say: that any engine is validated for a place, that
  * any is on sale or runnable from the site today, any run time, any price.
  * An error figure appears only as the engine's own, with where it was
@@ -45,7 +50,9 @@
  * failed lives in src/lib/copy/receipts.ts, not here.
  */
 
-export type EngineId = "flood" | "heat" | "ground" | "wind";
+import { MODEL_NAMES } from "./model-names";
+
+export type EngineId = "flood" | "heat" | "ground" | "wind" | "fire";
 
 /** Where the computing happens, which decides what a visitor can do alone. */
 export type RunsOn = "your-gpu" | "our-server" | "our-workstation";
@@ -54,8 +61,12 @@ export interface Engine {
   id: EngineId;
   /** The hazard, as a row title on a place page. */
   hazard: string;
-  /** The engine's own name. */
+  /** The name a buyer reads (src/lib/model-names.ts). */
   name: string;
+  /** One line on why it has that name. */
+  why: string;
+  /** The engine (repository) it runs on. */
+  engine: string;
   runsOn: RunsOn;
   /** Where it runs, in a sentence for a buyer. */
   where: string;
@@ -89,7 +100,7 @@ export const ENGINES: Engine[] = [
   {
     id: "flood",
     hazard: "Flood",
-    name: "FloodSim",
+    ...MODEL_NAMES.flood,
     runsOn: "your-gpu",
     where: "On your own computer's graphics card, in Chrome or Edge. Nothing heavy runs on our side.",
     summary:
@@ -123,7 +134,7 @@ export const ENGINES: Engine[] = [
   {
     id: "heat",
     hazard: "Heat",
-    name: "HeatSim",
+    ...MODEL_NAMES.heat,
     runsOn: "our-server",
     where: "On our server. You choose the run; it is queued and you are told when it is ready.",
     summary:
@@ -150,7 +161,7 @@ export const ENGINES: Engine[] = [
   {
     id: "ground",
     hazard: "Ground movement",
-    name: "SPARC InSAR",
+    ...MODEL_NAMES.ground,
     runsOn: "our-workstation",
     where:
       "On our workstation. The radar for the place is gathered and processed for you; you then read and explore the result.",
@@ -185,7 +196,7 @@ export const ENGINES: Engine[] = [
   {
     id: "wind",
     hazard: "Wind",
-    name: "WindSim",
+    ...MODEL_NAMES.wind,
     runsOn: "our-workstation",
     where: "On our workstation. Wind is worked out for the neighbourhood from every direction, then shown to you as a map.",
     summary:
@@ -206,6 +217,32 @@ export const ENGINES: Engine[] = [
     selfServe: "run-for-you",
     status: "In every house report, with a range on each finding.",
     source: { repo: "Kyle-Wire/WindSim", commit: "cc15851" },
+  },
+  {
+    id: "fire",
+    hazard: "Wildfire",
+    ...MODEL_NAMES.fire,
+    runsOn: "our-workstation",
+    where: "On our workstation. Fire is run for the land around the place from its fuels, slope and weather, then shown to you as a map.",
+    summary:
+      "Follows a wildfire across the land around a place from its fuels, slope and wind, carries embers ahead of the front, and works out which houses they and the flames can reach. Each finding is run over a range of winds and carries its range.",
+    findings: [
+      "How fire would move across the land around the place, and how fast",
+      "Where embers land ahead of the front",
+      "Whether flames or embers reach the house, and from which side",
+      "How that changes with stronger wind or drier fuel",
+    ],
+    choices: ["A dry, windy day", "A named past fire nearby, later"],
+    whatIf: [],
+    whatIfNote: "Being considered: how clearing the ground around the house changes what reaches it. Not offered yet.",
+    never: [
+      "That a house will or will not burn",
+      "A damage estimate or a dollar loss",
+      "Whether the house meets a fire code",
+    ],
+    selfServe: "run-for-you",
+    status: "In house reports for places wildfire can reach, with a range on each finding.",
+    source: { repo: "Kyle-Wire/FireSim", commit: "8bca734" },
   },
 ];
 

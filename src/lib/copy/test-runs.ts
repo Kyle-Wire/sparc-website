@@ -13,6 +13,7 @@
  * Source write-up: climate-home-inspection/docs/validation/TEST-RUN-2026-11-22.md
  */
 import type { EngineId } from "../engines";
+import { CHECKER_NAME, modelName } from "../model-names";
 
 export const TEST_RUN_DATE = "22 November 2026";
 
@@ -56,33 +57,33 @@ export interface TestRow {
 }
 
 export const TEST_ROWS: TestRow[] = [
-  { engine: "flood", model: "FloodSim", test: "Unit test suites", kind: "known-answer", passed: 53, failed: 0, other: 0, unit: "suites",
+  { engine: "flood", model: modelName("flood"), test: "Unit test suites", kind: "known-answer", passed: 53, failed: 0, other: 0, unit: "suites",
     note: "Every CPU suite: exact solutions, mass balance, pipes, rainfall, reports.", source: "FloodSim · npm test" },
-  { engine: "flood", model: "FloodSim", test: "Physics verification", kind: "known-answer", passed: 450, failed: 155, other: 38, unit: "checks",
+  { engine: "flood", model: modelName("flood"), test: "Physics verification", kind: "known-answer", passed: 450, failed: 155, other: 38, unit: "checks",
     note: "Exact answers and volume books mostly pass (398 of 434). Most failures are simplified street-drain and pipe rules scored against fuller references, known gaps written down before the run. 4 of 4 deliberately wrong inputs were caught.",
     source: "FloodSim · node benchmarks/physics/run.mjs" },
-  { engine: "flood", model: "FloodSim", test: "UK Environment Agency 2D benchmarks", kind: "benchmark", passed: 88, failed: 6, other: 0, unit: "checks",
+  { engine: "flood", model: modelName("flood"), test: "UK Environment Agency 2D benchmarks", kind: "benchmark", passed: 88, failed: 6, other: 0, unit: "checks",
     note: "Inside the spread of the professional packages on 88 of 94 measures. Run on a graphics card on 25 Oct 2026, rescored today. Two misses on a laboratory dam break, four on a river-floodplain test.",
     source: "FloodSim · node benchmarks/ea/score.mjs" },
-  { engine: "heat", model: "HeatSim", test: "Unit tests", kind: "known-answer", passed: 132, failed: 0, other: 1, unit: "tests",
+  { engine: "heat", model: modelName("heat"), test: "Unit tests", kind: "known-answer", passed: 132, failed: 0, other: 1, unit: "tests",
     note: "The one other needs a buildings data host the test machine can't reach.", source: "HeatSim 0.6.1 · pytest" },
-  { engine: "heat", model: "HeatSim", test: "Known-answer sandbox", kind: "known-answer", passed: 47, failed: 3, other: 4, unit: "cases",
+  { engine: "heat", model: modelName("heat"), test: "Known-answer sandbox", kind: "known-answer", passed: 47, failed: 3, other: 4, unit: "cases",
     note: "Each answer and pass rule fixed before the case ran. All three failures were predicted beforehand: heat carried past the edge of a city patch, a plume 0.3 % over its 5 % limit, and bone-dry soil still giving up a little water.",
     source: "HeatSim 0.6.1 · python -m sandbox.run" },
-  { engine: "wind", model: "WindSim", test: "Unit tests", kind: "known-answer", passed: 224, failed: 0, other: 2, unit: "tests",
+  { engine: "wind", model: modelName("wind"), test: "Unit tests", kind: "known-answer", passed: 224, failed: 0, other: 2, unit: "tests",
     note: "One needs a data host the test machine can't reach; one needs a graphics card.", source: "WindSim · pytest" },
-  { engine: "wind", model: "WindSim street model", test: "AIJ wind-tunnel cases", kind: "benchmark", passed: 2, failed: 4, other: 0, unit: "case and engine pairs",
+  { engine: "wind", model: `${modelName("wind")} street model`, test: "AIJ wind-tunnel cases", kind: "benchmark", passed: 2, failed: 4, other: 0, unit: "case and engine pairs",
     note: "Passes the single building on both engines. Fails every case with more than one building, so street-level wind stays out of reports.",
     source: "WindSim · windsim rescore (post hoc) and docs/validation.md" },
-  { engine: "wind", model: "WindSim storm gusts", test: "Blind check at five new cities", kind: "held-out", passed: 2, failed: 5, other: 1, unit: "place and storm-type checks",
+  { engine: "wind", model: `${modelName("wind")} storm gusts`, test: "Blind check at five new cities", kind: "held-out", passed: 2, failed: 5, other: 1, unit: "place and storm-type checks",
     note: "Cities chosen by a rule written and published before any of their data was read. Ordinary storms pass at Washington and Atlanta and fail at Houston and Los Angeles; thunderstorms fail at all three cities that had them; New York could not be scored (no airport in its exposure class).",
     source: "WindSim · windsim layer1 check, amendment A3" },
-  { engine: "ground", model: "SPARC InSAR", test: "Synthetic towns", kind: "known-answer", passed: 4, failed: 0, other: 0, unit: "towns",
+  { engine: "ground", model: modelName("ground"), test: "Synthetic towns", kind: "known-answer", passed: 4, failed: 0, other: 0, unit: "towns",
     note: "Quiet ground read as quiet; a planted sinkhole found with the year it started; a whole area sinking found; a faulty reference point caught and held back.",
     source: "climate-home-inspection · tools/gate4/synthetic.py" },
   { engine: "pipeline", model: "Report pipeline", test: "Report and evidence tests", kind: "known-answer", passed: 469, failed: 0, other: 6, unit: "tests",
     note: "The six others are expected failures marked in advance.", source: "climate-home-inspection · pytest" },
-  { engine: "pipeline", model: "codelen scorer", test: "Self-tests", kind: "known-answer", passed: 16, failed: 0, other: 1, unit: "tests",
+  { engine: "pipeline", model: `${CHECKER_NAME}, the code-length checker`, test: "Self-tests", kind: "known-answer", passed: 16, failed: 0, other: 1, unit: "tests",
     note: "The scorer that will rate every model's stated range in bits. One cross-check needs a repository that isn't on the test machine.", source: "gridzip-lab · python -m codelen.test_codelen" },
 ];
 
@@ -135,8 +136,8 @@ export const PLAIN = {
   ],
   failuresTitle: "What failed, plainly.",
   failures: [
-    "Flood: simplified street-drain rules miss their fuller references in about two of every three checks. Against measured flood levels in real storms, mostly beside rivers, FloodSim was off by 0.6 to 0.85 m against its own 0.15 m bar.",
-    "Heat: three sandbox cases fail, each predicted before it ran. In the afternoon HeatSim does no better than the nearest weather station.",
+    `Flood: simplified street-drain rules miss their fuller references in about two of every three checks. Against measured flood levels in real storms, mostly beside rivers, ${modelName("flood")} was off by 0.6 to 0.85 m against its own 0.15 m bar.`,
+    `Heat: three sandbox cases fail, each predicted before it ran. In the afternoon ${modelName("heat")} does no better than the nearest weather station.`,
     "Wind, street model: fails every wind-tunnel case with more than one building, reading street speeds about 1.3 times too high (LBM) or 0.64 times too low (RANS). It is not in any report.",
     "Wind, storm gusts: on the blind check at new cities, ordinary storms passed at two of four (Washington, Atlanta) and missed the 80 % mark by one to two points at Houston and Los Angeles. Thunderstorm gusts failed everywhere they were tested. The model does no better than simply averaging the nearby airports' gusts.",
     "Ground: the planted-movement test passed at one of our three real test places and failed at two, so ground readings there are held back.",

@@ -8,11 +8,11 @@ import { ENGINES, RUNS_ON_WORDS } from "@/lib/engines";
 
 export const metadata: Metadata = withPage("/models", {
   title: "The models",
-  description: "SPARC Labs' own flood, heat, ground movement and wind models: what each gives, what it has been checked against, and what it will never say.",
+  description: "SPARC Labs' own flood, heat, ground movement, wind and wildfire models: what each gives, what it has been checked against, and what it will never say.",
 });
 
 // What this page may say about the models, and where each sentence comes
-// from. All four are SPARC Labs' own engines, kept in their own repositories.
+// from. All five are SPARC Labs' own engines, kept in their own repositories.
 // The engine cards read src/lib/engines.ts, which records the commit each
 // sentence was read at; the notes below cover the first two.
 //
@@ -39,11 +39,11 @@ export default function ModelsPage() {
       <PageHero
         kicker="the models · in every house report"
         title="What the public record can’t tell you."
-        lead="A flood zone is a line on a map. It doesn’t say where the water goes on your street in a hard storm, how warm the block stays on a July night, or whether the ground under it moves differently from the ground around it. That takes a model of the neighbourhood. We built four."
+        lead="A flood zone is a line on a map. It doesn’t say where the water goes on your street in a hard storm, how warm the block stays on a July night, or whether the ground under it moves differently from the ground around it. That takes a model of the neighbourhood. We built five."
         accent="var(--flood)"
       />
 
-      <Section kicker="four engines" title="Flood, heat, ground movement and wind, for the neighbourhood around a home.">
+      <Section kicker="five models" title="Flood, heat, ground movement, wind and wildfire, for the neighbourhood around a home.">
         <div className="engine-grid">
           {ENGINES.map((e) => (
             <div key={e.id} className="card engine-card" data-hazard={e.id}>
@@ -51,6 +51,9 @@ export default function ModelsPage() {
                 {e.hazard} · {RUNS_ON_WORDS[e.runsOn]}
               </div>
               <h3>{e.name}</h3>
+              <p className="engine-why">
+                {e.why} <span className="engine-on">Runs on our {e.engine} engine.</span>
+              </p>
               <p>{e.summary}</p>
               {e.free && (
                 <>

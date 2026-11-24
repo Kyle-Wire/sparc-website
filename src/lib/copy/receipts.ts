@@ -91,7 +91,7 @@ export const RECEIPTS: QuantityReceipts[] = [
     receipts: [
       { verdict: "failed", kind: "real-world-elsewhere", evidence: "shown", text: "In the afternoon it does no better than the weather station alone (1.47 K against 1.43 K).", source: "HeatSim/validation/results/rescore/b_0.5.0_hybrid_absolute.json" },
     ],
-    next: "H3: HeatSim's daytime model must beat the station alone in held-out cities.",
+    next: "H3: Sundial's daytime model must beat the station alone in held-out cities.",
   },
   {
     engine: "heat",
@@ -138,6 +138,19 @@ export const RECEIPTS: QuantityReceipts[] = [
       { verdict: "failed", kind: "solver", evidence: "shown", text: "Fails every wind-tunnel case with more than one building, so it stays out of reports.", source: "WindSim/docs/validation/rans_case_c_d10; WindSim/docs/validation.md:220-221" },
     ],
     next: "W8: pass the full AIJ wind-tunnel set under VDI 3783-9 (66 % hit rate).",
+  },
+  {
+    engine: "fire",
+    quantity: "Fire spread, embers and houses reached",
+    rung: 0,
+    rungNote: "Not in reports yet.",
+    receipts: [
+      { verdict: "passed", kind: "solver", evidence: "shown", text: "Surface fire behaviour matches the US Forest Service's worked example digit for digit, and crown fire matches its published table within 2 %.", source: "FireSim/sandbox/REPORT.md; FireSim/tests" },
+      { verdict: "passed", kind: "solver", evidence: "shown", text: "Twelve made-up landscapes with known answers: slope, wind across slope, cell size, more wind and wetter fuel all pass at 10 m cells.", source: "FireSim/sandbox/REPORT.md, cases Y1 to Y5; sandbox/results_synth.json" },
+      { verdict: "failed", kind: "solver", evidence: "shown", text: "A long, narrow fire's flanks and back come out 13 to 17 % too wide, against a 5 % rule.", source: "FireSim/sandbox/REPORT.md, case S2" },
+      { verdict: "not-run", kind: "real-world-elsewhere", evidence: "stated", text: "Not yet scored against a real fire. The rules were written first: tune on four past fires, then six held back blind.", source: "gridzip-lab/physics/PROTOCOL-FIRE.md" },
+    ],
+    next: "F1: score spread on the four tuning fires, then the six blind fires, under the written protocol.",
   },
 ];
 

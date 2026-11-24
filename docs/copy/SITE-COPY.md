@@ -69,28 +69,28 @@ It's a screening tool. It gives you more to go on before you talk to an inspecto
 **Hero.** What the public record can't tell you.
 **Lead.** A flood zone is a line on a map. It doesn't say where the water goes on your street in a hard storm, how warm the block stays on a July night, or whether the ground under it moves differently from the ground around it. That takes a model of the neighbourhood. We built four.
 
-### FloodSim (flood)
+### Alder (flood, FloodSim engine)
 
 Builds a 1 m model of the neighbourhood from public data (terrain survey, building outlines, streets, land cover, soils, official rainfall statistics) and follows the water through it street by street, on your own graphics card. One metre is the detail of the map, not its accuracy.
 
 **Passed:** 88 of 94 of the UK Environment Agency's 2D flood benchmark checks against the spread of the professional packages; 22 of 22 exact pipe-and-street cases; a median difference under a centimetre from HEC-RAS (the US Army Corps model) on four of the same benchmark tests.
 **Not yet:** against measured flood levels in real storms elsewhere, mostly beside rivers, it was off by 0.6 to 0.85 m, and its own bar is 0.15 m. In a Louisiana test tract it put water against almost no house where FEMA paid rain claims. Nothing has been measured at any house we report on, so every result is labelled exploratory.
 
-### HeatSim (heat)
+### Ginkgo (heat, HeatSim engine)
 
 Models street air temperature hour by hour, and PET, an outdoor comfort index, in sun, building shade and tree shade. Surface temperature measured by satellite sits beside it as a measurement, not a model.
 
 **Passed:** at night, street air had an hourly error of about 1.46 K (2.6 °F) across 13 temperate cities, none in Philadelphia, each held out whole, against 1.86 K for the weather station alone. Those street sensors also helped develop the model, so treat it as a development score.
 **Not yet:** in the afternoon it does no better than the weather station alone. It hasn't been checked against a street sensor in Philadelphia. PET has never been compared with a measurement. Indoor temperature isn't modelled at all.
 
-### SPARC InSAR (ground movement)
+### Yew (ground movement, SPARC InSAR engine)
 
 Reads how the ground under a block has moved over years from NASA's OPERA satellite radar product, which passes over on a regular repeat schedule, through cloud and at night. A reading covers about a hundred metres around the house, along the satellite's slanted line of sight, compared with the ground around it.
 
 **Passed:** the engine's own record shows a pass against 7 GNSS stations around Houston (about 3 mm a year); the result files behind it are being restored.
 **Not yet:** its checks against GNSS in Oklahoma, California and an Australian mine did not pass. At our places no GNSS check has been run, and a planted-movement test passed at one of three. The tools for the GNSS check are built and tested on made-up data, not yet on real radar. Exploratory throughout.
 
-### WindSim (wind)
+### Poplar (wind, WindSim engine)
 
 Two layers. **Layer 1** carries a storm's gusts in from the airport anemometers around a place, through the land cover upwind. **Layer 2** is a computational fluid dynamics model of wind between the buildings.
 
@@ -161,7 +161,7 @@ Coming. Regional storm gusts are close; the between-the-buildings model is still
 | Empty panel, no run | No run here yet, so no numbers. That's on purpose. |
 | Section held back | Held back: this check hasn't passed here yet. Here's why. |
 | Model failed a check at this place | The check of this answer failed here. It's shown, labelled, with the reason. |
-| GPU check fails | Your graphics card can't run FloodSim in this browser. Try Chrome or Edge on a desktop, or ask us to run it. |
+| GPU check fails | Your graphics card can't run Alder in this browser. Try Chrome or Edge on a desktop, or ask us to run it. |
 | Request sent | Got it. A person reads every request. You'll hear back by email. |
 | Footer line | A screening tool. Not an engineering study, not for engineering decisions. |
 

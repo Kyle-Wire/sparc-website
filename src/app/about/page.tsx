@@ -29,18 +29,18 @@ const PRINCIPLES = [
   },
   {
     k: "02",
-    t: "Findings first, receipts right behind.",
+    t: "Findings first, the detail right behind.",
     b: "A result leads with what it means. How much stands behind it, its limits and its sources sit one tap away, never hidden and never in the way.",
   },
   {
     k: "03",
     t: "Measured beats modelled, every time.",
-    b: "A model result that has not been compared with a measurement at the place says so, on the result, at full size. A panel with no run behind it shows no numbers, and the build checks that, not our good intentions.",
+    b: "Where an agency or a satellite measured something, we show the measurement and say so. A model result carries its range, and a panel with no run behind it shows no numbers. The build checks that, not our good intentions.",
   },
   {
     k: "04",
-    t: "We post our misses.",
-    b: "When a model fails a check, the failure goes on the page next to the passes. A scoreboard that only shows wins is not a scoreboard.",
+    t: "Our methods are open.",
+    b: "How each model works, what it was tested against and how it did is written down for anyone who wants it, misses included. You don't have to read it to trust a report, but it is there.",
   },
   {
     k: "05",
@@ -57,7 +57,7 @@ export default function AboutPage() {
       <PageHero
         kicker={`about · ${COMPANY.toLowerCase()}`}
         title="Making planning available to everyone."
-        lead={`${COMPANY} builds flood, heat, ground and wind models and puts the public record where a home buyer can actually read it. Founded in ${FOUNDED_YEAR} in ${OFFICE_CITY}, ${OFFICE_STATE}. One person and a lot of benchmarks.`}
+        lead={`${COMPANY} builds flood, heat, ground and wind models and puts the public record where a home buyer can actually read it. Founded in ${FOUNDED_YEAR} in ${OFFICE_CITY}, ${OFFICE_STATE}. Run by one person.`}
         accent="var(--purple)"
       />
 
@@ -76,12 +76,12 @@ export default function AboutPage() {
               </p>
               <p>
                 The site does two things. It gathers what public agencies already publish about a place and
-                shows it plainly, free. And it will offer our own models of the neighbourhood around a
+                shows it plainly, free. And it offers our own models of the neighbourhood around a
                 property, so you can see what a hard storm or a hot week looks like there in the model, and
                 try out what you could do about it.
               </p>
               <p>
-                It&apos;s a screening tool. It gives you more to go on before you talk to an inspector, an
+                It&apos;s environmental screening, done properly. It gives you more to go on before you talk to an inspector, an
                 engineer or an insurer. It doesn&apos;t replace any of them.
               </p>
             </div>
@@ -93,7 +93,7 @@ export default function AboutPage() {
               <dt>entity</dt><dd className="mono">{COMPANY_LEGAL}</dd>
               <dt>people</dt><dd className="mono">one</dd>
               <dt>free today</dt><dd className="mono">the public record, any US address</dd>
-              <dt>paid</dt><dd className="mono">flood, heat and ground models · not on sale yet</dd>
+              <dt>paid</dt><dd className="mono">flood, heat, ground and wind models · by invitation</dd>
               <dt>contact</dt><dd className="mono">{EMAIL_PRIMARY}</dd>
             </dl>
           </div>

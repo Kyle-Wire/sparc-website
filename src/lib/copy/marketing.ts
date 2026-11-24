@@ -151,7 +151,7 @@ export const STEPS = {
   items: [
     { n: "01", t: "Type an address", b: "Any address in the US. We find the block and forget the house number." },
     { n: "02", t: "Read the record", b: "Flood, heat, ground and wind, as the agencies publish them, each with where it came from." },
-    { n: "03", t: "Ask the models, if you want", b: "The house report runs our own models around one property. Read the sample, and the receipts, before you decide." },
+    { n: "03", t: "Ask the models, if you want", b: "The house report runs our own models around one property. Read the sample before you decide." },
   ],
 };
 
@@ -161,7 +161,7 @@ export const RECEIPTS = {
   lead:
     "A model is only as good as what it's been checked against. Here's where each of ours stands today, " +
     "including the parts that haven't passed yet. We'd rather you hear it from us.",
-  // The one line /how-it-works keeps; the full receipts are on /how-we-test.
+  // No longer rendered on /how-it-works (24 Nov 2026); the full record is on /how-we-test.
   short:
     "Every model is checked against answers we already know, and every result is published, " +
     "including the parts that haven't passed yet. We'd rather you hear it from us.",

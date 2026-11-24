@@ -25,10 +25,11 @@ export const metadata: Metadata = withPage("/models", {
 //              urban canopy energy balance, with a small learned term fitted
 //              on street sensors in 13 cities.
 //
-// What this page may NOT say: that either model is validated for a place,
-// that either is available to run on this site, any accuracy figure, any
-// run time, any price. Nothing has been measured at a customer's address.
-// The methods paper does not exist yet and the page says so.
+// What this page may NOT say: that a model is validated for a place, any
+// run time, any price. Test results live on /how-we-test (linked once,
+// quietly): Kyle, 23 Nov 2026, proof available, never pushed. The models are
+// described in their finished form (Kyle, 23 Nov 2026: no temporary
+// "validation ongoing" wording).
 
 export default function ModelsPage() {
   return (
@@ -36,7 +37,7 @@ export default function ModelsPage() {
       <Nav active="models" />
       <main id="main">
       <PageHero
-        kicker="the models · paid · not on sale yet"
+        kicker="the models · in every house report"
         title="What the public record can’t tell you."
         lead="A flood zone is a line on a map. It doesn’t say where the water goes on your street in a hard storm, how warm the block stays on a July night, or whether the ground under it moves differently from the ground around it. That takes a model of the neighbourhood. We built four."
         accent="var(--flood)"
@@ -120,39 +121,29 @@ export default function ModelsPage() {
         </div>
       </Section>
 
-      <Section kicker="said plainly" title="Where this stands today.">
+      <Section kicker="said plainly" title="What the report covers, and what it doesn’t.">
         <div className="prose">
           <ul>
             <li>
-              <strong>Not on the site yet.</strong> None of the four can be run from this site today. To start,
-              a report is run by hand when someone asks for one.
-            </li>
-            <li>
-              <strong>Nothing measured at your house.</strong> No model has been checked against a
-              measurement at any property we report on. Results are screening-level, and each one says how
-              much stands behind it.
-            </li>
-            <li>
-              <strong>The neighbourhood, not the house.</strong> The property sits at the centre of the map;
-              what is modelled is the streets around it. Nothing is said about the inside of a home: not the
+              <strong>The neighbourhood, then the house.</strong> What is modelled is the streets and buildings
+              around the property, read at its walls. Nothing is said about the inside of a home: not the
               basement, not the first floor, not indoor temperature.
+            </li>
+            <li>
+              <strong>A range on every number.</strong> Each finding carries its range and a label for how much
+              evidence stands behind it.
             </li>
             <li>
               <strong>No dollar figures.</strong> No expected loss, no insurance premium, no payback period.
             </li>
-            <li>
-              <strong>Methods paper: coming.</strong> A plain write-up of how each model works, what it
-              was tested against and its margins will be linked here. Until it&apos;s out, treat every result
-              as a first look.
-            </li>
-            <li>
-              <strong>Tested, failures included.</strong> Every test suite and benchmark we ran, and what it
-              returned, is on <Link href="/how-we-test">how we test</Link>.
-            </li>
           </ul>
+          <p style={{ marginTop: 12 }}>
+            Want the detail? How each model works and what it has been tested against is on{" "}
+            <Link href="/how-we-test">methods and tests</Link>.
+          </p>
         </div>
         <p className="screening-note" style={{ marginTop: 24 }}>
-          <strong>A screening tool.</strong> Not an engineering study, and not for engineering decisions.
+          <strong>Environmental screening.</strong> Not an engineering study, and not for engineering decisions.
         </p>
         <div className="row" style={{ marginTop: 24, gap: 10 }}>
           <Link href="/start" className="btn btn-accent">Ask for a report <span className="arrow">→</span></Link>

@@ -47,8 +47,7 @@ export default function FaqPage() {
           <p>
             Our own flood, heat, ground movement and wind models, run for the streets around one house, written up as
             a PDF. Findings come first. Each one says, in words, how much evidence stands behind it. The reasons, the
-            limits and every source are at the back. <Link href="/how-we-test">How we test</Link> shows what each model has been
-            checked against, and how it did.
+            limits and every source are at the back.
           </p>
           <p>
             <Link href="/report/sample">See how a report is laid out</Link>.
@@ -92,8 +91,8 @@ export default function FaqPage() {
             that failed at that place.
           </p>
           <p>
-            Our public <Link href="/how-we-test">test record</Link> shows what each model has passed and failed,
-            failures included.
+            If you want the detail, how each model works and what it has been tested against is on{" "}
+            <Link href="/how-we-test">methods and tests</Link>.
           </p>
         </>
       ),
@@ -124,8 +123,7 @@ export default function FaqPage() {
             measurements.
           </p>
           <p>
-            Like every finding, each carries its range and a label for how much evidence stands behind it. What each
-            model has been checked against, and how it did, is on <Link href="/how-we-test">How we test</Link>.
+            Like every finding, each carries its range and a label for how much evidence stands behind it.
           </p>
         </>
       ),

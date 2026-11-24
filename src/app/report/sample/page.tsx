@@ -153,10 +153,8 @@ export default function SampleReportPage() {
           ))}
         </div>
         <p className="screening-note" style={{ marginTop: 28 }}>
-          <strong>Samples, not advice.</strong> These show what a report contains. They are screening reports: no model
-          result was checked against a measurement at either house, and each report says so once, on its back pages. These two
-          were made before ground movement and wind went into every report, so they show flood and heat only. See{" "}
-          <Link href="/how-we-test">How we test</Link> for where each check stands.
+          <strong>Samples, not advice.</strong> These show what a report contains. These two were made before ground
+          movement and wind went into every report, so they show flood and heat only.
         </p>
       </Section>
 

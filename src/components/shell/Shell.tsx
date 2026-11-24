@@ -85,7 +85,7 @@ export function Footer() {
             <Link href="/glossary">Plain glossary</Link>
             <Link href="/data">Data sources</Link>
             <Link href="/models">The models</Link>
-            <Link href="/how-we-test">How we test</Link>
+            <Link href="/how-we-test">Methods and tests</Link>
             <Link href="/pricing">Pricing</Link>
             <Link href="/faq">Questions</Link>
             <Link href="/next-steps">After your report</Link>

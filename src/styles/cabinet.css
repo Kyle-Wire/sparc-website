@@ -341,7 +341,7 @@ footer { padding: var(--space-7) 0 var(--space-5); }
 .record-body { font-size: var(--fs-body); }
 .record-body p, .prose, .shelf-empty, .screening-note, .questions-group li { max-width: 72ch; }
 .prose { font-size: 16px; }
-.record-figure-value { font-feature-settings: "tnum"; }
+.record-figure-value { font-variant-numeric: tabular-nums lining-nums; }
 
 /* ---------- the paid shelves, folded ----------
    Each hazard's paid shelves are one strip: what a run would give, in words,

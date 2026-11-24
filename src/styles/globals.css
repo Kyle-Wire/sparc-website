@@ -10,7 +10,12 @@ html, body {
   font-size: var(--fs-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  /* Tabular-lining figures everywhere, so columns of readings line up and a
+     number that changes does not shift the text around it (from PR 18). */
+  font-variant-numeric: tabular-nums lining-nums;
 }
+/* Form controls reset font-variant-numeric through the UA's font shorthand. */
+input, button, select, textarea { font-variant-numeric: inherit; }
 body { overflow-x: hidden; }
 
 /* Every scale step reads from a token. No literal font-size for a scale step
@@ -323,7 +328,7 @@ body.no-scroll { overflow: hidden; }
    so the layout reads exactly as it would with a number in it -- that is what
    makes this a placeholder rather than a deletion. */
 [data-placeholder] .ph-em {
-  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums lining-nums;
   color: var(--fg-2);
 }
 

@@ -1,8 +1,9 @@
 # Data ramps, and why the brand ramp is not one
 
 Internal design specification. Owner: Head of Design. Enforced by
-`npm run check:colors`; the render-level half is specified in §5 and handed to
-Gate.
+`npm run check:colors` (the ramps are re-derived and their separation asserted)
+and `npm run check:color-usage` (the brand ramp cannot leave its declared
+decorative sites). The render-level half is specified in §5 and handed to Gate.
 
 > **Brand colour never encodes data. Data colour never decorates.**
 
@@ -40,6 +41,19 @@ printed, so this is not hypothetical.
 
 **Rule: the brand ramp is brand furniture. It never encodes an ordered
 quantity.**
+
+**And the rule is now a build failure rather than a comment.** `tokens.css`
+listed the ramp's legal uses — the hero wordmark fill, the 4px strip under the
+nav, a radial glow — and listed the illegal ones it had been doing. That list was
+prose. It is now the `RAMP_SITES` allowlist in
+`scripts/check-color-usage.mjs`: `var(--grad-ramp)` outside a declared site
+fails `npm run check:color-usage`, and the two declared sites are the two that
+exist. A third one is a decision somebody has to write down, with a reason,
+where the next person will read it.
+
+That matters more here than anywhere else in this directory, because this is the
+rule the company already had in writing — `insar_pipeline app_assets/app.css:6`
+— and broke anyway, on the one surface that is public.
 
 ## 2. The two ramps
 

@@ -39,7 +39,7 @@ export default function DownloadPage() {
       />
 
       <Section>
-        <article style={{ maxWidth: 760, display: "grid", gap: 18, color: "var(--ink-2)", fontSize: 15, lineHeight: 1.7 }}>
+        <article className="prose">
           <p>
             This page used to list five installers with filenames and version
             numbers behind &ldquo;Coming soon&rdquo; buttons, and told you your licence
@@ -48,7 +48,7 @@ export default function DownloadPage() {
             and there is no licensing system to activate anything.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>What we can do today</h2>
+          <h2>What we can do today</h2>
           <p>
             Run the work ourselves and hand you the results — the outputs, the
             record of the run behind them, and the limits stated alongside. That
@@ -57,7 +57,7 @@ export default function DownloadPage() {
             <Link href="/demo" style={{ color: "var(--accent)" }}>Tell us what you are trying to decide</Link>.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>What we are building towards</h2>
+          <h2>What we are building towards</h2>
           <p>
             Software that runs on your machine, so your data never has to leave
             it, installed by one double-click and shipped as a versioned,
@@ -65,7 +65,7 @@ export default function DownloadPage() {
             that here, because we do not have one we would stand behind.
           </p>
 
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--ink)", margin: 0 }}>System requirements</h2>
+          <h2>System requirements</h2>
           <p>
             We have taken these down rather than guess. The previous figures were
             never measured on a machine other than the developer&apos;s, and

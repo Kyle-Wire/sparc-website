@@ -33,7 +33,24 @@
  *     warm hues that clear their thresholds, and they are what a component
  *     reaches for when it needs a hue that carries something.
  *
- * There is deliberately no exemption list. Four surfaces are frozen until the
+ *  3. THE BRAND RAMP STAYS WHERE IT IS DECLARED LEGAL.
+ *     `--grad-ramp` is the nine-step purple-to-yellow gradient. It is brand
+ *     furniture and it is not luminance-monotonic: four consecutive steps sit
+ *     inside a 19-level band out of 256, so stages 02 through 05 were one
+ *     colour in greyscale print and for a reader with red-green deficiency.
+ *     tokens.css lists its legal uses -- the hero wordmark fill, the 4px strip
+ *     under the nav, a radial glow -- and lists the illegal ones it was doing:
+ *     the stage colour on the pipeline, the progress fill on the product rail,
+ *     the accent of a panel. Each of those encoded an ordered quantity on a
+ *     ramp that is not ordered.
+ *
+ *     That list was a comment. It is now the allowlist below, so "the brand
+ *     ramp cannot encode severity" is a property of the build rather than of
+ *     whoever reviews the next pull request. The two legal sites are the two
+ *     that exist; a third one is a decision somebody has to write down here.
+ *
+ * There is deliberately no exemption list for the AA rules. Four surfaces are
+ * frozen until the
  * direction answer lands -- the header and nav, the section openers, the 404
  * and the empty states -- but what is frozen there is the REGISTER: the type,
  * the ground, the voice, the elevation. Which token a 1px border points at is
@@ -70,6 +87,26 @@ const CARRYING = [
   "border-color", "outline", "outline-color", "text-decoration-color", "caret-color",
   "borderColor", "borderTop", "borderRight", "borderBottom", "borderLeft",
   "outlineColor", "textDecorationColor", "caretColor", "stroke", "fill",
+];
+
+/**
+ * Where the brand ramp is allowed to appear, and why. Decoration, both of them:
+ * nothing is lost if a reader cannot resolve either, which is the test for
+ * whether a brand hue is being used legally.
+ *
+ * Adding an entry here is the decision. Reaching for `--grad-ramp` in a
+ * component without adding one is the mistake that put a non-monotonic
+ * nine-step gradient on a severity scale.
+ */
+const RAMP_SITES = [
+  {
+    file: "src/components/marketing/landing-parts.tsx",
+    why: "the hero wordmark fill, clipped to the headline text. Decoration, and legal.",
+  },
+  {
+    file: "src/styles/globals.css",
+    why: ".ramp-strip -- the 4px strip under the nav. Decoration, and legal.",
+  },
 ];
 
 function files(dir) {
@@ -111,6 +148,15 @@ for (const file of files(SRC)) {
       return;
     }
 
+    /* 3 · the brand ramp, only where it is declared legal */
+    if (/var\(\s*--grad-ramp\s*\)/.test(line) && !RAMP_SITES.some((s) => s.file === rel)) {
+      violations.push({
+        at,
+        msg: "reaches for --grad-ramp. It is brand furniture and it is not luminance-monotonic -- four of its nine steps sit inside a 19-level band out of 256, so it cannot encode an ordered quantity. If this use is genuinely decoration, add it to RAMP_SITES in scripts/check-color-usage.mjs with a reason. If it is encoding a quantity, --seq-* is the sequential ramp and --div-* the diverging one.",
+      });
+      return;
+    }
+
     /* 2 · a decoration-only hue in a position that carries meaning */
     const hue = line.match(decorativeRe);
     if (!hue) return;
@@ -124,6 +170,8 @@ for (const file of files(SRC)) {
 
 if (!violations.length) {
   console.log("check:color-usage  ok  ·  --line unreachable, no decorative hue carrying text or a boundary");
+  console.log(`  --grad-ramp confined to ${RAMP_SITES.length} declared decorative site(s):`);
+  for (const s of RAMP_SITES) console.log(`    ${s.file}  ·  ${s.why}`);
   process.exit(0);
 }
 

@@ -185,7 +185,12 @@
   --tex-hatch-dense: repeating-linear-gradient(45deg,
     rgba(26,20,22,0.16) 0 1.5px, transparent 1.5px 4.5px);
 
-  /* Spacing scale (px) */
+  /* Spacing scale (px). The 4/8/12/16/24/32/48/64 run was already the closest
+     thing to a real token set in the company and is kept as it stands. 96 and
+     128 are the two additions: the scale topped out at 64, which is smaller
+     than a section's own padding, so every page-level rhythm value -- 80, 72,
+     60, 56 -- was a literal off the scale. A scale that cannot express page
+     rhythm is a scale the page ignores. */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -194,6 +199,19 @@
   --space-6: 32px;
   --space-7: 48px;
   --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  /* The reading measure for long-form text.
+
+     The five long-form pages each carried `maxWidth: 760` inline, which at
+     15px is roughly 100 characters per line -- about a third longer than the
+     range where a reader reliably finds the start of the next line. "Generous
+     measure" in a field report means comfortable, not wide: 74ch is around 74
+     characters, which is the upper end of the printed-page range rather than
+     past it. In ch units so it tracks the font size instead of contradicting
+     it. */
+  --measure: 74ch;
 
   /* Type scale. These tokens are now the only place a heading size is
      declared; globals.css reads them at every breakpoint and declares no
@@ -213,6 +231,12 @@
   --fs-stage-title: 32px; /* .stage-block h2 on /product */
   --fs-display: 40px;     /* large inline numerics (pricing, about) */
   --fs-body: 13px;        /* the base, and the floor for any honesty label */
+  --fs-prose: 16px;       /* long-form body on the trust surfaces */
+  /* The step type-scale.md §4 named as missing: "a run of 24s on the legal
+     pages that is a section-head step the scale does not name". It is a
+     sub-head inside long-form text, between --fs-h2 and --fs-h3 and belonging
+     to neither, and it was the same literal in five files. */
+  --fs-prose-head: 24px;
   --fs-lead: 18px;
   --fs-label: 10px;       /* .kicker, .label, .pill */
 

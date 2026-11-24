@@ -60,7 +60,7 @@ export const TWO_QUESTIONS = {
     cta: "Look up a block",
   },
   paid: {
-    name: "The house report",
+    name: "The SPARC Labs Field Kit",
     tag: "paid · one house",
     question: "What do our models say about this house?",
     points: [

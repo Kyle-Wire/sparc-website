@@ -46,10 +46,13 @@ export interface Product {
 
 export const REPORT: Product = {
   id: "home-report",
-  name: "The house report",
+  // Kyle, 24 Nov 2026 (CHI D65): the whole buyer program is the SPARC Labs
+  // Field Kit. Always with the house name in front, never bare "FieldKit"
+  // (FieldKit.org exists), and never for the home sensor.
+  name: "The SPARC Labs Field Kit",
   priceCents: 14900,
   currency: "USD",
-  tagline: "Flood, heat, ground movement and wind around one house and its streets, in our models, with the receipts. Bought once.",
+  tagline: "Your house report, an atlas that opens with no internet, print-ready maps and a year of updates. Flood, heat, ground movement and wind around one house and its streets, in our models, with the receipts. Bought once.",
   includes: [
     "Flood: our 1 m flood model run for the streets around the house in design storms and a past storm, showing where water reaches and how deep it stands beside the house in each storm modelled",
     "Heat: modelled street air temperature around the house in a hot spell, afternoon and night, and modelled outdoor comfort (PET) in sun and in shade, with the satellite surface temperature of the block beside them",

@@ -41,11 +41,12 @@ export default function FaqPage() {
 
   const before: QA[] = [
     {
-      q: "What is the house report?",
+      q: "What is the SPARC Labs Field Kit?",
       a: (
         <>
           <p>
-            Our own flood, heat, ground movement and wind models, run for the streets around one house, written up as
+            Everything you get for one house: the house report, an atlas that opens with no internet, maps to
+            print, the data files, and a year of updates. The house report is the heart of it: our own flood, heat, ground movement and wind models, run for the streets around one house, written up as
             a PDF. Findings come first. Each one says, in words, how much evidence stands behind it. The reasons, the
             limits and every source are at the back.
           </p>

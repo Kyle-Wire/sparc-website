@@ -154,7 +154,8 @@ export default function SampleReportPage() {
         </div>
         <p className="screening-note" style={{ marginTop: 28 }}>
           <strong>Samples, not advice.</strong> These show what a report contains. These two were made before ground
-          movement and wind went into every report, so they show flood and heat only.
+          movement and wind went into every report, so they show flood and heat only. The{" "}
+          <Link href="/example">worked example of Sample A&rsquo;s block</Link> has all four layers, in 3D.
         </p>
       </Section>
 

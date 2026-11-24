@@ -1,0 +1,34 @@
+/* The How it works hero time-lapse (src/components/marketing/HeroTimelapse.tsx).
+   It sits on the dark banner, so text uses the banner tokens. The canvas draws
+   its own sky; the frame is a plain rectangle (no circles, docs/design). */
+.tl { margin: 0; width: 100%; max-width: 560px; justify-self: end; }
+.tl-stage { position: relative; aspect-ratio: 5 / 4; border-radius: 10px; overflow: hidden; background: #0d1324; }
+.tl-canvas { display: block; width: 100%; height: 100%; }
+.tl-now {
+  position: absolute; left: 12px; top: 12px; display: inline-flex; align-items: center; gap: 8px;
+  padding: 5px 10px; border-radius: 6px; background: rgba(20, 20, 20, 0.62); color: var(--ban-ink);
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase;
+  backdrop-filter: blur(4px);
+}
+.tl-now-dot { width: 8px; height: 8px; border-radius: 2px; background: var(--ban-muted); }
+.tl-now-dot[data-scene="flood"], .tl-now-dot[data-scene="hurricane"] { background: #4f9fc4; }
+.tl-now-dot[data-scene="heat"] { background: #f0b632; }
+.tl-now-dot[data-scene="quake"] { background: #c9925a; }
+.tl-now-dot[data-scene="wind"] { background: #8fc4a0; }
+.tl-play {
+  position: absolute; right: 12px; bottom: 12px; min-height: 32px; padding: 4px 12px; border-radius: 6px;
+  border: 1px solid rgba(245, 245, 244, 0.5); background: rgba(20, 20, 20, 0.62); color: var(--ban-ink);
+  font: 500 13px/1 var(--font-sans); cursor: pointer;
+}
+.tl-play:focus-visible, .tl-chip:focus-visible { outline: 2px solid var(--ban-ink); outline-offset: 2px; }
+.tl-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.tl-chip {
+  min-height: 30px; padding: 4px 10px; border-radius: 6px; border: 1px solid rgba(245, 245, 244, 0.28);
+  background: transparent; color: var(--ban-muted); font: 500 12.5px/1 var(--font-sans); cursor: pointer;
+}
+.tl-chip[aria-current="step"] { color: var(--ban-ink); border-color: var(--ban-ink); }
+.tl-cap { margin-top: 10px; color: var(--ban-muted); font-size: 13px; line-height: 1.5; }
+.tl-cap a { color: var(--ban-ink); }
+@media (max-width: 900px) {
+  .tl { justify-self: stretch; max-width: none; }
+}

@@ -1,6 +1,7 @@
-// The hero time-lapse: a made-up neighbourhood on a floating slab, two days
+// The hero time-lapse: a made-up neighbourhood on a floating slab, three days
 // long, that goes through a flood, a hurricane, a heat wave, an earthquake that
-// opens a sinkhole, and a wind storm, then folds itself into the fluid cell of
+// opens a sinkhole, a wildfire (smoke, embers, then ash drifting over town), a
+// winter storm (snow, a frozen creek, a thaw) and a wind storm, then folds into the fluid cell of
 // the SPARC Labs mark (public/brand/sparc-labs-mark.svg) and unfolds again.
 //
 // It is an illustration. No number in this file comes from a model, a place or
@@ -17,7 +18,7 @@
 // frames run slow; small screens draw fewer particles. The caller stops the
 // clock when the canvas is off screen or the tab is hidden.
 
-export type SceneId = "unfold" | "flood" | "hurricane" | "night" | "heat" | "quake" | "wind" | "fold";
+export type SceneId = "unfold" | "flood" | "hurricane" | "night" | "heat" | "quake" | "fire" | "winter" | "wind" | "fold";
 
 export interface Scene {
   id: SceneId;
@@ -29,18 +30,25 @@ export interface Scene {
   still: number;
 }
 
-export const LOOP = 50;
+/** The story is written in "story seconds" and played at SPEED (Kyle, 24 Nov: twice as fast). */
+const SPEED = 2;
+const STORY = 65.5;
+export const LOOP = STORY / SPEED;
 
-export const SCENES: Scene[] = [
-  { id: "unfold", label: "A neighbourhood wakes", t0: 0, t1: 6, still: 5.2 },
-  { id: "flood", label: "Flood", t0: 6, t1: 13.5, still: 10.4 },
-  { id: "hurricane", label: "Hurricane", t0: 13.5, t1: 20.5, still: 17 },
-  { id: "night", label: "Night", t0: 20.5, t1: 23, still: 21.8 },
-  { id: "heat", label: "Heat wave", t0: 23, t1: 30, still: 27.6 },
-  { id: "quake", label: "Earthquake and sinkhole", t0: 30, t1: 37, still: 35.6 },
-  { id: "wind", label: "Wind storm", t0: 37, t1: 43.5, still: 41 },
-  { id: "fold", label: "Into one cell", t0: 43.5, t1: 50, still: 48.6 },
+const STORY_SCENES: [SceneId, string, number, number, number][] = [
+  ["unfold", "A neighbourhood wakes", 0, 6, 5.2],
+  ["flood", "Flood", 6, 13.5, 10.4],
+  ["hurricane", "Hurricane", 13.5, 20.5, 17],
+  ["night", "Night", 20.5, 23, 21.8],
+  ["heat", "Heat wave", 23, 30, 27.6],
+  ["quake", "Earthquake and sinkhole", 30, 37, 35.6],
+  ["fire", "Wildfire", 37, 44.5, 41.4],
+  ["winter", "Winter storm", 44.5, 52.5, 50.2],
+  ["wind", "Wind storm", 52.5, 59, 56.5],
+  ["fold", "Into one cell", 59, 65.5, 64.1],
 ];
+
+export const SCENES: Scene[] = STORY_SCENES.map(([id, label, a, b, st]) => ({ id, label, t0: a / SPEED, t1: b / SPEED, still: st / SPEED }));
 
 export function sceneAt(t: number): number {
   const u = ((t % LOOP) + LOOP) % LOOP;
@@ -110,6 +118,8 @@ interface Town {
   creek: (x: number, y: number) => number; // distance to the creek's line
   hole: { cx: number; cy: number; R: number };
   lamps: [number, number][];
+  /** for the back forest: how many tiles of fire front reach it (Infinity: never burns) */
+  fireDelay: Float32Array;
 }
 
 function buildTown(): Town {
@@ -204,7 +214,13 @@ function buildTown(): Town {
       houses[k] = null;
       trees[k] = [];
     }
-  return { use, z, houses, trees, creek, hole, lamps };
+  // the wildfire starts at the back corner of the forest and runs through it, never into town
+  const fireDelay = new Float32Array(N * N).fill(Infinity);
+  const nf = valueNoise(23);
+  for (let j = 0; j < 19; j++)
+    for (let i = 10; i < N; i++)
+      if (use[j * N + i] === "forest") fireDelay[j * N + i] = Math.hypot(i - 22.5, j - 1.5) * 0.9 + 3 * nf(i / 2.5, j / 2.5);
+  return { use, z, houses, trees, creek, hole, lamps, fireDelay };
 }
 
 /* ---------------------------------------------------------------- engine */
@@ -225,6 +241,7 @@ const BASE: Record<Use, RGB> = {
   lot: hex("#94ad6d"),
   plaza: hex("#a29d94"),
 };
+const SNOW: RGB = hex("#f4f7fa");
 const SOIL: RGB[] = [hex("#6b4a2e"), hex("#563a24"), hex("#43301f")];
 
 export class Timelapse {
@@ -240,6 +257,8 @@ export class Timelapse {
   private slow = 0;
   private scene = -1;
   private small = false;
+  private burning = new Float32Array(800);
+  private nBurning = 0;
   private prevT = 0;
   private stepDt = 0.016;
   // per-vertex working buffers
@@ -332,7 +351,7 @@ export class Timelapse {
   private state(t: number) {
     // hour of the day: two days in one loop
     const keys: [number, number][] = [
-      [0, 5.0], [6, 8.5], [13.5, 13.5], [20.5, 20.6], [23, 30.4], [30, 36.6], [37, 38.0], [43.5, 42.6], [50, 53.0],
+      [0, 5.0], [6, 8.5], [13.5, 13.5], [20.5, 20.6], [23, 30.4], [30, 36.6], [37, 38.0], [44.5, 44.0], [46.5, 55.0], [52.5, 58.5], [59, 64.6], [65.5, 77.0],
     ];
     let hour = 5;
     for (let k = 1; k < keys.length; k++)
@@ -350,27 +369,33 @@ export class Timelapse {
     const hurricane = env(t, 13.5, 20.5, 1.3, 1.6);
     const heat = env(t, 23.6, 30, 2.2, 1.2);
     const quake = env(t, 31, 34.2, 0.15, 1.6);
-    const wind = env(t, 37, 43.5, 1.2, 1.6);
-    const overcast = Math.max(flood, hurricane * 1.1, wind * 0.55);
+    const wind = env(t, 52.5, 59, 1.2, 1.6);
+    const fire = env(t, 37.4, 44.8, 0.6, 1.4); // flames and smoke
+    const burn = t > 37.6 && t < 65.5 ? (t - 37.6) * 2.1 : -99; // how far the fire front has run, in tiles
+    const ash = env(t, 39, 46, 1.5, 2);
+    const snowfall = env(t, 44.8, 50.5, 1.2, 1.5);
+    const snow = env(t, 45, 53.2, 3, 2.4); // lying snow and ice, then the thaw
+    const overcast = Math.max(flood, hurricane * 1.1, wind * 0.55, snowfall * 0.85, fire * 0.35);
     const rain = Math.max(env(t, 7, 12, 1, 1.8), hurricane * smooth(14.2, 15.4, t));
     // water: the creek rises in the flood and again under the hurricane
     const water = 0.22 + 0.85 * env(t, 7.4, 13.6, 3.2, 2.6) + 0.6 * env(t, 15, 20.5, 2.2, 2.2);
-    const hole = smooth(32.2, 35, t) * (1 - smooth(43.5, 45.5, t)) + 0; // the hole stays until the fold
+    const hole = smooth(32.2, 35, t) * (1 - smooth(59.5, 61.5, t)); // the hole stays until the fold
     // fold: 1 at the very start and end of the loop
-    const fold = Math.max(1 - smooth(0.4, 4.2, t), smooth(43.8, 47.2, t));
-    const gust = wind + hurricane * 1.3;
-    const windDir = hurricane > wind ? 2.4 + t * 0.6 : 0.25; // radians in the ground plane
-    return { hour, sunUp, day, golden, flood, hurricane, heat, quake, wind, overcast, rain, water, hole, fold, gust, windDir };
+    const fold = Math.max(1 - smooth(0.4, 4.2, t), smooth(59.3, 62.7, t));
+    const gust = wind + hurricane * 1.3 + snowfall * 0.25 + fire * 0.2;
+    const windDir = hurricane > wind ? 2.4 + t * 0.6 : fire > 0 ? 2.6 : 0.25; // radians in the ground plane
+    return { hour, sunUp, day, golden, flood, hurricane, heat, quake, wind, fire, burn, ash, snowfall, snow, overcast, rain, water, hole, fold, gust, windDir };
   }
 
   /* ------------------------------------------------------------ drawing */
 
-  private draw(t: number) {
+  private draw(rt: number) {
+    const t = rt * SPEED; // story seconds
     const ctx = this.ctx, W = this.W, H = this.H, T = this.town;
     const s = this.state(t);
     this.stepDt = clamp(t - this.prevT, 0, 0.1);
     this.prevT = t;
-    const idx = sceneAt(t);
+    const idx = sceneAt(rt);
     if (idx !== this.scene) {
       this.scene = idx;
       this.opts.onScene?.(idx);
@@ -563,6 +588,7 @@ export class Timelapse {
     const objH = 1 - smooth(0.05, 0.5, m);
     const W1 = N + 1;
     const waterLevel = s.water;
+    this.nBurning = 0;
     const rainSheen = s.rain;
     for (let d = 0; d <= 2 * N - 2; d++) {
       for (let j = Math.max(0, d - N + 1); j <= Math.min(N - 1, d); j++) {
@@ -581,6 +607,9 @@ export class Timelapse {
           if (deep) base = mix(hex("#9a7550"), SOIL[1], clamp(sunk / 2.2));
           if (use === "road" && rainSheen > 0) base = mix(base, hex("#6f7680"), rainSheen * 0.6);
           if (s.heat > 0 && (use === "yard" || use === "lot" || use === "bank")) base = mix(base, hex("#b7a565"), s.heat * 0.45);
+          const fb = s.burn - T.fireDelay[k]; // > 0 once the fire front has reached this tile
+          if (fb > 2.2) base = mix(base, hex("#55504a"), 0.85 * smooth(2.2, 4, fb)); // ash
+          if (s.snow > 0) base = mix(base, use === "creek" ? hex("#cfe2ea") : SNOW, s.snow * (use === "road" ? 0.55 : use === "creek" ? 0.75 : 0.9));
           ctx.globalAlpha = groundA;
           ctx.fillStyle = shadeCol(base, lam);
           ctx.beginPath();
@@ -590,6 +619,17 @@ export class Timelapse {
           ctx.lineTo(this.px[e], this.py[e]);
           ctx.closePath();
           ctx.fill();
+          if (fb > 0 && fb < 4.2 && mE < 0.5) {
+            // the burning floor glows through the smoke, day or night
+            const fl = 0.55 + 0.45 * Math.sin(t * 13 + i * 1.7 + j * 2.3);
+            ctx.fillStyle = `rgba(255,${Math.round(90 + 70 * fl)},30,${(0.8 * Math.sin((Math.PI * fb) / 4.2) * groundA).toFixed(3)})`;
+            ctx.fill();
+            if (this.nBurning < 400) {
+              this.burning[this.nBurning * 2] = i + 0.5;
+              this.burning[this.nBurning * 2 + 1] = j + 0.5;
+              this.nBurning++;
+            }
+          }
           // street lines
           if (use === "road" && mE < 0.3) {
             ctx.strokeStyle = shadeCol(hex("#b9b4aa"), 0.6);
@@ -613,7 +653,7 @@ export class Timelapse {
             const zw = thick + waterLevel;
             const depth = clamp((waterLevel - lo) / 0.8);
             const [x0, y0] = P(i, j, zw), [x1, y1] = P(i + 1, j, zw), [x2, y2] = P(i + 1, j + 1, zw), [x3, y3] = P(i, j + 1, zw);
-            const wc = mix(hex("#4f86a6"), hex("#2f5f7f"), depth);
+            const wc = mix(mix(hex("#4f86a6"), hex("#2f5f7f"), depth), hex("#d8e8ef"), s.snow * 0.8);
             const glint = 0.1 * Math.sin(t * 3 + i * 0.9 + j * 0.7);
             ctx.fillStyle = shadeCol(wc, 0.55 + glint);
             ctx.globalAlpha = (0.55 + 0.35 * depth) * groundA;
@@ -632,7 +672,8 @@ export class Timelapse {
           ctx.globalAlpha = objA;
           const h = T.houses[k];
           if (h) this.house(h, s, t, P, thick + T.z[a], objH, shadeCol, faceL, faceR, u);
-          for (const tr of T.trees[k]) this.tree(tr, s, t, P, thick + this.groundAt(tr.x, tr.y), objH, shadeCol, u);
+          const fbT = s.burn - T.fireDelay[k];
+          for (const tr of T.trees[k]) this.tree(tr, s, t, P, thick + this.groundAt(tr.x, tr.y), objH, shadeCol, u, fbT);
           ctx.globalAlpha = 1;
         }
       }
@@ -680,6 +721,9 @@ export class Timelapse {
       if (s.gust > 0.05) this.windStreaks(s, t, P, u, thick);
       if (s.heat > 0.05) this.shimmer(s, t, P, u, thick);
       if (s.rain > 0.02) this.rainfall(s, t);
+      if (s.fire > 0.02 && this.nBurning > 0) this.smoke(s, t, P, u, thick);
+      if (s.ash > 0.02) this.flakes(t, s.ash, "ash");
+      if (s.snowfall > 0.02) this.flakes(t, s.snowfall, "snow");
       if (s.quake > 0.02 || s.hole > 0.02) this.quakeDust(s, t, P, u, thick);
     }
 
@@ -746,7 +790,8 @@ export class Timelapse {
     const { x0, y0, x1, y1 } = h;
     poly([Q(x0, y1, zb), Q(x1, y1, zb), Q(x1, y1, zt), Q(x0, y1, zt)], shade(h.wall, faceL));
     poly([Q(x1, y0, zb), Q(x1, y1, zb), Q(x1, y1, zt), Q(x1, y0, zt)], shade(h.wall, faceR * 0.85));
-    const roofC = s.heat > 0 ? mix(h.top, hex("#c4583a"), s.heat * 0.35) : h.top;
+    let roofC = s.heat > 0 ? mix(h.top, hex("#c4583a"), s.heat * 0.35) : h.top;
+    if (s.snow > 0) roofC = mix(roofC, SNOW, s.snow * 0.92);
     if (h.flat || rf < 0.02) {
       poly([Q(x0, y0, zt), Q(x1, y0, zt), Q(x1, y1, zt), Q(x0, y1, zt)], shade(mix(roofC, hex("#9a9a96"), 0.5), 0.9));
     } else if (h.gableX) {
@@ -781,10 +826,17 @@ export class Timelapse {
 
   private tree(
     tr: Tree, s: ReturnType<Timelapse["state"]>, t: number, P: (x: number, y: number, z: number) => [number, number],
-    zb: number, k: number, shade: (c: RGB, n: number) => string, u: number,
+    zb: number, k: number, shadeIn: (c: RGB, n: number) => string, u: number, fb = -1,
   ) {
     const ctx = this.ctx;
-    const h = tr.h * k;
+    const burning = fb > 0.15 && fb < 3.8, burnt = fb >= 3.8;
+    const fl = 0.5 + 0.5 * Math.sin(t * 17 + tr.phase * 3);
+    const shade = burning
+      ? (_c: RGB, n: number) => rgb(mix(hex("#ff5a1f"), hex("#ffd45a"), clamp(fl * 0.6 + n * 0.4)))
+      : burnt
+        ? (_c: RGB, n: number) => shadeIn(hex("#2c2623"), n)
+        : shadeIn;
+    const h = tr.h * k * (burnt ? 0.8 : 1);
     if (h < 0.03) return;
     // trees bend with the wind: a steady lean plus gusts
     const g = s.gust;
@@ -801,7 +853,8 @@ export class Timelapse {
     ctx.stroke();
     let leaf: RGB = tr.pine ? mix(hex("#2f5a3a"), hex("#3c6b3f"), tr.tone) : mix(hex("#4f7d3a"), hex("#6f9a45"), tr.tone);
     if (s.heat > 0) leaf = mix(leaf, hex("#9a8a3e"), s.heat * 0.4 * (tr.pine ? 0.4 : 1));
-    const w = tr.w * u * (tr.pine ? 1 : 1.25);
+    if (s.snow > 0) leaf = mix(leaf, SNOW, s.snow * 0.6);
+    const w = tr.w * u * (tr.pine ? 1 : 1.25) * (burnt ? 0.55 : burning ? 0.9 + 0.2 * fl : 1);
     if (tr.pine) {
       // two stacked cones, split light and shade
       for (const [f0, f1, ww] of [[0.2, 0.75, 1], [0.48, 1, 0.72]] as const) {
@@ -841,6 +894,63 @@ export class Timelapse {
       ctx.closePath();
       ctx.fill();
     }
+  }
+
+  private smokeSprite: HTMLCanvasElement | null = null;
+  private smoke(s: ReturnType<Timelapse["state"]>, t: number, P: (x: number, y: number, z: number) => [number, number], u: number, thick: number) {
+    const ctx = this.ctx;
+    if (!this.smokeSprite) {
+      const c = document.createElement("canvas");
+      c.width = c.height = 64;
+      const g = c.getContext("2d")!;
+      const grad = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+      grad.addColorStop(0, "rgba(92,84,78,0.85)");
+      grad.addColorStop(0.55, "rgba(110,102,96,0.4)");
+      grad.addColorStop(1, "rgba(120,112,104,0)");
+      g.fillStyle = grad;
+      g.fillRect(0, 0, 64, 64);
+      this.smokeSprite = c;
+    }
+    const n = this.nBurning, puffs = this.small ? 26 : 48;
+    const dx = Math.cos(s.windDir), dy = Math.sin(s.windDir);
+    for (let q = 0; q < puffs; q++) {
+      const src = (q * 7) % n;
+      const x0 = this.burning[src * 2], y0 = this.burning[src * 2 + 1];
+      const life = (t * 0.45 + this.rain[q * 3]) % 1;
+      const rise = life * 7;
+      const x = x0 + dx * rise * 0.8, y = y0 + dy * rise * 0.8;
+      const [sx, sy] = P(x, y, thick + this.groundAt(Math.min(N, Math.max(0, x0)), Math.min(N, Math.max(0, y0))) + 1 + rise);
+      const size = u * (0.8 + life * 2.6);
+      ctx.globalAlpha = s.fire * 0.5 * Math.sin(Math.PI * life);
+      ctx.drawImage(this.smokeSprite, sx - size, sy - size, size * 2, size * 2);
+    }
+    // embers lifting off the flames
+    ctx.globalAlpha = 1;
+    for (let q = 0; q < (this.small ? 24 : 50); q++) {
+      const src = (q * 13) % n;
+      const life = (t * 0.9 + this.rain[q * 3 + 1]) % 1;
+      const x = this.burning[src * 2] + dx * life * 2 + Math.sin(q + t * 4) * 0.3, y = this.burning[src * 2 + 1] + dy * life * 2;
+      const [sx, sy] = P(x, y, thick + 1.2 + life * 4);
+      ctx.fillStyle = `rgba(255,${150 + (q % 4) * 25},60,${(s.fire * (1 - life)).toFixed(3)})`;
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+  }
+
+  /** Falling snow, or the ash that drifts over town after the fire: small squares, no rain streaks. */
+  private flakes(t: number, amount: number, kind: "snow" | "ash") {
+    const ctx = this.ctx, W = this.W, H = this.H;
+    const n = Math.floor((this.small ? 90 : 180) * amount);
+    ctx.fillStyle = kind === "snow" ? "rgba(250,252,255,0.9)" : "rgba(120,114,108,0.75)";
+    for (let q = 0; q < n; q++) {
+      const a = this.rain[q * 3], b = this.rain[q * 3 + 1], c = this.rain[q * 3 + 2];
+      const sp = kind === "snow" ? 0.12 + c * 0.1 : 0.06 + c * 0.05;
+      const y = ((b + t * sp) % 1) * (H + 20) - 10;
+      const x = (((a + Math.sin(t * 0.8 + q) * 0.015 + (kind === "ash" ? t * 0.01 : 0)) % 1) + 1) % 1 * W;
+      const r = kind === "snow" ? 1.5 + c * 1.6 : 1.2 + c * 1.4;
+      ctx.globalAlpha = kind === "snow" ? 0.6 + 0.4 * c : amount;
+      ctx.fillRect(x, y, r, r);
+    }
+    ctx.globalAlpha = 1;
   }
 
   private rainfall(s: ReturnType<Timelapse["state"]>, t: number) {
@@ -954,7 +1064,7 @@ export class Timelapse {
       tr[1] = sy;
       if (p.n < 3) continue;
       const fade = Math.sin(Math.PI * clamp(p.life)) * clamp(s.gust);
-      ctx.strokeStyle = `rgba(244,247,248,${(0.8 * fade).toFixed(3)})`;
+      ctx.strokeStyle = `rgba(244,247,248,${((swirl ? 0.45 : 0.8) * fade).toFixed(3)})`;
       ctx.beginPath();
       ctx.moveTo(tr[0], tr[1]);
       for (let k = 2; k < p.n * 2; k += 2) ctx.lineTo(tr[k], tr[k + 1]);

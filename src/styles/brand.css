@@ -117,6 +117,7 @@
 .receipt[data-hazard="heat"] { --hz: var(--heat); }
 .receipt[data-hazard="ground"] { --hz: var(--ground); }
 .receipt[data-hazard="wind"] { --hz: var(--wind); }
+.receipt[data-hazard="fire"] { --hz: var(--fire); }
 .receipt-body p { margin: 0 0 6px; font-size: 14px; line-height: 1.55; color: var(--ink-2); }
 .receipt-body p.next { color: var(--ink); }
 .receipt-body p.next::before { content: "Next check \2192  "; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
@@ -219,6 +220,7 @@
 .tr-table tr[data-hazard="heat"] td:first-child { box-shadow: inset 3px 0 0 var(--heat); }
 .tr-table tr[data-hazard="ground"] td:first-child { box-shadow: inset 3px 0 0 var(--ground); }
 .tr-table tr[data-hazard="wind"] td:first-child { box-shadow: inset 3px 0 0 var(--wind); }
+.tr-table tr[data-hazard="fire"] td:first-child { box-shadow: inset 3px 0 0 var(--fire); }
 .tr-table tr[data-hazard="pipeline"] td:first-child { box-shadow: inset 3px 0 0 var(--rule); }
 .tr-bar-wrap { display: grid; gap: 6px; min-width: 200px; }
 .tr-bar { display: flex; gap: 2px; height: 12px; }

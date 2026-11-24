@@ -549,6 +549,7 @@ div.place-layer { grid-template-columns: 1fr; cursor: default; }
 .hazard-mark[data-hazard="heat"] { background: var(--heat); }
 .hazard-mark[data-hazard="ground"] { background: var(--ground); }
 .hazard-mark[data-hazard="wind"] { background: var(--wind); }
+.hazard-mark[data-hazard="fire"] { background: var(--fire); }
 
 .shelf { margin-top: 28px; }
 .shelf-head { display: flex; align-items: baseline; gap: 12px; padding-bottom: 10px; margin-bottom: 16px; border-bottom: 1px solid var(--rule); }
@@ -627,6 +628,7 @@ div.place-layer { grid-template-columns: 1fr; cursor: default; }
 .engine-card[data-hazard="heat"] { border-top-color: var(--heat); }
 .engine-card[data-hazard="ground"] { border-top-color: var(--ground); }
 .engine-card[data-hazard="wind"] { border-top-color: var(--wind); }
+.engine-card[data-hazard="fire"] { border-top-color: var(--fire); }
 .engine-card h3 { margin: 2px 0 4px; }
 .engine-card p, .engine-card ul { font-size: 14px; line-height: 1.6; color: var(--ink-2); margin: 0; }
 .engine-card ul { padding-left: 18px; }

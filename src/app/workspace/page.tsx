@@ -41,6 +41,11 @@ const FLOW: Record<EngineId, string[]> = {
     "It is put together with the local wind record, season by season.",
     "Explore the map at street level and at roof level.",
   ],
+  fire: [
+    "We read the fuels, slope and weather records for the land around the place.",
+    "Fire is run across it over a range of winds, with embers carried ahead of the front.",
+    "Explore where flames and embers reach, and which side of the house they come from.",
+  ],
 };
 
 function Slots({ items }: { items: string[] }) {
@@ -157,6 +162,7 @@ export default function WorkspacePage() {
       <HazardWorkspace id="heat" />
       <HazardWorkspace id="ground" />
       <HazardWorkspace id="wind" />
+      <HazardWorkspace id="fire" />
 
       <section className="hazard-row" id="history">
         <div className="wrap">

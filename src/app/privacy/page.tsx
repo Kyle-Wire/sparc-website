@@ -109,7 +109,8 @@ export default function PrivacyPage() {
             <>
               <h2 id="reports" style={h2}>Ordering a house report</h2>
               <p>
-                A report is about one house, so this is the one place the site keeps a street address. When you order,
+                A report is about one house, so ordering one, or joining the waitlist for one, is the only time the site
+                keeps a street address. When you order,
                 we store the address you give, your note, any answers you give about the house (basement, central air, year
                 built, storeys, first-floor height), your account and the order&apos;s progress in our database.
                 Only you (signed in) and the person making your report can read it. It is not put in any link.
@@ -121,6 +122,13 @@ export default function PrivacyPage() {
                 and tells us whether the charge went through and the amount. Stripe sends your receipt. The finished
                 report is stored privately and is downloaded through your account with a link that lasts a few
                 minutes.
+              </p>
+              <p>
+                When a week is full, you can join the waitlist instead. We keep your name, email, the address, any
+                inspection deadline and note you give, and your place in the queue, readable only by the person running
+                reports. We use them to invite you in turn and to run your report, nothing else. Leave the list from the
+                link in our email and we delete the address and note at once; we keep only that the email left, so we do
+                not write again.
               </p>
               <p>
                 We keep your order and report while you have an account, so you can download it again. Ask us at{" "}

@@ -4,7 +4,7 @@ import { isSameOrigin } from "@/lib/require-same-origin";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { SITE_URL } from "@/lib/brand";
 import { checkoutEnabled, mayOrder, paymentProvider, REPORT, REPORT_TERMS_VERSION } from "@/lib/payments";
-import { atCapacity } from "@/lib/payments/capacity";
+import { capacity, openInvite } from "@/lib/payments/capacity";
 import { tooManyAttempts } from "@/lib/payments/attempts";
 import { checkOrder } from "@/lib/payments/order-input";
 
@@ -35,7 +35,11 @@ export async function POST(req: NextRequest) {
   // Soft launch (Kyle, 22 November 2026): only invited emails may order until
   // ORDERS_OPEN is set. Checked here, not only on the page, so a hand-made
   // POST is refused too.
-  if (!mayOrder(user.email)) return back("invite");
+  // A waitlist invite (migration 0012) also lets its email order, and holds
+  // a place so the weekly cap does not turn it away.
+  const admin = createSupabaseAdminClient();
+  const invite = await openInvite(admin, user.email);
+  if (!mayOrder(user.email) && !invite) return back("invite");
 
   const rl = await checkRateLimit("apiWrite", `report-order:${user.id}`);
   if (!rl.ok) return back("checkout");
@@ -51,8 +55,7 @@ export async function POST(req: NextRequest) {
   const provider = paymentProvider();
   if (!provider.configured()) return back("unconfigured", input.placeSlug);
 
-  const admin = createSupabaseAdminClient();
-  if (await atCapacity(admin)) return back("full", input.placeSlug);
+  if (!invite && (await capacity(admin)).full) return back("full", input.placeSlug);
   if (await tooManyAttempts(admin, user.id)) return back("attempts", input.placeSlug);
 
   const { data: order, error } = await admin
@@ -81,6 +84,17 @@ export async function POST(req: NextRequest) {
   if (error || !order) {
     console.error("[reports/order] insert failed:", error);
     return back("checkout", input.placeSlug);
+  }
+
+  // Tie the order to the invite, so the held place and the order are not both
+  // counted against the cap. The invite stays open until it expires, so an
+  // abandoned card page can be tried again.
+  if (invite) {
+    const { error: linkError } = await admin
+      .from("report_waitlist")
+      .update({ order_id: order.id, updated_at: new Date().toISOString() })
+      .eq("id", invite.id);
+    if (linkError) console.error("[reports/order] invite link failed:", linkError);
   }
 
   try {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Kicker } from "@/components/marketing/page-shell";
 import { Placeholder } from "@/components/system/placeholder";
 import { Measurement, MeasurementRow } from "@/components/system/measurement";
+import { Figure } from "@/components/system/figure";
 import { TAGLINE_SHORT, BRAND_LONG, VERSION } from "@/lib/brand";
 
 // This panel is an illustration of the interface. It previously opened
@@ -197,14 +198,22 @@ export function PipelineFlow() {
     { n: "06", k: "Report", note: "audit trail · pdf · shareable" },
   ];
   return (
+    <Figure
+      of="The application's seven pipeline stages"
+      caption="Drawn to show the interface, not produced by a run. The highlighted row advances on a timer and the rows are selectable; nothing behind them is computing."
+    >
     <div className="card" style={{ padding: 0 }}>
       {/* The stage cycles on a setInterval. Nothing is running. The pill said
           "running . stage 0X" next to a pulsing live dot, which asserted a
-          computation in progress; it now says "illustration" and the dot is
-          gone. Do not reinstate a live indicator over a timer. */}
+          computation in progress; the dot is gone and the word "illustration"
+          has moved out of the pill and into the figure's caption, at body size.
+          A pill is 10px uppercase mono -- the register §4.4 found a disclaimer
+          failing in, and the floor for an honesty label is --fs-body. What is
+          left in the pill is a neutral readout of which row is shown, which is
+          what a pill is for. Do not reinstate a live indicator over a timer. */}
       <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--hairline)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div className="kicker">pipeline · 7 stages</div>
-        <span className="pill">illustration · stage {String(stage).padStart(2, "0")}</span>
+        <span className="pill">stage {String(stage).padStart(2, "0")}</span>
       </div>
       <div style={{ padding: 14, display: "flex", flexDirection: "column", gap: 6 }}>
         {stages.map((s, i) => {
@@ -234,6 +243,7 @@ export function PipelineFlow() {
         })}
       </div>
     </div>
+    </Figure>
   );
 }
 
@@ -271,11 +281,24 @@ export function PosteriorTrace() {
   const chainStrokes = [1.6, 1.1, 1.8, 1.3];
   const chainOpacities = [0.95, 0.7, 0.85, 0.6];
   return (
+    /* "illustration · not sampled data" was a .pill: 10px uppercase mono, the
+       weakest register in the system, carrying the only statement on this panel
+       that a reader needs. It is a caption now, at --fs-body, which type-scale
+       §3 fixes as the floor for an honesty label. The kicker went with it --
+       the caption's first line says what the figure is, so the label above the
+       frame was saying it twice.
+
+       Still open, and a register decision rather than a caption one: these four
+       curves are drawn, and placeholder.tsx rule 5 says a drawn curve crops
+       into a result. By that rule this panel should be a <PlaceholderPlot/>
+       with no curves at all, as the seven /product panels are. That is a
+       visible change to the landing page and it is recorded in
+       docs/design/placeholder-register.md rather than taken here. */
+    <Figure
+      of="What a posterior trace plot looks like"
+      caption="The four curves are drawn by a formula in this component, not sampled from any posterior, and no chain is running. The panel shows the shape of the chart; it has never held a result."
+    >
     <div className="card" style={{ padding: 0 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: "1px solid var(--hairline)" }}>
-        <div className="kicker">posterior trace</div>
-        <span className="pill">illustration · not sampled data</span>
-      </div>
       <div style={{ padding: 16 }}>
         <svg width="100%" height="160" viewBox="0 0 400 160" preserveAspectRatio="none" role="img" aria-label="Illustration of what a posterior trace plot looks like. The curves are drawn, not sampled.">
           {chains.map((pts, c) => (
@@ -293,6 +316,7 @@ export function PosteriorTrace() {
         </div>
       </div>
     </div>
+    </Figure>
   );
 }
 

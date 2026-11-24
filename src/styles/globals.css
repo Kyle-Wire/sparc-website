@@ -100,9 +100,17 @@ code, pre, kbd, samp { font-family: var(--font-mono); font-size: 12px; color: va
 .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; vertical-align: middle; }
 .mono { font-family: var(--font-mono); }
 
-/* Sections */
-section { padding: 80px 0; position: relative; }
-section.compact { padding: 56px 0; }
+/* Sections.
+
+   Printed-page rhythm means the vertical spacing comes off the scale, and the
+   scale now goes high enough to express it. These were 80px and 56px -- two
+   literals that are on no scale, picked once, and the reason the documented
+   spacing run looked decorative. 96 and 48 are --space-9 and --space-7.
+
+   The section OPENER -- its kicker, its heading, the rule under it -- is held
+   until the direction answer. This is the ground it sits on, not the opener. */
+section { padding: var(--space-9) 0; position: relative; }
+section.compact { padding: var(--space-7) 0; }
 .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 32px; padding-bottom: 18px; border-bottom: 1px solid var(--hairline); }
 .section-head h2 { font-size: var(--fs-h2-section); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin: 0; }
 .section-head .lead { color: var(--muted); font-size: 14px; max-width: 420px; }
@@ -284,7 +292,7 @@ body.no-scroll { overflow: hidden; }
    --rule for the same reason the edge of a control is --rule. */
 .stage-stack .stage-rail { position: absolute; left: 32px; top: 0; bottom: 0; width: 2px; background: var(--rule); }
 .stage-stack .stage-rail-fill { position: absolute; left: 0; top: 0; width: 100%; background: var(--accent); transition: height .5s ease; }
-.stage-block { position: relative; border-bottom: 1px solid var(--hairline); padding: 56px 0; transition: background .4s ease; }
+.stage-block { position: relative; border-bottom: 1px solid var(--hairline); padding: var(--space-7) 0; transition: background .4s ease; }
 .stage-block .stage-num { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--paper); background: var(--fg); transition: background .2s ease; }
 .stage-block.open .stage-num { background: var(--accent); }
 .stage-block .stage-head { display: grid; grid-template-columns: 50px 1fr auto; gap: 18px; align-items: center; width: 100%; background: transparent; border: 0; padding: 0; margin: 0; text-align: left; color: inherit; font: inherit; cursor: pointer; }
@@ -304,6 +312,124 @@ body.no-scroll { overflow: hidden; }
      and the nav strip; both ran continuously regardless of the preference. */
   .ramp-strip { animation: none; }
   [style*="rampShift"] { animation: none !important; }
+}
+
+/* ============================================================
+   The reading ground — Register B's long-form surfaces
+
+   Warm paper, a comfortable measure, printed-page leading, real captions.
+
+   /docs, /research, /data-use, /privacy, /terms and /download each carried an
+   identical inline block -- maxWidth 760, margin auto, grid, gap 18, --ink-2,
+   15px, 1.7 -- copied five times. /privacy additionally carried
+   className="prose" with NO SUCH RULE ANYWHERE IN THE STYLESHEET, which is the
+   clearest possible statement that this class should have existed: somebody
+   reached for it, nothing happened, and the inline copy stayed.
+
+   What changes beyond deduplication:
+
+   The measure. 760px at 15px is roughly 100 characters a line, about a third
+   past the range where a reader reliably finds the start of the next one.
+   --measure is 74ch, in ch so it tracks the font size rather than fighting it.
+   "Generous measure" in a methods appendix means comfortable, not wide.
+
+   The size and the leading. --fs-prose is 16px against the old 15px literal,
+   at 1.75 rather than 1.7. A token, because type-scale.md's rule is that no
+   scale step is declared as a literal, and 15px was one in five files.
+
+   The ink. --fg-2 at 13.94:1, which these already had and which is worth
+   keeping named: long-form body on a trust surface is not --muted.
+
+   The rhythm comes off the spacing scale, so paragraph separation on these
+   pages and section separation on every page are the same series.
+   ============================================================ */
+
+.prose {
+  max-width: var(--measure);
+  margin: 0 auto;
+  display: grid;
+  gap: var(--space-5);
+  color: var(--fg-2);
+  font-size: var(--fs-prose);
+  line-height: 1.75;
+}
+
+/* The grid gap carries the separation, so the default paragraph margin would
+   double it. */
+.prose > p { margin: 0; }
+
+/* A heading inside long-form text sits closer to the text it introduces than
+   to the text above it -- the one piece of asymmetric spacing worth having,
+   because it is what makes a run of sections scannable on paper. */
+.prose > h2,
+.prose > h3 { margin-top: var(--space-3); }
+.prose > h2:first-child,
+.prose > h3:first-child { margin-top: 0; }
+
+/* The sub-head step. This was `fontSize: 24, fontWeight: 700,
+   color: var(--ink), margin: 0` inline, eighteen times across five pages --
+   the run of literals type-scale.md §4 named as a step the scale did not have.
+   It has a token now, so the heading is a <h2> and nothing else. */
+.prose > h2 { font-size: var(--fs-prose-head); font-weight: 700; color: var(--fg); }
+
+.prose > ul,
+.prose > ol { margin: 0; padding-left: var(--space-5); display: grid; gap: var(--space-3); }
+
+/* A table inside a field report is a table, with a structural outer frame and
+   faint row rules. Same split as .dl. */
+.prose table { width: 100%; border-collapse: collapse; }
+.prose thead th {
+  text-align: left;
+  font-size: var(--fs-body);
+  font-weight: 700;
+  padding: var(--space-2) var(--space-3) var(--space-2) 0;
+  border-bottom: 1px solid var(--rule);
+}
+.prose tbody td {
+  padding: var(--space-3) var(--space-3) var(--space-3) 0;
+  border-bottom: 1px dotted var(--hairline);
+  vertical-align: top;
+}
+
+/* ============================================================
+   Captions
+
+   A figure says what it is, in words, at body size.
+
+   This is the §4.4 failure stated as a positive rule. The old mock panel's
+   disclaimer rendered at 10px mono --muted -- the weakest register in the
+   system and visually identical to the decorative metadata beside it -- while
+   the claim it qualified rendered in body copy at full strength. The design is
+   what made the false claim read as true.
+
+   So a caption is --fs-body, which type-scale.md §3 fixes as the floor for any
+   honesty label, in --fg-2, above a structural rule. It is not the kicker
+   register and it is not a pill. The <Figure> primitive in
+   src/components/system/figure.tsx is the only way to get one and takes no
+   style or className, so a caption cannot be quietly made smaller at a call
+   site -- which is exactly how the last one got to 10px.
+   ============================================================ */
+
+/* 1fr auto, so that a figure in a stretched grid or flex cell gives its height
+   to the figure and not to dead space under the caption -- the two panels on
+   the homepage sit in a stretched column and were full-height cards before the
+   caption existed. */
+figure.fig { margin: 0; display: grid; grid-template-rows: 1fr auto; gap: 0; }
+figure.fig > figcaption {
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--fg-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--rule);
+}
+/* The figure's subject, in the caption and not floating above the frame: on
+   paper the label and the caption are one block of text under the figure. */
+figure.fig > figcaption > .fig-of {
+  display: block;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 2px;
 }
 
 /* ============================================================
@@ -645,8 +771,8 @@ body.no-scroll { overflow: hidden; }
     --fs-lead: 16px;
   }
 
-  section { padding: 48px 0; }
-  section.compact { padding: 36px 0; }
+  section { padding: var(--space-7) 0; }
+  section.compact { padding: var(--space-6) 0; }
 
   .nav-inner { gap: 12px; height: 56px; padding: 0 var(--wrap-pad); }
   .nav-cta { gap: 6px; }
@@ -673,7 +799,7 @@ body.no-scroll { overflow: hidden; }
   .dl dd { padding-top: 0; }
 
   /* Stage stack typography */
-  .stage-block { padding: 40px 0; }
+  .stage-block { padding: var(--space-6) 0; }
   .stage-block .stage-head { grid-template-columns: 40px 1fr auto; gap: 12px; }
   .stage-block .stage-body { gap: 18px; }
 

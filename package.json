@@ -12,9 +12,10 @@
     "check:placeholders": "node scripts/check-placeholders.mjs",
     "check:placeholders:rendered": "node scripts/check-placeholders-rendered.mjs",
     "check:colors": "node scripts/check-colors.mjs",
+    "check:color-usage": "node scripts/check-color-usage.mjs",
     "check:measurements": "node scripts/check-measurements.mjs",
     "check:numerals": "node scripts/check-numerals.mjs",
-    "check:design": "npm run check:placeholders && npm run check:measurements && npm run check:numerals && npm run check:colors",
+    "check:design": "npm run check:placeholders && npm run check:measurements && npm run check:numerals && npm run check:colors && npm run check:color-usage",
     "security:audit": "npm audit --omit=dev --audit-level=high",
     "email:dev": "email dev --dir src/emails --port 3001",
     "email:build": "tsx scripts/render-emails.ts"

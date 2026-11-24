@@ -54,7 +54,13 @@ h3 { font-size: var(--fs-h3); font-weight: 700; line-height: 1.25; }
 h4 { font-size: var(--fs-h4); font-weight: 600; line-height: 1.25; }
 h6 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-muted); font-family: var(--font-mono); }
 p { margin: 0 0 12px; }
-a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line); transition: text-decoration-color .12s; }
+/* --rule, not --hairline, and this one is not in the §5.2 table. Link text on
+   this site is --ink, the same ink as body copy, so THE UNDERLINE IS THE ONLY
+   THING THAT IDENTIFIES A LINK. That makes it non-text content required to
+   identify a user-interface component, WCAG 1.4.11 applies, and at 1.61:1 a
+   reader could not find it. The underline is not decoration here; it is the
+   affordance. */
+a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--rule); transition: text-decoration-color .12s; }
 a:hover { text-decoration-color: var(--crimson); }
 code, pre, kbd, samp { font-family: var(--font-mono); font-size: 12px; color: var(--fg-2); }
 
@@ -62,7 +68,7 @@ code, pre, kbd, samp { font-family: var(--font-mono); font-size: 12px; color: va
 .wrap-narrow { max-width: 920px; margin: 0 auto; padding: 0 var(--wrap-pad); }
 
 /* Nav */
-.nav { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--paper) 92%, transparent); border-bottom: 1px solid var(--line); backdrop-filter: saturate(1.2); }
+.nav { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--paper) 92%, transparent); border-bottom: 1px solid var(--hairline); backdrop-filter: saturate(1.2); }
 .nav-inner { display: flex; align-items: center; gap: 32px; height: 60px; padding: 0 32px; max-width: 1240px; margin: 0 auto; }
 .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
 .nav-links { display: flex; gap: 24px; flex: 1; }
@@ -97,14 +103,26 @@ code, pre, kbd, samp { font-family: var(--font-mono); font-size: 12px; color: va
 /* Sections */
 section { padding: 80px 0; position: relative; }
 section.compact { padding: 56px 0; }
-.section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 32px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 32px; padding-bottom: 18px; border-bottom: 1px solid var(--hairline); }
 .section-head h2 { font-size: var(--fs-h2-section); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin: 0; }
 .section-head .lead { color: var(--muted); font-size: 14px; max-width: 420px; }
 
 .grid-bg { background-image: var(--tex-grid); background-size: var(--tex-grid-size); }
 
-/* Cards */
-.card { background: var(--bg-elevated); border: 1px solid var(--line); border-radius: 8px; padding: 18px; }
+/* Cards.
+
+   --rule, not --hairline. This is the one swap in this change with a visible
+   consequence, so the reasoning is worth stating: .card is this site's data
+   panel. It frames readouts, tables, the pipeline rows, the posterior trace and
+   every placeholder on /product. §5.2's structural list is "the edge of an
+   input, the division between a result and the caveat on it, THE FRAME OF A
+   DATA PANEL", and at 1.61:1 a reader could not find where one panel stopped
+   and the next began -- which on a page of stacked panels is the information
+   the frame exists to carry.
+
+   The borders do get darker. A 1.61:1 frame is a smudge; a 4.26:1 frame is a
+   rule, and a rule is what a printed methods appendix uses. */
+.card { background: var(--bg-elevated); border: 1px solid var(--rule); border-radius: 8px; padding: 18px; }
 .card.dashed { border-style: dashed; background: var(--paper); }
 
 /* Pills */
@@ -114,13 +132,13 @@ section.compact { padding: 56px 0; }
 .ramp-strip { height: 4px; width: 100%; background: var(--grad-ramp); background-size: 200% 100%; animation: rampShift 18s ease-in-out infinite; }
 
 /* Footer */
-footer { border-top: 1px solid var(--line); padding: 60px 0 40px; background: var(--paper-2); }
+footer { border-top: 1px solid var(--hairline); padding: 60px 0 40px; background: var(--paper-2); }
 .foot-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
 .foot-grid h6 { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; font-family: var(--font-mono); }
 .foot-grid a { display: block; color: var(--ink-2); text-decoration: none; font-size: var(--fs-body); padding: 4px 0; }
 .foot-grid a:hover { color: var(--accent); }
 .foot-tag { color: var(--muted); font-size: 12px; line-height: 1.6; max-width: 320px; }
-.foot-bottom { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.foot-bottom { margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--hairline); display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
 
 /* Helpers */
 .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
@@ -153,11 +171,17 @@ footer { border-top: 1px solid var(--line); padding: 60px 0 40px; background: va
 .hide-tablet  { display: initial; }
 
 /* Mobile nav drawer */
+/* The two controls in the nav. --rule for the same reason .btn and .input are
+   --rule: the edge of a control is a meaning-carrying boundary under WCAG
+   1.4.11, and these two are the whole of the navigation on a phone. The nav's
+   REGISTER is held for the direction answer; which token a 1px border points at
+   is not part of that answer, and holding a surface is not the same as the
+   surface being correct. */
 .mobile-menu-btn {
   display: none;
   align-items: center; justify-content: center;
   width: 40px; height: 40px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--rule);
   background: transparent; color: var(--ink);
   border-radius: 6px; cursor: pointer; padding: 0;
 }
@@ -175,7 +199,7 @@ footer { border-top: 1px solid var(--line); padding: 60px 0 40px; background: va
   position: fixed; top: 0; right: 0; bottom: 0;
   width: min(320px, 85vw);
   background: var(--paper);
-  border-left: 1px solid var(--line);
+  border-left: 1px solid var(--hairline);
   transform: translateX(100%);
   transition: transform .28s ease;
   z-index: 100;
@@ -188,7 +212,7 @@ footer { border-top: 1px solid var(--line); padding: 60px 0 40px; background: va
 .drawer-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .drawer-close {
   width: 36px; height: 36px; border-radius: 6px;
-  border: 1px solid var(--line); background: transparent; color: var(--ink);
+  border: 1px solid var(--rule); background: transparent; color: var(--ink);
   cursor: pointer; padding: 0; display: inline-flex; align-items: center; justify-content: center;
 }
 .drawer-close:hover { background: rgba(0,0,0,0.04); }
@@ -198,7 +222,7 @@ footer { border-top: 1px solid var(--line); padding: 60px 0 40px; background: va
   color: var(--ink); text-decoration: none; border-radius: 6px;
 }
 .drawer-links a:hover { background: rgba(0,0,0,0.04); }
-.drawer-divider { height: 1px; background: var(--line); margin: 16px 0; }
+.drawer-divider { height: 1px; background: var(--hairline); margin: 16px 0; }
 .drawer-cta { display: flex; flex-direction: column; gap: 10px; }
 .drawer-cta .btn { width: 100%; justify-content: center; }
 body.no-scroll { overflow: hidden; }
@@ -213,9 +237,12 @@ body.no-scroll { overflow: hidden; }
 .account-nav a:hover { background: rgba(0,0,0,0.04); color: var(--ink); }
 .account-nav a.active { color: var(--ink); border-left-color: var(--accent); background: rgba(231,60,37,0.06); }
 
-/* Definition lists */
-.dl { display: grid; grid-template-columns: 1fr 2fr; gap: 0; border-top: 1px solid var(--line); }
-.dl > * { padding: 12px 0; border-bottom: 1px dotted var(--line); font-size: var(--fs-body); }
+/* Definition lists. A .dl is a table of readings -- physics assumptions on
+   /domains, key and value on the account pages -- so its outer frame is
+   structural and its row separators are not. Two tokens, one per job, which is
+   the whole point of having split them. */
+.dl { display: grid; grid-template-columns: 1fr 2fr; gap: 0; border-top: 1px solid var(--rule); }
+.dl > * { padding: 12px 0; border-bottom: 1px dotted var(--hairline); font-size: var(--fs-body); }
 .dl dt { color: var(--muted); font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
 .dl dd { margin: 0; color: var(--ink-2); }
 
@@ -232,7 +259,7 @@ body.no-scroll { overflow: hidden; }
 .fadeup { animation: fadeUp .4s ease-out both; }
 
 /* Page hero */
-.page-hero { padding: 72px 0 40px; border-bottom: 1px solid var(--line); position: relative; }
+.page-hero { padding: 72px 0 40px; border-bottom: 1px solid var(--hairline); position: relative; }
 .page-hero h1 { font-size: var(--fs-page-hero); font-weight: 800; letter-spacing: -0.025em; line-height: 1; margin: 14px 0 18px; max-width: 900px; }
 .page-hero p.lead { font-size: var(--fs-lead); color: var(--ink-2); max-width: 640px; line-height: 1.55; }
 
@@ -252,9 +279,12 @@ body.no-scroll { overflow: hidden; }
    carries the accent, and progress on the rail is carried by length, which is
    what a progress bar is for. One hue, two states, nothing lost in print. */
 .stage-stack { position: relative; }
-.stage-stack .stage-rail { position: absolute; left: 32px; top: 0; bottom: 0; width: 2px; background: var(--line); }
+/* The rail is the track of a meter: progress is encoded by the length of the
+   fill against it, so a reader who cannot see the track cannot read the fill.
+   --rule for the same reason the edge of a control is --rule. */
+.stage-stack .stage-rail { position: absolute; left: 32px; top: 0; bottom: 0; width: 2px; background: var(--rule); }
 .stage-stack .stage-rail-fill { position: absolute; left: 0; top: 0; width: 100%; background: var(--accent); transition: height .5s ease; }
-.stage-block { position: relative; border-bottom: 1px solid var(--line); padding: 56px 0; transition: background .4s ease; }
+.stage-block { position: relative; border-bottom: 1px solid var(--hairline); padding: 56px 0; transition: background .4s ease; }
 .stage-block .stage-num { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--paper); background: var(--fg); transition: background .2s ease; }
 .stage-block.open .stage-num { background: var(--accent); }
 .stage-block .stage-head { display: grid; grid-template-columns: 50px 1fr auto; gap: 18px; align-items: center; width: 100%; background: transparent; border: 0; padding: 0; margin: 0; text-align: left; color: inherit; font: inherit; cursor: pointer; }
@@ -577,7 +607,7 @@ body.no-scroll { overflow: hidden; }
     -webkit-overflow-scrolling: touch;
     gap: 4px;
     padding-bottom: 4px;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid var(--hairline);
   }
   .account-nav a {
     flex: 0 0 auto;
@@ -658,6 +688,6 @@ body.no-scroll { overflow: hidden; }
 
   /* Steps row: switch separators from right to bottom */
   .steps-row { grid-template-columns: 1fr !important; }
-  .steps-row > .steps-cell { border-right: none !important; border-bottom: 1px solid var(--line); }
+  .steps-row > .steps-cell { border-right: none !important; border-bottom: 1px solid var(--hairline); }
   .steps-row > .steps-cell:last-child { border-bottom: none; }
 }

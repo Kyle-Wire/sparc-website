@@ -43,11 +43,13 @@ test("an inspection deadline before the promise needs the buyer's yes", () => {
   assert.deepEqual(checkOrder(form({ ...base, deadline: "soon" }), today), { ok: false, error: "deadline_invalid" });
 });
 
-test("the weekly cap is off unless set to a positive whole number", async () => {
+test("the weekly cap defaults to 10, and \"none\" turns it off", async () => {
   const { weeklyCap, REPORT_TERMS_VERSION, AGREE_STATEMENT } = await import("./catalog");
-  assert.equal(weeklyCap({}), null);
-  assert.equal(weeklyCap({ ORDERS_WEEKLY_CAP: "0" }), null);
-  assert.equal(weeklyCap({ ORDERS_WEEKLY_CAP: "2.5" }), null);
+  assert.equal(weeklyCap({}), 10);
+  assert.equal(weeklyCap({ ORDERS_WEEKLY_CAP: "0" }), 10);
+  assert.equal(weeklyCap({ ORDERS_WEEKLY_CAP: "2.5" }), 10);
+  assert.equal(weeklyCap({ ORDERS_WEEKLY_CAP: "none" }), null);
+  assert.equal(weeklyCap({ ORDERS_WEEKLY_CAP: "off" }), null);
   assert.equal(weeklyCap({ ORDERS_WEEKLY_CAP: "3" }), 3);
   assert.match(REPORT_TERMS_VERSION, /^\d{4}-\d{2}-\d{2}/);
   assert.match(AGREE_STATEMENT, /screening report/);

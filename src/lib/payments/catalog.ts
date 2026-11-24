@@ -140,16 +140,24 @@ export const AGREE_STATEMENT =
   "I have read what the report is and is not. It is a screening report, not an engineering survey, and none of its model results has been checked against a measurement at the house.";
 export const REPORT_TERMS_VERSION = "2026-11-23c-draft";
 
+/** The cap when nothing is set: Kyle, 24 November 2026, "we cap it at 10". */
+export const DEFAULT_WEEKLY_CAP = 10;
+
 /**
- * How many orders we take in any seven days, from ORDERS_WEEKLY_CAP. Unset or
- * not a positive whole number means no cap. One person reads every report
- * before it leaves (about two to three a week alongside other work,
- * docs/report-ops.md), so after a storm in the news it is kinder to say "not
- * this week" before a card is saved than to miss the promise after.
+ * How many orders we take in any seven days, from the environment. The cap in
+ * force is order_settings.weekly_cap in the database (migration 0012, changed
+ * with `npx tsx scripts/waitlist.ts cap <n|none>`, no deploy needed); this is
+ * the fallback when that row cannot be read. ORDERS_WEEKLY_CAP takes a whole
+ * number, or "none" / "off" for no cap; unset or unreadable means
+ * DEFAULT_WEEKLY_CAP. One person reads every report before it leaves, so past
+ * the cap a buyer joins the waitlist (src/lib/payments/waitlist.ts) before a
+ * card is saved, rather than us missing the promise after.
  */
 export function weeklyCap(env: Record<string, string | undefined> = process.env): number | null {
-  const n = Number(env.ORDERS_WEEKLY_CAP);
-  return Number.isInteger(n) && n > 0 ? n : null;
+  const raw = (env.ORDERS_WEEKLY_CAP ?? "").trim().toLowerCase();
+  if (raw === "none" || raw === "off") return null;
+  const n = Number(raw);
+  return raw !== "" && Number.isInteger(n) && n > 0 ? n : DEFAULT_WEEKLY_CAP;
 }
 
 /** The order states that count against the weekly cap: the ones we owe work on or have done. */

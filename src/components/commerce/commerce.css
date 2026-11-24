@@ -49,3 +49,10 @@
 .buy-facts-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; margin-top: 10px; }
 .buy-fact { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--ink-2); min-width: 0; }
 @media (max-width: 520px) { .buy-facts-grid { grid-template-columns: 1fr; } }
+
+/* Weekly cap and waitlist (migration 0012). */
+.buy-full { border-left: 3px solid var(--flood); padding: 2px 0 2px 14px; margin: 0 0 6px; }
+.buy-full p { font-size: 14px; line-height: 1.6; color: var(--ink-2); margin: 0 0 10px; }
+.buy-full .buy-wait { margin-bottom: 4px; }
+.buy-held { font-size: 14px; line-height: 1.6; color: var(--ink-2); margin: 0 0 6px; border-left: 3px solid var(--flood); padding-left: 14px; }
+.buy-joined-h { font-size: 16px !important; }

@@ -6,7 +6,8 @@ import { PageHero } from "@/components/marketing/page-shell";
 import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/supabase/server";
 import { parsePlaceSlug, placeSlug } from "@/lib/place/coords";
 import { AGREE_STATEMENT, REPORT, checkoutEnabled, formatPrice, mayOrder, salesMode } from "@/lib/payments";
-import { atCapacity } from "@/lib/payments/capacity";
+import { capacity, openInvite, waitingCount, type OpenInvite } from "@/lib/payments/capacity";
+import { DEADLINE_WARNING, WAITLIST_ERRORS, expectedWeeks, waitNote, waitPhrase, INVITE_DAYS, type Capacity } from "@/lib/payments/waitlist";
 import { formatDay, promisedBy, todayEastern } from "@/lib/payments/turnaround";
 import { DeadlineField } from "@/components/commerce/DeadlineField";
 import { HouseFactsField } from "@/components/commerce/HouseFactsField";
@@ -20,7 +21,9 @@ export const metadata: Metadata = {
 };
 export const dynamic = "force-dynamic";
 
-type Props = { searchParams: Promise<{ place?: string; error?: string }> };
+type Props = {
+  searchParams: Promise<{ place?: string; error?: string; joined?: string; tight?: string; wl_error?: string }>;
+};
 
 // The one page where the report is bought. Built to the map-first brief §7:
 // no countdowns, no scarcity, nothing pre-ticked, the sample one click away,
@@ -43,20 +46,34 @@ export default async function BuyReportPage({ searchParams }: Props) {
     }
   }
   const inviteOnly = salesMode() === "invite";
-  const allowed = mayOrder(email);
   const error = sp.error ? ORDER_ERRORS[sp.error] ?? ORDER_ERRORS.checkout : null;
   const today = todayEastern();
   const by = promisedBy(today, REPORT.deliveryDays);
 
-  // Weekly cap (ORDERS_WEEKLY_CAP): say "not this week" before a card is saved.
-  let full = false;
-  if (onSale && email && allowed) {
+  // The weekly cap (migration 0012, default 10): past it, buyers join the
+  // waitlist before any card is saved. An open waitlist invite holds a place,
+  // so its holder may order even when the week is full or sales are by
+  // invitation.
+  let cap: Capacity | null = null;
+  let invite: OpenInvite | null = null;
+  let waiting = 0;
+  if (onSale) {
     try {
-      full = await atCapacity(createSupabaseAdminClient());
+      const admin = createSupabaseAdminClient();
+      [cap, invite, waiting] = await Promise.all([capacity(admin), openInvite(admin, email), waitingCount(admin)]);
     } catch {
-      full = false;
+      cap = null;
     }
   }
+  const full = !!cap?.full && !invite;
+  const allowed = mayOrder(email) || !!invite;
+  const joined = sp.joined ?? null;
+  const wlError = sp.wl_error ? WAITLIST_ERRORS[sp.wl_error as keyof typeof WAITLIST_ERRORS] ?? WAITLIST_ERRORS.save : null;
+  const nextPosition = waiting + 1;
+  const weeklyCap = cap?.cap ?? null;
+  // Join the list when this week is full, or during the invitation-only launch
+  // for anyone not invited.
+  const showWaitlist = !joined && (full || (inviteOnly && !allowed));
 
   return (
     <>
@@ -77,7 +94,7 @@ export default async function BuyReportPage({ searchParams }: Props) {
         ) : (
           <div className="buy-grid">
             <section className="card buy-form" aria-labelledby="buy-form-h">
-              <div className="kicker">your order</div>
+              <div className="kicker">{showWaitlist || joined ? "the waitlist" : "your order"}</div>
               <h2 id="buy-form-h">{REPORT.name}</h2>
               <p className="buy-price">
                 <span className="buy-price-figure">{formatPrice(REPORT.priceCents)}</span>
@@ -88,32 +105,19 @@ export default async function BuyReportPage({ searchParams }: Props) {
                   {error}
                 </p>
               )}
-              {inviteOnly && (
-                <p className="buy-hint" style={{ marginTop: 0 }}>
-                  Open by invitation for now: a first few buyers, each report run and read by hand, before anyone can
-                  order.
-                </p>
-              )}
-              {email && allowed && full ? (
-                <div className="buy-signin">
-                  <p>
-                    We have as many reports as we can make well this week, so we are not taking new orders for a few
-                    days. Every report is read by a person before it leaves, and we would rather say so now than miss
-                    our promise later. Write to{" "}
-                    <a href={`mailto:${EMAIL_PRIMARY}?subject=${encodeURIComponent("House report: when can you start?")}`}>{EMAIL_PRIMARY}</a>{" "}
-                    with the property and your deadline, and we will tell you when we can start. Nothing is charged.
-                  </p>
-                </div>
-              ) : email && !allowed ? (
-                <div className="buy-signin">
-                  <p>
-                    This account ({email}) is not on the invitation list yet. Write to{" "}
-                    <a href={`mailto:${EMAIL_PRIMARY}?subject=${encodeURIComponent("House report invitation")}`}>{EMAIL_PRIMARY}</a>{" "}
-                    with the property you are deciding on, or{" "}
-                    <Link href={slug ? `/start?place=${slug}` : "/start"}>ask for a report</Link>, and a person will reply.
-                    Nothing is charged.
-                  </p>
-                </div>
+              {joined ? (
+                <JoinedNote joined={joined} tight={sp.tight === "1"} cap={weeklyCap} />
+              ) : showWaitlist ? (
+                <WaitlistForm
+                  full={full}
+                  cap={weeklyCap}
+                  nextPosition={nextPosition}
+                  email={email}
+                  slug={slug}
+                  today={today}
+                  error={wlError}
+                  signInHref={!email ? `/login?next=${encodeURIComponent(here)}` : null}
+                />
               ) : !email ? (
                 <div className="buy-signin">
                   <p>
@@ -132,6 +136,12 @@ export default async function BuyReportPage({ searchParams }: Props) {
               ) : (
                 <form method="post" action="/api/reports/order" className="buy-fields">
                   {slug && <input type="hidden" name="place" value={slug} />}
+                  {invite && (
+                    <p className="buy-held" role="status">
+                      <strong>Your place is held until {formatHold(invite.expiresAt)}.</strong> You came off the waitlist, so
+                      this order goes ahead whatever else comes in this week.
+                    </p>
+                  )}
                   <label className="label" htmlFor="b-address">
                     The property&apos;s street address
                   </label>
@@ -139,6 +149,7 @@ export default async function BuyReportPage({ searchParams }: Props) {
                     id="b-address"
                     name="address"
                     className="input"
+                    defaultValue={invite?.address ?? undefined}
                     required
                     minLength={5}
                     maxLength={300}
@@ -220,5 +231,130 @@ export default async function BuyReportPage({ searchParams }: Props) {
       </main>
       <Footer />
     </>
+  );
+}
+
+function formatHold(iso: string): string {
+  return new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "long", month: "long", day: "numeric" }).format(new Date(iso));
+}
+
+/** After joining: where they stand, in the same words as the email. */
+function JoinedNote({ joined, tight, cap }: { joined: string; tight: boolean; cap: number | null }) {
+  if (joined === "invited") {
+    return (
+      <div className="buy-signin" role="status">
+        <p>
+          <strong>You already have an invitation.</strong> Sign in, or make an account, with the email address we wrote to,
+          and the order form opens here. We have updated the details you gave.
+        </p>
+      </div>
+    );
+  }
+  const position = Math.max(1, Number.parseInt(joined, 10) || 1);
+  return (
+    <div className="buy-signin" role="status">
+      <p className="buy-joined-h">
+        <strong>You are on the list.</strong>
+      </p>
+      <p>{waitNote(position, cap)}</p>
+      {tight && (
+        <p>
+          <strong>{DEADLINE_WARNING}</strong>
+        </p>
+      )}
+      <p>We have sent the same to your email, with a link to leave the list. Nothing was charged and no card was asked for.</p>
+    </div>
+  );
+}
+
+/** The waitlist form: no account and no card needed. */
+function WaitlistForm({
+  full,
+  cap,
+  nextPosition,
+  email,
+  slug,
+  today,
+  error,
+  signInHref,
+}: {
+  full: boolean;
+  cap: number | null;
+  nextPosition: number;
+  email: string | null;
+  slug: string | null;
+  today: string;
+  error: string | null;
+  signInHref: string | null;
+}) {
+  const weeks = expectedWeeks(nextPosition, cap);
+  return (
+    <form method="post" action="/api/reports/waitlist" className="buy-fields">
+      {slug && <input type="hidden" name="place" value={slug} />}
+      <div className="buy-full" role="status">
+        {full ? (
+          <p>
+            <strong>This week is full.</strong> We take up to {cap} reports a week, because a person reads every one before
+            it leaves, and this week&apos;s places are taken. Rather than take your order and miss our promise, we put you
+            on a list and invite you in the order you joined.
+          </p>
+        ) : (
+          <p>
+            <strong>Reports are by invitation for now.</strong> We are starting with a few buyers, each report run and read by
+            hand. Join the list and we invite people in the order they joined.
+          </p>
+        )}
+        <p className="buy-wait">
+          {nextPosition === 1 ? "Nobody is ahead of you." : `${nextPosition - 1} ${nextPosition === 2 ? "person is" : "people are"} ahead of you.`}{" "}
+          At our current pace that is <strong>{waitPhrase(weeks)}</strong> before we invite you. That is an estimate, not a
+          promise. Once invited you have {INVITE_DAYS} days to order. Nothing is charged to join.
+        </p>
+      </div>
+      {error && (
+        <p className="journey-error" role="alert">
+          {error}
+        </p>
+      )}
+      <label className="label" htmlFor="w-name">Your name</label>
+      <input id="w-name" name="name" className="input" required maxLength={200} autoComplete="name" />
+      <label className="label" htmlFor="w-email">Email</label>
+      <input
+        id="w-email"
+        name="email"
+        type="email"
+        className="input"
+        required
+        maxLength={320}
+        autoComplete="email"
+        defaultValue={email ?? undefined}
+      />
+      <label className="label" htmlFor="w-address">The property&apos;s street address</label>
+      <input
+        id="w-address"
+        name="address"
+        className="input"
+        required
+        minLength={5}
+        maxLength={300}
+        autoComplete="street-address"
+        placeholder="Number, street, city, state"
+      />
+      <p className="buy-hint">
+        We keep it only to run your report, and only the person running it can see it. Leave the list and we delete it.
+      </p>
+      <label className="label" htmlFor="w-deadline">When does your inspection period end? (optional)</label>
+      <input id="w-deadline" name="inspection_deadline" type="date" className="input" min={today} />
+      <p className="buy-hint">If the wait will probably miss it, we tell you straight away, so you can look elsewhere.</p>
+      <label className="label" htmlFor="w-note">What are you trying to decide? (optional)</label>
+      <textarea id="w-note" name="note" className="input" maxLength={2000} style={{ minHeight: 70, resize: "vertical" }} />
+      <button type="submit" className="btn btn-accent buy-submit">
+        Join the waitlist <span className="arrow">→</span>
+      </button>
+      {signInHref && (
+        <p className="buy-hint">
+          Already invited? <Link href={signInHref as Route}>Sign in</Link> with the email we wrote to.
+        </p>
+      )}
+    </form>
   );
 }

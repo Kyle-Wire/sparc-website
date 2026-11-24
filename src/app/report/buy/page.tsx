@@ -80,8 +80,8 @@ export default async function BuyReportPage({ searchParams }: Props) {
       <Nav active="pricing" />
       <main id="main">
       <PageHero
-        kicker={onSale ? "the house report · bought once" : "the house report · not on sale yet"}
-        title={onSale ? "Order the house report." : "The house report is not on sale yet."}
+        kicker={onSale ? "the SPARC Labs Field Kit · bought once" : "the SPARC Labs Field Kit · not on sale yet"}
+        title={onSale ? "Order the SPARC Labs Field Kit." : "The SPARC Labs Field Kit is not on sale yet."}
         lead={REPORT.tagline}
         accent="var(--flood)"
       />

@@ -283,7 +283,7 @@ function InfoPanel() {
         it. It describes the area around your pin, not the house itself.
       </p>
       <p>
-        <strong>The house report</strong> is the paid part: our own flood, heat, ground movement and wind models, worked out for one house. <Link href="/report/sample">See a sample</Link>.
+        <strong>The SPARC Labs Field Kit</strong> is the paid part: our own flood, heat, ground movement and wind models, worked out for one house, with its report, atlas and maps. <Link href="/report/sample">See a sample</Link>.
       </p>
       <p>
         <Link href="/how-it-works">How it works</Link> · <Link href="/about">Who we are</Link> · <Link href="/data">Every source</Link>
@@ -317,7 +317,7 @@ function SpotCard({ slug, matched, spot, onClose }: { slug: string; matched: str
           The full public record for this block <span className="arrow">→</span>
         </Link>
         <span className="spot-card-paid">
-          <Link href={{ pathname: "/start", query: { place: slug } }}>Get the house report</Link> ·{" "}
+          <Link href={{ pathname: "/start", query: { place: slug } }}>Get the SPARC Field Kit</Link> ·{" "}
           <Link href="/report/sample">see a sample</Link>
         </span>
       </div>

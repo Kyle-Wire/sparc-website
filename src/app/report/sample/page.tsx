@@ -160,9 +160,10 @@ export default function SampleReportPage() {
       </Section>
 
 
-      <Section sunken kicker="beyond the pdf" title="A report you can open, print and keep.">
+      <Section sunken kicker="the SPARC Labs Field Kit" title="A report you can open, print and keep.">
         <p className="lead" style={{ maxWidth: 760, margin: "0 0 28px" }}>
-          The PDF is the report. Around it comes everything you need to look closer, show someone else, or hand to an
+          The PDF is the report. Together with everything around it, it makes up the SPARC Labs Field Kit:
+          everything you need to look closer, show someone else, or hand to an
           engineer. Pictures below are from Sample A, with a sample pin where the house would be.
         </p>
         <div className="pkg-grid">

@@ -24,7 +24,7 @@ export type Mode = "report" | "self";
 const MODES: { id: Mode; name: string; who: string; how: string[] }[] = [
   {
     id: "report",
-    name: "A report",
+    name: "The SPARC Labs Field Kit",
     who: "For someone buying a home. Bought once.",
     how: [
       "We run every model you pick for the neighbourhood around the property",
@@ -255,11 +255,11 @@ export function Journey({
       {reportOnSale && mode === "report" ? (
         <Step n={++n} title="Order it">
           <p>
-            The house report can be ordered now. You pay once, when it is ready, and it lands in your account.{" "}
+            The SPARC Labs Field Kit can be ordered now. You pay once, when it is ready, and it lands in your account.{" "}
             <Link href="/report/sample">See how a report is laid out</Link> first if you like.
           </p>
           <Link className="btn btn-accent" href={slug ? `/report/buy?place=${slug}` : "/report/buy"}>
-            Order the house report <span className="arrow">→</span>
+            Order the SPARC Field Kit <span className="arrow">→</span>
           </Link>
         </Step>
       ) : (

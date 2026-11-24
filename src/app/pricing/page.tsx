@@ -47,10 +47,11 @@ const PLANS: { name: string; state: string; who: string; what: string[] }[] = [
     ],
   },
   {
-    name: "A report",
+    name: "The SPARC Labs Field Kit",
     state: "Planned · bought once",
     who: "Someone buying a home. You get the report and you are done.",
     what: [
+      "The house report, an atlas that opens with no internet, maps to print and a year of updates",
       "Flood, heat, ground movement and wind, modelled for the neighbourhood around one property",
       "Findings first, with how much evidence stands behind each",
       "What to check at the house",
@@ -97,8 +98,8 @@ function OnSale() {
       <main id="main">
       <PageHero
         kicker="pricing"
-        title="The public record is free. The house report is paid."
-        lead="Looking up what is on record costs nothing and needs no account. When you are deciding on one house, the house report runs our own models for it."
+        title="The public record is free. The SPARC Labs Field Kit is paid."
+        lead="Looking up what is on record costs nothing and needs no account. When you are deciding on one house, the SPARC Labs Field Kit runs our own models for it: a house report, an atlas, maps to print and a year of updates."
         accent="var(--amber)"
       />
       <Section kicker="two ways to use it" title="Free for the area. Paid for the house.">
@@ -134,7 +135,7 @@ function OnSale() {
               you cancel, you pay nothing.
             </p>
             <div className="row" style={{ marginTop: "auto", paddingTop: 10, gap: 10, flexWrap: "wrap" }}>
-              <Link href="/report/buy" className="btn btn-accent">Order the house report <span className="arrow">→</span></Link>
+              <Link href="/report/buy" className="btn btn-accent">Order the SPARC Field Kit <span className="arrow">→</span></Link>
               <Link href="/report/sample" className="btn">See a sample</Link>
             </div>
           </div>

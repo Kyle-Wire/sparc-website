@@ -91,7 +91,7 @@ export const RECEIPTS: QuantityReceipts[] = [
     receipts: [
       { verdict: "failed", kind: "real-world-elsewhere", evidence: "shown", text: "In the afternoon it does no better than the weather station alone (1.47 K against 1.43 K).", source: "HeatSim/validation/results/rescore/b_0.5.0_hybrid_absolute.json" },
     ],
-    next: "H3: HeatSim's daytime model must beat the station alone in held-out cities.",
+    next: "H3: Sundial's daytime model must beat the station alone in held-out cities.",
   },
   {
     engine: "heat",

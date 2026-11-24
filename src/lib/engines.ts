@@ -45,6 +45,8 @@
  * failed lives in src/lib/copy/receipts.ts, not here.
  */
 
+import { MODEL_NAMES } from "./model-names";
+
 export type EngineId = "flood" | "heat" | "ground" | "wind";
 
 /** Where the computing happens, which decides what a visitor can do alone. */
@@ -54,8 +56,12 @@ export interface Engine {
   id: EngineId;
   /** The hazard, as a row title on a place page. */
   hazard: string;
-  /** The engine's own name. */
+  /** The name a buyer reads (src/lib/model-names.ts). */
   name: string;
+  /** One line on why it has that name. */
+  why: string;
+  /** The engine (repository) it runs on. */
+  engine: string;
   runsOn: RunsOn;
   /** Where it runs, in a sentence for a buyer. */
   where: string;
@@ -89,7 +95,7 @@ export const ENGINES: Engine[] = [
   {
     id: "flood",
     hazard: "Flood",
-    name: "FloodSim",
+    ...MODEL_NAMES.flood,
     runsOn: "your-gpu",
     where: "On your own computer's graphics card, in Chrome or Edge. Nothing heavy runs on our side.",
     summary:
@@ -123,7 +129,7 @@ export const ENGINES: Engine[] = [
   {
     id: "heat",
     hazard: "Heat",
-    name: "HeatSim",
+    ...MODEL_NAMES.heat,
     runsOn: "our-server",
     where: "On our server. You choose the run; it is queued and you are told when it is ready.",
     summary:
@@ -150,7 +156,7 @@ export const ENGINES: Engine[] = [
   {
     id: "ground",
     hazard: "Ground movement",
-    name: "SPARC InSAR",
+    ...MODEL_NAMES.ground,
     runsOn: "our-workstation",
     where:
       "On our workstation. The radar for the place is gathered and processed for you; you then read and explore the result.",
@@ -185,7 +191,7 @@ export const ENGINES: Engine[] = [
   {
     id: "wind",
     hazard: "Wind",
-    name: "WindSim",
+    ...MODEL_NAMES.wind,
     runsOn: "our-workstation",
     where: "On our workstation. Wind is worked out for the neighbourhood from every direction, then shown to you as a map.",
     summary:

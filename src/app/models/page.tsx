@@ -51,6 +51,9 @@ export default function ModelsPage() {
                 {e.hazard} · {RUNS_ON_WORDS[e.runsOn]}
               </div>
               <h3>{e.name}</h3>
+              <p className="engine-why">
+                {e.why} <span className="engine-on">Runs on our {e.engine} engine.</span>
+              </p>
               <p>{e.summary}</p>
               {e.free && (
                 <>

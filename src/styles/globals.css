@@ -631,6 +631,8 @@ div.place-layer { grid-template-columns: 1fr; cursor: default; }
 .engine-card p, .engine-card ul { font-size: 14px; line-height: 1.6; color: var(--ink-2); margin: 0; }
 .engine-card ul { padding-left: 18px; }
 .engine-card .engine-where { color: var(--ink); }
+.engine-card .engine-why { margin-top: -4px; font-style: italic; color: var(--ink-2, var(--ink)); }
+.engine-card .engine-on { font-style: normal; color: var(--muted, inherit); font-size: 0.92em; }
 .engine-card .engine-status { margin-top: auto; padding-top: 8px; border-top: 1px dotted var(--rule); }
 .engine-way { display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: inherit; padding: 20px; }
 .engine-way:hover { border-color: var(--ink); }

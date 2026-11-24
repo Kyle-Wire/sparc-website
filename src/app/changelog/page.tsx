@@ -47,7 +47,13 @@ export default function ChangelogPage() {
                   style={{
                     marginTop: 14,
                     paddingTop: 14,
-                    borderTop: "1px solid var(--line)",
+                    /* --rule, not --hairline. This rule separates a release's
+                       notes from the statement that the release was withdrawn,
+                       which is "the division between a result and the caveat on
+                       it" -- §5.2's structural phrase, literally. A reader who
+                       cannot find this line reads the retraction as one more
+                       bullet. */
+                    borderTop: "1px solid var(--rule)",
                     color: "var(--ink-2)",
                     fontSize: 13,
                     lineHeight: 1.7,

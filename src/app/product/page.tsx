@@ -189,7 +189,7 @@ export default function ProductPage() {
             // "subscription" is removed with it: nothing is sold on this site today.
             { k: "license", v: "proprietary", c: "var(--red)" },
           ].map((r, i) => (
-            <div key={i} className="card" style={{ borderLeft: `2px solid ${r.c}` }}>
+            <div key={i} className="card" style={{ boxShadow: `inset 2px 0 0 ${r.c}` }}>
               <div className="kicker">{r.k}</div>
               <div className="mono" style={{ fontSize: 13, fontWeight: 600, marginTop: 6 }}>{r.v}</div>
             </div>
@@ -197,7 +197,7 @@ export default function ProductPage() {
         </div>
       </Section>
 
-      <section style={{ borderTop: "1px solid var(--line)", padding: "56px 0" }} className="grid-bg">
+      <section style={{ borderTop: "1px solid var(--hairline)", padding: "56px 0" }} className="grid-bg">
         <div className="wrap" style={{ textAlign: "center" }}>
           <h2 style={{ fontSize: 40, fontWeight: 800, letterSpacing: "-0.025em", margin: "0 0 16px" }}>Ready to run the pipeline?</h2>
           <div className="row" style={{ justifyContent: "center", gap: 10 }}>

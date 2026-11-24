@@ -37,7 +37,10 @@ export default async function UsagePage() {
         ] : rows).map((r) => (
           <div key={r.metric} className="card" style={{ padding: 22 }}>
             <div className="kicker">{r.metric.replace(/_/g, " ")}</div>
-            <div style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-0.025em", marginTop: 6, fontFeatureSettings: "'tnum'" }}>{r.total.toLocaleString()}</div>
+            {/* The inline fontFeatureSettings: 'tnum' that used to be here is
+                gone. Tabular-lining figures come from the root rule now, and
+                the low-level property would have overridden it. */}
+            <div style={{ fontSize: 32, fontWeight: 800, letterSpacing: "-0.025em", marginTop: 6 }}>{r.total.toLocaleString()}</div>
           </div>
         ))}
       </div>

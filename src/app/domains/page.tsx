@@ -139,11 +139,21 @@ export default function DomainsPage() {
               const dim = d.status === "roadmap" && !active;
               return (
                 <button key={d.id} onClick={() => setSel(d)} style={{
-                  textAlign: "left", border: "1px solid var(--line)",
+                  /* --rule, not --hairline: this is the edge of a control, which
+                     §5.2 lists first among the structural boundaries. Nine of
+                     these buttons sat behind a 1.61:1 edge, and the only other
+                     thing marking one as pressed is a ground change. Tokens
+                     only -- the copy on this page is not mine to touch. */
+                  textAlign: "left", border: "1px solid var(--rule)",
                   background: active ? "var(--ink)" : "var(--bg-elevated)",
                   color: active ? "var(--paper)" : "var(--ink)",
                   borderRadius: 8, padding: 16, cursor: "pointer", fontFamily: "inherit",
-                  borderLeftWidth: 3, borderLeftColor: d.c, transition: "all .15s",
+                  /* The domain hue was the control's left EDGE, which replaced
+                     3px of a meaning-carrying boundary with a decoration-only
+                     token at between 1.23:1 and 3.50:1. It is now an inset
+                     stripe: the hue is unchanged and decorative, and the
+                     control's own frame runs uninterrupted at --rule. */
+                  boxShadow: `inset 3px 0 0 ${d.c}`, transition: "all .15s",
                   opacity: dim ? 0.78 : 1,
                 }}>
                   <div className="row" style={{ justifyContent: "space-between", alignItems: "baseline" }}>
@@ -166,8 +176,10 @@ export default function DomainsPage() {
             })}
           </div>
           <div className="sticky-md-up" style={{ position: "sticky", top: 80 }}>
-            <div className="card" style={{ padding: 0, overflow: "hidden", borderLeft: `3px solid ${sel.c}` }}>
-              <div style={{ padding: 18, borderBottom: "1px solid var(--line)" }}>
+            {/* Inset rather than a border, for the reason above: the panel frame is
+                structural and a decoration-only hue cannot stand in for 3px of it. */}
+            <div className="card" style={{ padding: 0, overflow: "hidden", boxShadow: `inset 3px 0 0 ${sel.c}` }}>
+              <div style={{ padding: 18, borderBottom: "1px solid var(--hairline)" }}>
                 <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
                   <div className="kicker">{sel.tag}</div>
                   <span className="pill"><span className="dot" style={{ background: STATUS_DOT[sel.status] }} /> {STATUS_LABEL[sel.status]}</span>

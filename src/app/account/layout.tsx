@@ -29,7 +29,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
   return (
     <>
       <Nav />
-      <section className="grid-bg" style={{ borderBottom: "1px solid var(--line)", padding: "32px 0 18px" }}>
+      <section className="grid-bg" style={{ borderBottom: "1px solid var(--hairline)", padding: "32px 0 18px" }}>
         <div className="wrap">
           <div className="kicker">account</div>
           <div className="row" style={{ alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>

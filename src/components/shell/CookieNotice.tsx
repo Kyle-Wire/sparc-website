@@ -46,7 +46,7 @@ export function CookieNotice() {
         margin: "0 auto",
         background: "var(--paper)",
         color: "var(--ink)",
-        border: "1px solid var(--line)",
+        border: "1px solid var(--rule)",
         borderRadius: 10,
         boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
         padding: "14px 16px",

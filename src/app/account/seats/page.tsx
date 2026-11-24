@@ -43,7 +43,7 @@ export default async function SeatsPage() {
 
       <div className="card table-scroll" style={{ padding: 0, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-          <thead><tr style={{ background: "var(--paper-2)", borderBottom: "1px solid var(--line)" }}>
+          <thead><tr style={{ background: "var(--paper-2)", borderBottom: "1px solid var(--rule)" }}>
             <th style={{ textAlign: "left", padding: "12px 18px", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--muted)" }}>email</th>
             <th style={{ textAlign: "left", padding: "12px 18px", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--muted)" }}>status</th>
             <th style={{ textAlign: "left", padding: "12px 18px", fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--muted)" }}>invited</th>
@@ -52,7 +52,7 @@ export default async function SeatsPage() {
             {seats.length === 0 ? (
               <tr><td colSpan={3} style={{ padding: 22, textAlign: "center", color: "var(--muted)" }}>No seats yet.</td></tr>
             ) : seats.map((s) => (
-              <tr key={s.id} style={{ borderBottom: "1px dotted var(--line)" }}>
+              <tr key={s.id} style={{ borderBottom: "1px dotted var(--hairline)" }}>
                 <td style={{ padding: "12px 18px" }}>{s.email}</td>
                 <td style={{ padding: "12px 18px" }}><span className="pill mono">{s.status}</span></td>
                 <td style={{ padding: "12px 18px" }} className="mono">{s.invited_at ? new Date(s.invited_at).toLocaleDateString() : "—"}</td>

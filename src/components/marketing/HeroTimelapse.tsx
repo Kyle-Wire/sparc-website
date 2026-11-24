@@ -90,7 +90,7 @@ export function HeroTimelapse() {
           ref={canvasRef}
           className="tl-canvas"
           role="img"
-          aria-label="An illustrated town on a floating block of ground, with a creek and a forest, over two days and nights: a flood, a hurricane, a heat wave, an earthquake that opens a sinkhole in a square, and a wind storm. At the end the block folds into the SPARC Labs cube."
+          aria-label="An illustrated town on a floating block of ground, with a creek and a forest, over three days and nights: a flood, a hurricane, a heat wave, an earthquake that opens a sinkhole in a square, a wildfire through the forest, a winter storm and a wind storm. At the end the block folds into the SPARC Labs cube."
         />
         <div className="tl-now" aria-hidden="true">
           <span className="tl-now-dot" data-scene={SCENES[scene].id} />

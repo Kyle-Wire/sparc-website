@@ -15,6 +15,8 @@
 .tl-now-dot[data-scene="heat"] { background: #f0b632; }
 .tl-now-dot[data-scene="quake"] { background: #c9925a; }
 .tl-now-dot[data-scene="wind"] { background: #8fc4a0; }
+.tl-now-dot[data-scene="fire"] { background: #ff7a2a; }
+.tl-now-dot[data-scene="winter"] { background: #dbe8f0; }
 .tl-play {
   position: absolute; right: 12px; bottom: 12px; min-height: 32px; padding: 4px 12px; border-radius: 6px;
   border: 1px solid rgba(245, 245, 244, 0.5); background: rgba(20, 20, 20, 0.62); color: var(--ban-ink);

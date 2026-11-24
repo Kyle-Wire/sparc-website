@@ -65,7 +65,7 @@ Answer each from the address, and write the answers in the order note:
 | The report cannot be made | `report-order.ts cannot-model <id> "<why, plainly>"`: nothing is charged and the saved card is removed |
 | The buyer says the report is wrong | Reply within the support reply time. Read it with them. Materially wrong about what it says it describes (wrong property, a number that does not match its own records, a missing label or limit): refund in full (Terms) and log the fault in Climate Home Inspection. A finding the buyer dislikes, or one a later storm contradicts, is not by itself materially wrong: explain the label and the limits, and log it as a model check |
 | The buyer disputes the charge with their bank | Answer in the Stripe Dashboard with: the order's `agreed_at` and `terms_version` and the sentence they ticked (`AGREE_STATEMENT` in `catalog.ts`), the delivery email, and the download time. Never argue with the buyer by email while a dispute is open |
-| Too many orders | Set `ORDERS_WEEKLY_CAP` (see `payments.md`). New buyers are told "not this week" before saving a card; nobody already in is affected |
+| Too many orders | Set `ORDERS_WEEKLY_CAP` (see `payments.md`). Past the cap, invited buyers see a wait-list form instead of the order form (no card, no charge). Rows land in Supabase `waitlist` with `domain = 'house-report'`, oldest first; you get an email if `WAITLIST_NOTIFY_EMAIL` is set. Invite the oldest `queued` row when a slot opens and set its `status` to `invited`. Nobody already in is affected. Kyle (24 Nov 2026): cap at 10 a week |
 
 ## Capacity
 

@@ -7,6 +7,7 @@ import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/sup
 import { parsePlaceSlug, placeSlug } from "@/lib/place/coords";
 import { AGREE_STATEMENT, REPORT, checkoutEnabled, formatPrice, mayOrder, salesMode } from "@/lib/payments";
 import { atCapacity } from "@/lib/payments/capacity";
+import { parsePlaceInLine } from "@/lib/payments/waitlist";
 import { formatDay, promisedBy, todayEastern } from "@/lib/payments/turnaround";
 import { DeadlineField } from "@/components/commerce/DeadlineField";
 import { HouseFactsField } from "@/components/commerce/HouseFactsField";
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
 };
 export const dynamic = "force-dynamic";
 
-type Props = { searchParams: Promise<{ place?: string; error?: string }> };
+type Props = { searchParams: Promise<{ place?: string; error?: string; waitlisted?: string }> };
 
 // The one page where the report is bought. Built to the map-first brief §7:
 // no countdowns, no scarcity, nothing pre-ticked, the sample one click away,
@@ -47,8 +48,10 @@ export default async function BuyReportPage({ searchParams }: Props) {
   const error = sp.error ? ORDER_ERRORS[sp.error] ?? ORDER_ERRORS.checkout : null;
   const today = todayEastern();
   const by = promisedBy(today, REPORT.deliveryDays);
+  const placeInLine = parsePlaceInLine(sp.waitlisted);
 
-  // Weekly cap (ORDERS_WEEKLY_CAP): say "not this week" before a card is saved.
+  // Weekly cap (ORDERS_WEEKLY_CAP): past it, offer the wait list (src/lib/payments/waitlist.ts)
+  // before a card is saved.
   let full = false;
   if (onSale && email && allowed) {
     try {
@@ -94,16 +97,42 @@ export default async function BuyReportPage({ searchParams }: Props) {
                   order.
                 </p>
               )}
-              {email && allowed && full ? (
-                <div className="buy-signin">
+              {email && allowed && placeInLine ? (
+                <div className="buy-signin" role="status">
                   <p>
-                    We have as many reports as we can make well this week, so we are not taking new orders for a few
-                    days. Every report is read by a person before it leaves, and we would rather say so now than miss
-                    our promise later. Write to{" "}
-                    <a href={`mailto:${EMAIL_PRIMARY}?subject=${encodeURIComponent("House report: when can you start?")}`}>{EMAIL_PRIMARY}</a>{" "}
-                    with the property and your deadline, and we will tell you when we can start. Nothing is charged.
+                    <strong>You&apos;re on the wait list, number {placeInLine}.</strong> We&apos;ll email{" "}
+                    <span className="mono">{email}</span> as soon as we can start your report, in the order people
+                    joined. Nothing is charged and no card is saved. If your deadline moves, write to{" "}
+                    <a href={`mailto:${EMAIL_PRIMARY}?subject=${encodeURIComponent("House report wait list")}`}>{EMAIL_PRIMARY}</a>.
                   </p>
                 </div>
+              ) : email && allowed && full ? (
+                <form method="post" action="/api/reports/waitlist" className="buy-fields">
+                  <p style={{ marginTop: 0 }}>
+                    <strong>This week is full.</strong> A person reads every report before it leaves, so we take only
+                    as many orders a week as we can make well. Join the wait list and we&apos;ll email you when we
+                    can start, in the order people joined. Nothing is charged.
+                  </p>
+                  {slug && <input type="hidden" name="place" value={slug} />}
+                  <label className="label" htmlFor="w-deadline">
+                    Your inspection deadline (optional)
+                  </label>
+                  <input id="w-deadline" name="deadline" type="date" className="input" min={today} />
+                  <label className="label" htmlFor="w-note">
+                    The property, or what you&apos;re deciding (optional)
+                  </label>
+                  <textarea
+                    id="w-note"
+                    name="note"
+                    className="input"
+                    maxLength={2000}
+                    style={{ minHeight: 84, resize: "vertical" }}
+                  />
+                  <button type="submit" className="btn btn-accent buy-submit">
+                    Join the wait list <span className="arrow">→</span>
+                  </button>
+                  <p className="buy-hint">Signed in as <span className="mono">{email}</span>.</p>
+                </form>
               ) : email && !allowed ? (
                 <div className="buy-signin">
                   <p>

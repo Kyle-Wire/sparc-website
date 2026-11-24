@@ -140,7 +140,7 @@ export const ORDER_ERRORS: Record<string, string> = {
   house_facts:
     "One of the answers about the house is not one we can read. Leave any you are not sure of blank. Nothing was charged.",
   deadline_past: "That inspection deadline has already passed. Leave it blank if your inspection period is over. Nothing was charged.",
-  full: "We have as many reports as we can make well this week, so we are not taking new orders for a few days. Nothing was charged. Write to us and we will tell you when we can start.",
+  full: "This week filled up while you were ordering. Nothing was charged. Join the wait list below and we will email you when we can start.",
   attempts:
     "This account has started several orders today without saving a card, so to protect against card fraud we pause new ones for a day. Nothing was charged. If that was you having trouble with the card page, write to us and we will help.",
   checkout: "We could not open the checkout. Nothing was charged. Please try again in a minute.",

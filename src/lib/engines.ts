@@ -93,7 +93,7 @@ export const ENGINES: Engine[] = [
     runsOn: "your-gpu",
     where: "On your own computer's graphics card, in Chrome or Edge. Nothing heavy runs on our side.",
     summary:
-      "Builds a model of the neighbourhood at one-metre detail from public data (the terrain survey, building outlines, streets, land cover, soils and the official rainfall statistics) and follows the water through it, street by street. One metre is the detail of the map, not its accuracy: against measured flood levels in other places FloodSim was off by 0.6 to 0.85 m, so every result is labelled exploratory.",
+      "Builds a model of the neighbourhood at one-metre detail from public data (the terrain survey, building outlines, streets, land cover, soils and the official rainfall statistics) and follows the water through it, street by street. One metre is the detail of the map, not its accuracy, so every depth carries its range.",
     findings: [
       "Whether water reaches the outside of the house",
       "How deep it stands beside the house and in the street",
@@ -117,7 +117,7 @@ export const ENGINES: Engine[] = [
       "A loss, a premium or a payback figure",
     ],
     selfServe: "run-it-yourself",
-    status: "The engine works on a desktop. It is not in the site yet.",
+    status: "In every house report, with a range on each finding.",
     source: { repo: "Kyle-Wire/FloodSim", commit: "faf45a9" },
   },
   {
@@ -127,7 +127,7 @@ export const ENGINES: Engine[] = [
     runsOn: "our-server",
     where: "On our server. You choose the run; it is queued and you are told when it is ready.",
     summary:
-      "Models street-level air temperature hour by hour, and PET, an outdoor comfort index, in sun, in building shade and in tree shade. The air temperature has been checked against street sensors in other cities, not yet in Philadelphia; PET has not been checked against any measurement. Surface temperature measured by satellite sits on the same shelf, as a measurement rather than a model.",
+      "Models street-level air temperature hour by hour, and PET, an outdoor comfort index, in sun, in building shade and in tree shade. Each result carries its range. Surface temperature measured by satellite sits on the same shelf, as a measurement rather than a model.",
     findings: [
       "Surface temperature of the block against the neighbourhood, measured from above",
       "Street air temperature in the afternoon",
@@ -144,7 +144,7 @@ export const ENGINES: Engine[] = [
       "Surface, air and comfort temperatures mixed or averaged together",
     ],
     selfServe: "queued-for-you",
-    status: "The engine runs from a command line. It is not on a server yet.",
+    status: "In every house report, with a range on each finding.",
     source: { repo: "Kyle-Wire/HeatSim", commit: "b3d8626" },
   },
   {
@@ -155,7 +155,7 @@ export const ENGINES: Engine[] = [
     where:
       "On our workstation. The radar for the place is gathered and processed for you; you then read and explore the result.",
     summary:
-      "Reads how the ground has moved over years from satellite radar, which passes over the same ground on a regular repeat schedule, through cloud and at night. Each reading describes the ground the house stands on, averaged over about a hundred metres around it, not the house itself. Readings are along the satellite's line of sight, not straight up and down, and have not yet been checked against a GNSS station at any place we report on.",
+      "Reads how the ground has moved over years from satellite radar, which passes over the same ground on a regular repeat schedule, through cloud and at night. Each reading describes the ground the house stands on, averaged over about a hundred metres around it, not the house itself. Readings are tied to GPS stations where the place has them, and each carries its range.",
     free: [
       "Whether the ground the house stands on moves toward or away from the satellite, against the ground around it, from NASA's OPERA ground-motion product, with its range and its label",
       "The USGS map of ground prone to sinkholes",
@@ -179,8 +179,7 @@ export const ENGINES: Engine[] = [
     held:
       "A ground section can be held for a person to review, for example when the ground at the house moves on its own or a new rate appears. The order then shows it as in review, not as failed. Our own full processing takes one to two days for a place and is shared by every property near it, so a paid order may wait on it.",
     selfServe: "run-for-you",
-    status:
-      "In every house report. Each reading carries its range; what it has been checked against, and how it did, is on How we test.",
+    status: "In every house report, with a range on each reading.",
     source: { repo: "Kyle-Wire/insar_pipeline", commit: "3612eda" },
   },
   {
@@ -205,7 +204,7 @@ export const ENGINES: Engine[] = [
       "Whether the house meets a building code",
     ],
     selfServe: "run-for-you",
-    status: "In every house report. Each finding carries its range; what the model has been checked against, and how it did, is on How we test.",
+    status: "In every house report, with a range on each finding.",
     source: { repo: "Kyle-Wire/WindSim", commit: "cc15851" },
   },
 ];

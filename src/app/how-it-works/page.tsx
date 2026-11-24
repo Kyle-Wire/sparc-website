@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PlaceSearch } from "@/components/place/PlaceSearch";
 import { HazardBar, Stamp } from "@/components/marketing/brand";
-import { AFTER, CLOSER, HERO, NEVER, RECEIPTS, REMEMBERS, SIMULATE, STEPS, TWO_QUESTIONS } from "@/lib/copy/marketing";
+import { AFTER, CLOSER, HERO, NEVER, REMEMBERS, SIMULATE, STEPS, TWO_QUESTIONS } from "@/lib/copy/marketing";
 
 // The marketing page. The home page is the map and nothing else (Kyle,
 // map-first-brief.md s.3), so this is where someone arriving from a link, a
@@ -12,9 +12,11 @@ import { AFTER, CLOSER, HERO, NEVER, RECEIPTS, REMEMBERS, SIMULATE, STEPS, TWO_Q
 //
 // Its order is the conversion path in docs/design/brand-and-conversion.md s.4:
 // curiosity (what your block remembers) -> the free/paid line -> the steps ->
-// trust (receipts, and what we will never say) -> one action. Every word is
-// in src/lib/copy/; nothing here holds a figure. The receipts come from
-// src/lib/copy/receipts.ts.
+// trust (what we will never say) -> one action. The test record lives on
+// /how-we-test, linked from the footer and the FAQ, not pushed here (Kyle,
+// 23 Nov 2026: proof stays available for anyone who wants it, never in a
+// buyer's face). Every word is
+// in src/lib/copy/; nothing here holds a figure.
 
 export const metadata: Metadata = withPage("/how-it-works", {
   title: "How it works",
@@ -204,19 +206,6 @@ export default function HowItWorksPage() {
             ))}
           </div>
           <p className="screening-note" style={{ marginTop: 24 }}>{AFTER.note}</p>
-        </div>
-      </section>
-
-      <section style={{ background: "var(--paper-2)" }} id="receipts">
-        <div className="wrap hiw-proof">
-          <div>
-            <Stamp tone="accent">{RECEIPTS.kicker}</Stamp>
-            <h2>{RECEIPTS.title}</h2>
-            <p className="lead">{RECEIPTS.short}</p>
-          </div>
-          <Link href="/how-we-test#receipts" className="btn">
-            See every test, failures included <span className="arrow">→</span>
-          </Link>
         </div>
       </section>
 

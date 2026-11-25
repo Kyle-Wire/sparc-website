@@ -1,0 +1,256 @@
+{
+ "source": "climate-home-inspection reports/samples (tools/report/build_sample.py)",
+ "samples": [
+  {
+   "id": "a",
+   "property": "PHL-POC-001",
+   "name": "Sample A",
+   "pages": [
+    {
+     "section": "Sample",
+     "title": "What you get: a sample report"
+    },
+    {
+     "section": "Title page",
+     "title": "How your land works"
+    },
+    {
+     "section": "Main findings",
+     "title": "Main findings"
+    },
+    {
+     "section": "Flood · design storms",
+     "title": "Does storm water reach the house?"
+    },
+    {
+     "section": "Flood · harder tests and the record",
+     "title": "Harder tests, and what the public record shows"
+    },
+    {
+     "section": "Heat · measured from above",
+     "title": "How hot do the block's surfaces run?"
+    },
+    {
+     "section": "Heat · modelled",
+     "title": "How warm is the air, and how does it feel outdoors?"
+    },
+    {
+     "section": "Ground · measured from space",
+     "title": "Is the ground under the house moving?"
+    },
+    {
+     "section": "Ground · in detail",
+     "title": "Does it move on its own, and has it changed?"
+    },
+    {
+     "section": "Wind · past storms",
+     "title": "Which tropical storms have passed near here?"
+    },
+    {
+     "section": "Wind · storm gusts at the house",
+     "title": "How strong do storm gusts get at the house?"
+    },
+    {
+     "section": "Wind · around the house",
+     "title": "What do the buildings around it do to that wind?"
+    },
+    {
+     "section": "Winter · the cold here",
+     "title": "How hard are winters here?"
+    },
+    {
+     "section": "Winter · ice",
+     "title": "Where does ice linger?"
+    },
+    {
+     "section": "Winter · walls",
+     "title": "Which walls take the cold wind?"
+    },
+    {
+     "section": "Winter · snow after a storm",
+     "title": "Where does the snow pile up?"
+    },
+    {
+     "section": "Reading this report",
+     "title": "What to check at the house, and how sure the findings are"
+    },
+    {
+     "section": "Reading this report",
+     "title": "Limits and points to note"
+    },
+    {
+     "section": "Reading this report",
+     "title": "Limits and points to note, continued"
+    },
+    {
+     "section": "Reading this report",
+     "title": "Limits and points to note, continued"
+    },
+    {
+     "section": "Reading this report",
+     "title": "Where each finding comes from, continued"
+    }
+   ],
+   "answers": [
+    {
+     "kick": "01 · The air · Wind",
+     "say": "Storm gusts reach about 67 mph."
+    },
+    {
+     "kick": "02 · The surface · Heat",
+     "say": "Shade feels 20 °F cooler."
+    },
+    {
+     "kick": "03 · The street · Flood",
+     "say": "Water stays at the curb."
+    },
+    {
+     "kick": "04 · The ground · Ground",
+     "say": "The ground here is holding still."
+    }
+   ],
+   "engines": [
+    {
+     "engine": "FloodSim",
+     "version": "0070c6c",
+     "run": "terrain 2015, buildings 2022, run 23 November 2026"
+    },
+    {
+     "engine": "HeatSim",
+     "version": "4e8cd38",
+     "run": "weather of 2025-07-01 to 2025-07-31; HeatSim 0.7.0, run 23 November 2026"
+    },
+    {
+     "engine": "WindSim Layer 1",
+     "version": "b9c1532",
+     "run": "storms of the station record to 2020; WindSim b9c1532"
+    },
+    {
+     "engine": "WindSim LBM-LES house library",
+     "version": "b9c1532",
+     "run": "house library, WindSim b9c1532"
+    },
+    {
+     "engine": "Sun on the 1 m block (NREL SPA)",
+     "version": "pvlib 0.16.1",
+     "run": "Overture Maps 2026-11-18.0 buildings; USGS 3DEP 1 m DEM: USGS_1M_18_x48y443_PA_17County_D24.tif"
+    },
+    {
+     "engine": "WindSim house LBM-LES",
+     "version": "32c77ab",
+     "run": "Overture Maps 2026-11-18.0 buildings; USGS 3DEP 1 m DEM: USGS_1M_18_x48y443_PA_17County_D24.tif"
+    }
+   ],
+   "pdf": "/samples/sample-report-a.pdf",
+   "dir": "/samples/pages/2026-11-25"
+  },
+  {
+   "id": "b",
+   "property": "PHL-POC-002",
+   "name": "Sample B",
+   "pages": [
+    {
+     "section": "Sample",
+     "title": "What you get: a sample report"
+    },
+    {
+     "section": "Title page",
+     "title": "How your land works"
+    },
+    {
+     "section": "Main findings",
+     "title": "Main findings"
+    },
+    {
+     "section": "Flood · design storms",
+     "title": "Does storm water reach the house?"
+    },
+    {
+     "section": "Flood · harder tests and the record",
+     "title": "Harder tests, and what the public record shows"
+    },
+    {
+     "section": "Heat · measured from above",
+     "title": "How hot do the block's surfaces run?"
+    },
+    {
+     "section": "Heat · modelled",
+     "title": "How warm is the air, and how does it feel outdoors?"
+    },
+    {
+     "section": "Ground · measured from space",
+     "title": "Is the ground under the house moving?"
+    },
+    {
+     "section": "Ground · in detail",
+     "title": "Does it move on its own, and has it changed?"
+    },
+    {
+     "section": "Wind · past storms",
+     "title": "Which tropical storms have passed near here?"
+    },
+    {
+     "section": "Wind · storm gusts at the house",
+     "title": "How strong do storm gusts get at the house?"
+    },
+    {
+     "section": "Reading this report",
+     "title": "What to check at the house, and how sure the findings are"
+    },
+    {
+     "section": "Reading this report",
+     "title": "What to check at the house, and how sure the findings are, continued"
+    },
+    {
+     "section": "Reading this report",
+     "title": "Limits and points to note, continued"
+    },
+    {
+     "section": "Reading this report",
+     "title": "Limits and points to note, continued"
+    },
+    {
+     "section": "Reading this report",
+     "title": "Where each finding comes from, continued"
+    }
+   ],
+   "answers": [
+    {
+     "kick": "01 · The air · Wind",
+     "say": "Storm gusts reach about 70 mph."
+    },
+    {
+     "kick": "02 · The surface · Heat",
+     "say": "Shade feels 16 °F cooler."
+    },
+    {
+     "kick": "03 · The street · Flood",
+     "say": "Water reaches the walls in every storm."
+    },
+    {
+     "kick": "04 · The ground · Ground",
+     "say": "The ground here is holding still."
+    }
+   ],
+   "engines": [
+    {
+     "engine": "FloodSim",
+     "version": "0070c6c",
+     "run": "terrain 2015, buildings 2022, run 23 and 24 November 2026"
+    },
+    {
+     "engine": "HeatSim",
+     "version": "4e8cd38",
+     "run": "weather of 2025-07-01 to 2025-07-31; HeatSim 0.7.0, run 23 November 2026"
+    },
+    {
+     "engine": "WindSim Layer 1",
+     "version": "b9c1532",
+     "run": "storms of the station record to 2024; WindSim b9c1532"
+    }
+   ],
+   "pdf": "/samples/sample-report-b.pdf",
+   "dir": "/samples/pages/2026-11-25"
+  }
+ ]
+}

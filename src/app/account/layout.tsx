@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AccountNav } from "./AccountNav";
+import { ownProfile } from "@/lib/house/server";
+import { greetingName } from "@/lib/house/profile";
 
 // Authenticated pages must never be cached by shared caches and must not be indexed.
 export const dynamic = "force-dynamic";
@@ -15,8 +17,9 @@ export const metadata = {
 // keys, usage, devices) are left in place but out of the menu: none of them
 // describes anything that can be bought (docs/HANDOFF.md §6).
 const NAV: { href: Route; label: string }[] = [
-  { href: "/account", label: "Overview" },
-  { href: "/account/reports", label: "Your reports" },
+  { href: "/account", label: "Your houses" },
+  { href: "/account/reports", label: "Orders and reports" },
+  { href: "/account/profile", label: "Profile" },
   { href: "/account/settings", label: "Settings" },
 ];
 
@@ -24,6 +27,8 @@ export default async function AccountLayout({ children }: { children: React.Reac
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/account");
+  // The header greets the buyer by name once they give one (profile), not by email.
+  const name = greetingName(await ownProfile(), (user.user_metadata?.full_name as string | undefined) ?? null);
 
   return (
     <>
@@ -31,9 +36,9 @@ export default async function AccountLayout({ children }: { children: React.Reac
       <main id="main">
       <section className="grid-bg" style={{ borderBottom: "1px solid var(--line)", padding: "32px 0 18px" }}>
         <div className="wrap">
-          <div className="kicker">account</div>
+          <div className="kicker">{name ? user.email : "account"}</div>
           <div className="row" style={{ alignItems: "baseline", justifyContent: "space-between", gap: 14 }}>
-            <h1 style={{ fontSize: "var(--fs-h1)", fontWeight: 800, letterSpacing: "-0.025em", margin: "6px 0 0", wordBreak: "break-all" }}>{user.email}</h1>
+            <h1 style={{ fontSize: "var(--fs-h1)", fontWeight: 800, letterSpacing: "-0.025em", margin: "6px 0 0", wordBreak: name ? "normal" : "break-all" }}>{name ? `Hi, ${name}` : user.email}</h1>
             <form action="/auth/signout" method="post"><button className="btn btn-sm" type="submit">Sign out</button></form>
           </div>
         </div>

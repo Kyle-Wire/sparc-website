@@ -16,6 +16,8 @@
  *   npx tsx scripts/report-order.ts package <order-id> <atlas.zip>   # the offline atlas, plates and data (D47)
  *   npx tsx scripts/report-order.ts update <order-id> <correction|change|hazard> <report.pdf> "what changed, plainly"
  *   npx tsx scripts/report-order.ts stop-updates <order-id>  # the buyer replied "no more updates"
+ *   npx tsx scripts/report-order.ts progress <order-id> <step> <running|done|skipped>   # the buyer's tracker
+ *   npx tsx scripts/report-order.ts house <order-id> <house.json> [<whatif-model.json> <whatif-engine.js>]
  *
  * The buyer is charged when the report is ready (Kyle, 22 November 2026).
  * deliver uploads the PDF, charges the card saved at order (with sales tax
@@ -39,6 +41,15 @@
  * changed finding is the next minor version (v1.1), a new hazard the next
  * major (v2.0). Old versions stay in the account. The buyer is emailed; if a
  * finding was wrong, the email's first line says so. Nothing is charged.
+ *
+ * progress marks one model step of an order (place, flood, heat, ground, wind,
+ * review) so the buyer's tracker lights it up (src/lib/house/progress.ts). The
+ * order runner calls it as each step finishes; nothing is emailed.
+ *
+ * house uploads the files the account's house page reads (src/lib/house/paths.ts):
+ * the dashboard (a HouseBundle, src/lib/house/types.ts) and, when the house's
+ * what-if study passed (CHI D46/D51), its emulator export and FloodSim's engine
+ * script (CHI tools/whatif/page.mjs engineScript). Running it again replaces them.
  */
 
 import { readFileSync } from "node:fs";
@@ -52,6 +63,9 @@ import { noticeFor } from "../src/lib/payments/webhook";
 import { sendEmail } from "../src/lib/email";
 import { feedbackDue } from "../src/lib/payments/feedback";
 import { packagePath, looksLikeZip, hasStartHere, PACKAGE_MAX_BYTES } from "../src/lib/payments/package";
+import { STEP_KEYS } from "../src/lib/house/progress";
+import { isHouseBundle } from "../src/lib/house/types";
+import { housePath, whatifModelPath, whatifEnginePath } from "../src/lib/house/paths";
 import { versionsByOrder, nextVersion, versionPath, updateAllowed, UPDATE_KINDS, UPDATE_WINDOW_DAYS, type UpdateKind } from "../src/lib/payments/versions";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://sparclabs.co";
@@ -81,7 +95,9 @@ npx tsx scripts/report-order.ts cancel <order-id> ["note"]
 npx tsx scripts/report-order.ts feedback <order-id>
 npx tsx scripts/report-order.ts package <order-id> <atlas.zip>
 npx tsx scripts/report-order.ts update <order-id> <correction|change|hazard> <report.pdf> "what changed"
-npx tsx scripts/report-order.ts stop-updates <order-id>`;
+npx tsx scripts/report-order.ts stop-updates <order-id>
+npx tsx scripts/report-order.ts progress <order-id> <${STEP_KEYS.join("|")}> <running|done|skipped>
+npx tsx scripts/report-order.ts house <order-id> <house.json> [<whatif-model.json> <whatif-engine.js>]`;
 
 function admin(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -347,6 +363,48 @@ async function main() {
       refId: `report-updated-${o.id}-v${v.label}`,
     });
     console.log(r.ok ? `Emailed ${email} (${r.id}). Note it in the order time log.` : `Email not sent: ${r.error}`);
+    return;
+  }
+
+  if (cmd === "progress" && a && b && c) {
+    if (!STEP_KEYS.includes(b) || !["running", "done", "skipped"].includes(c)) {
+      console.error(`The step is one of ${STEP_KEYS.join(", ")}; the state is running, done or skipped.`);
+      quit(2);
+    }
+    const o = await getOrder(db, a);
+    const progress = { ...((o.progress as Record<string, unknown> | null) ?? {}), [b]: { state: c, at: new Date().toISOString() } };
+    const { error } = await db.from("report_orders").update({ progress }).eq("id", o.id);
+    if (error) throw error;
+    console.log(`${o.id}: ${b} ${c}.`);
+    return;
+  }
+
+  if (cmd === "house" && a && b) {
+    const o = await getOrder(db, a);
+    const bundle: unknown = JSON.parse(readFileSync(b, "utf8"));
+    if (!isHouseBundle(bundle)) {
+      console.error("That file is not a house bundle (src/lib/house/types.ts): kind, version, label and five hazards.");
+      quit(1);
+    }
+    const put = async (path: string, bytes: Buffer, contentType: string) => {
+      const up = await db.storage.from("reports").upload(path, bytes, { contentType, upsert: true });
+      if (up.error) throw up.error;
+      console.log(`Uploaded reports/${path}`);
+    };
+    await put(housePath(o.user_id, o.id), Buffer.from(JSON.stringify(bundle)), "application/json");
+    const [model, engine] = [c, process.argv[6]];
+    if (model || engine) {
+      if (!model || !engine || !engine.endsWith(".js")) {
+        console.error("Give both the what-if model (.json) and the engine (.js), or neither.");
+        quit(2);
+      }
+      if (!bundle.floodLab.offered) {
+        console.error("The bundle says the flood lab is not offered for this house (its study did not pass): not uploading the lab.");
+        quit(1);
+      }
+      await put(whatifModelPath(o.user_id, o.id), readFileSync(model), "application/json");
+      await put(whatifEnginePath(o.user_id, o.id), readFileSync(engine), "text/javascript");
+    }
     return;
   }
 

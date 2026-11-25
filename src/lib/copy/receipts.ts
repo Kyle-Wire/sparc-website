@@ -20,7 +20,7 @@ export const RECEIPTS_AS_OF = "2026-11-22";
 export type Rung = 0 | 1 | 2 | 3;
 
 export const RUNG_WORDS: Record<Rung, { label: string; meaning: string }> = {
-  0: { label: "Held back", meaning: "A check hasn't passed, so it isn't shown in reports." },
+  0: { label: "Below the bar", meaning: "A check it must pass has failed or has not been run." },
   1: { label: "Exploratory", meaning: "Passes its solver tests; no real-world check has met its own bar yet." },
   2: { label: "Screening-checked", meaning: "Met its bar against real measurements in places like this one, held out." },
   3: { label: "Field-checked here", meaning: "Compared with a measurement at this place and passed a mark set in advance." },
@@ -120,22 +120,23 @@ export const RECEIPTS: QuantityReceipts[] = [
     engine: "wind",
     quantity: "Storm gusts at the block (regional layer)",
     rung: 0,
-    rungNote: "Not in reports yet.",
+    rungNote: "In every report, with the station-check error carried over as its range.",
     receipts: [
       { verdict: "passed", kind: "real-world-elsewhere", evidence: "shown", text: "For ordinary storms (not thunderstorms), gusts carried in to an airport left out of the set landed within 25 % of what it measured for 87 to 98 % of storm-and-airport pairs, at six places. This run came after two rule fixes, so a blind re-check is next.", source: "WindSim/docs/validation.md, \"Layer 1\", run 4", shipsWhen: "WindSim PR 7 (Layer 1) is merged", live: true },
       { verdict: "failed", kind: "real-world-elsewhere", evidence: "shown", text: "Thunderstorm gusts passed at Miami only.", source: "WindSim/docs/validation.md, \"Layer 1\", run 4", shipsWhen: "WindSim PR 7 (Layer 1) is merged", live: true },
       { verdict: "failed", kind: "real-world-elsewhere", evidence: "shown", text: "The blind re-check, at five new cities chosen by a rule written first: ordinary storms passed at Washington and Atlanta but missed at Houston and Los Angeles (78 and 79 %, against 80 %). Thunderstorms failed at all three cities that had them. New York could not be scored.", source: "WindSim/docs/validation.md, \"Layer 1: A3 blind results\"", shipsWhen: "WindSim PR 9 (blind check) is merged", live: true },
       { verdict: "not-run", kind: "real-world-our-places", evidence: "stated", text: "The step from an airport into a city street hasn't been tested; that needs an anemometer in the city.", source: "WindSim PR 7" },
     ],
-    next: "W3: carry storm gusts into a report only at places whose own held-out check passed, labelled so.",
+    next: "W3: the held-out station check at each place we report on.",
   },
   {
     engine: "wind",
     quantity: "Wind between the buildings (street model)",
     rung: 0,
+    rungNote: "In every report whose block has a street wind run.",
     receipts: [
       { verdict: "passed", kind: "solver", evidence: "shown", text: "Passes the one-building wind-tunnel case (AIJ Case A) on both engines.", source: "WindSim/benchmarks/aij_case_a/R1_kEpsilon/aij_case_a.json" },
-      { verdict: "failed", kind: "solver", evidence: "shown", text: "Fails every wind-tunnel case with more than one building, so it stays out of reports.", source: "WindSim/docs/validation/rans_case_c_d10; WindSim/docs/validation.md:220-221" },
+      { verdict: "failed", kind: "solver", evidence: "shown", text: "Fails every wind-tunnel case with more than one building.", source: "WindSim/docs/validation/rans_case_c_d10; WindSim/docs/validation.md:220-221" },
     ],
     next: "W8: pass the full AIJ wind-tunnel set under VDI 3783-9 (66 % hit rate).",
   },
@@ -143,7 +144,7 @@ export const RECEIPTS: QuantityReceipts[] = [
     engine: "fire",
     quantity: "Fire spread, embers and houses reached",
     rung: 0,
-    rungNote: "Not in reports yet.",
+    rungNote: "A research model. It is not part of the report.",
     receipts: [
       { verdict: "passed", kind: "solver", evidence: "shown", text: "Surface fire behaviour matches the US Forest Service's worked example digit for digit, and crown fire matches its published table within 2 %.", source: "FireSim/sandbox/REPORT.md; FireSim/tests" },
       { verdict: "passed", kind: "solver", evidence: "shown", text: "Twelve made-up landscapes with known answers: slope, wind across slope, cell size, more wind and wetter fuel all pass at 10 m cells.", source: "FireSim/sandbox/REPORT.md, cases Y1 to Y5; sandbox/results_synth.json" },

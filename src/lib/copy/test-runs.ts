@@ -73,7 +73,7 @@ export const TEST_ROWS: TestRow[] = [
   { engine: "wind", model: modelName("wind"), test: "Unit tests", kind: "known-answer", passed: 224, failed: 0, other: 2, unit: "tests",
     note: "One needs a data host the test machine can't reach; one needs a graphics card.", source: "WindSim · pytest" },
   { engine: "wind", model: `${modelName("wind")} street model`, test: "AIJ wind-tunnel cases", kind: "benchmark", passed: 2, failed: 4, other: 0, unit: "case and engine pairs",
-    note: "Passes the single building on both engines. Fails every case with more than one building, so street-level wind stays out of reports.",
+    note: "Passes the single building on both engines. Fails every case with more than one building.",
     source: "WindSim · windsim rescore (post hoc) and docs/validation.md" },
   { engine: "wind", model: `${modelName("wind")} storm gusts`, test: "Blind check at five new cities", kind: "held-out", passed: 2, failed: 5, other: 1, unit: "place and storm-type checks",
     note: "Cities chosen by a rule written and published before any of their data was read. Ordinary storms pass at Washington and Atlanta and fail at Houston and Los Angeles; thunderstorms fail at all three cities that had them; New York could not be scored (no airport in its exposure class).",

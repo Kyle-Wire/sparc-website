@@ -486,6 +486,9 @@ export class Timelapse {
     const hole = T.hole;
     const sheet = (i: number, j: number) =>
       N * 0.55 + N * 0.1 * Math.sin(i / N * 5.2 + 0.6 + t * 0.4 * m) * Math.cos(j / N * 3.4 - 0.4) + N * 0.07 * Math.sin((i + j) / N * 4 - 1);
+    // as in the logo, the cell's sheet floats inside the cube without touching its edges
+    // (Kyle, 25 Nov 2026)
+    const ins = N * 0.13 * smooth(0.45, 1, m), insK = (N - 2 * ins) / N;
     for (let j = 0; j <= N; j++)
       for (let i = 0; i <= N; i++) {
         const k = j * (N + 1) + i;
@@ -498,7 +501,7 @@ export class Timelapse {
         }
         z = lerp(thick + z, sheet(i, j), mE);
         this.vz[k] = z;
-        const [x, y] = P(i, j, z);
+        const [x, y] = P(ins + i * insK, ins + j * insK, z);
         this.px[k] = x;
         this.py[k] = y;
       }

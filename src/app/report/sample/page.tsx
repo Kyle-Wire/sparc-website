@@ -4,112 +4,63 @@ import Link from "next/link";
 import Image from "next/image";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
+import DATA from "@/lib/copy/samples.json";
 
 export const metadata: Metadata = withPage("/report/sample", {
   title: "Sample reports",
   description: "Two real house reports for two Philadelphia rowhouses, addresses withheld: every page, every finding with its range, how sure the findings are, and what a report will never say.",
 });
 
-// The buyer report's structure, from the Climate Inspection repository's
-// docs/product/DIRECTIVE.md §7 ("The report"), opened 18 November 2026. The
-// report there is built only from evidence records; the proof-of-concept report
-// names its block and stays private, so this page shows the layout and no
-// finding. A public sample report replaces it once there is a place that can
-// be shown (docs/HANDOFF.md, item 5).
+// The samples are two real reports built by Climate Home Inspection's own
+// pipeline (tools/report/build_sample.py, reports/samples/) for PHL-POC-001 and
+// PHL-POC-002: the same records, models and code as a paid report, "Sample
+// report" on every page, the address withheld and no house marked on any map.
 //
-// 22 November 2026: two real sample reports replace the empty layout as the
-// page's main exhibit. They were built by the real pipeline in Climate Home
-// Inspection (PR 23, remade on HeatSim 0.6.1 with Copernicus weather in PR 26,
-// reports/samples/) for PHL-POC-001 and PHL-POC-002, carry
-// "Sample report" on every page, withhold the address and do not mark the
-// house on any map. Files: public/samples/. The statements quoted below are
-// copied from page 3 of each report (finding F1), as printed.
-//
-// Ground movement and wind are in every report (Kyle, 23 November 2026). The
-// two samples were built before that and do not have the sections yet.
+// 25 November 2026: replaced with the option B report Kyle made the main report
+// on 24 November (CHI D58: the "How your land works" title page with four
+// answers, squared-off maps, flood, heat, ground, wind and, where the block has
+// the runs, winter). Files and the page list come from
+// scripts/samples/import-chi-samples.py, which writes public/samples/ and
+// src/lib/copy/samples.json from the report as printed. Rerun it after the
+// samples are rebuilt; nothing on this page is typed from a report by hand.
 
 const LABELS = ["Well supported", "Moderately supported", "Limited evidence", "Insufficient information"];
 
+const PLACES: Record<string, string> = {
+  a: "A rowhouse on South Street, Center City",
+  b: "A rowhouse in Northeast Philadelphia",
+};
 
-const SAMPLES = [
-  {
-    id: "a",
-    name: "Sample A",
-    place: "A rowhouse on South Street, Center City",
-    stat: "0 of 24",
-    statLine: "design-storm runs with water at the house's walls",
-    finding:
-      "In the model, water does not reach the house's outside walls in any of the six design storms (10-, 100- and 500-year, lasting 1 hour and 24 hours): none of 24 runs.",
-    pdf: "/samples/sample-report-a.pdf",
-  },
-  {
-    id: "b",
-    name: "Sample B",
-    place: "A rowhouse in Northeast Philadelphia",
-    stat: "24 of 24",
-    statLine: "design-storm runs with water at the house's walls",
-    finding:
-      "In the model, water reaches the house's outside walls in 24 of 24 design-storm runs, standing up to 30 cm above the typical ground beside the house.",
-    pdf: "/samples/sample-report-b.pdf",
-  },
-] as const;
+const SAMPLES = DATA.samples.map((x) => ({ ...x, place: PLACES[x.id] ?? x.name }));
 
-const PAGE_NAMES = [
-  "What you get: a sample report",
-  "Main findings",
-  "Does storm water reach the house?",
-  "Harder tests, and what the public record shows",
-  "How hot do the block's surfaces run?",
-  "How warm is the air, and how does it feel outdoors?",
-  "What to check at the house, and how sure the findings are",
-  "Limits and points to note",
-  "Where each finding comes from",
-];
-
-const SECTIONS: { title: string; what: string; cards: string[]; plot?: string; screening?: boolean }[] = [
+const SECTIONS: { title: string; what: string }[] = [
   {
-    title: "At a glance",
-    what: "The property's reference, the headline findings for each hazard, and the names of the things the report does not cover.",
-    cards: ["Flood, the headline", "Heat, the headline", "Not covered"],
+    title: "How your land works",
+    what: "The block in 3D on the title page, with one plain answer for each of the air, the surface, the street and the ground. Then the main findings, each with its range.",
   },
   {
     title: "Flood",
-    what: "The design storms, with a map. Then the harder tests of the model, and what the public record shows: the flood zone, the ground's height, inspections after a real storm, and how the model compares with other records.",
-    cards: ["Water beside the house", "Water in the street", "Nearest deeper water", "Storm by storm"],
-    plot: "Where the map of peak water depth around the property would go. Nothing has been modelled, so nothing is drawn.",
+    what: "The design storms, with a map of where the water goes. Then harder tests of the model, and what the public record shows: the flood zone, the ground's height, inspections after a real storm, and how the model compares with other records.",
   },
   {
     title: "Heat",
-    what: "What was measured from above, with a map. Then what the model estimates: street air temperature, and outdoor comfort under its own heading, with its own map.",
-    cards: ["Surface, block against neighbourhood", "Street air, day", "Street air, night", "Comfort, sun against shade"],
-    plot: "Where the map of measured surface temperature would go. Nothing has been measured for a place shown here, so nothing is drawn.",
+    what: "What was measured from above, with a map. Then what the model gives: street air temperature, and outdoor comfort (PET) in sun and in shade, under its own heading.",
   },
   {
     title: "Ground movement",
-    what: "Whether the ground the house stands on moves toward or away from the satellite against the ground around it, as a rate with its range, from NASA's satellite radar product where it covers the place; the map of ground prone to sinkholes; whether it moves with its surroundings or on its own, and whether the rate is steady or new. A refused reading shows no number and says why.",
-    cards: ["Ground at the house, free", "Sinkhole-prone ground, free", "With its surroundings or on its own", "Steady or new", "Seasonal swing", "Ten years ahead"],
-    screening: true,
+    what: "Whether the ground under the house is moving against the ground around it, read from satellite radar, as a rate with its range. Then whether it moves on its own or with its surroundings, whether the rate has changed, the seasonal swing, and ten years ahead if the past rate holds.",
   },
   {
     title: "Wind",
-    what: "Storm gusts for the area from long weather-station records, and how wind moves between the buildings around the house, from our street model. Each with its range.",
-    cards: ["Storm gusts for the area", "Wind between the buildings"],
-    screening: true,
+    what: "The tropical storms that have passed near the place, storm gusts at the house from long weather-station records, and what the buildings around the house do to that wind, from our street model. Each with its range.",
   },
   {
-    title: "What to check at the house, and how sure the findings are",
-    what: "Every question the report cannot answer, with what would settle it. Then, said once: nothing is checked at the house itself, the four evidence levels, which findings carry which, and why.",
-    cards: ["Questions, with what settles each", ...LABELS],
+    title: "Winter",
+    what: "Where the block has the runs: how hard winters are here, where ice lingers, which outside walls take the cold wind, and where snow piles up after a storm.",
   },
   {
-    title: "Limits and points to note",
-    what: "What each model cannot see at this place, said once, at the back.",
-    cards: ["Limits of the flood model here", "Limits of the heat model here"],
-  },
-  {
-    title: "Where each finding comes from",
-    what: "Every source, its date and its method, and the engine version that produced each modelled figure.",
-    cards: ["Sources", "Engine versions"],
+    title: "Reading this report",
+    what: "What to check at the house, with what would settle each question. How sure each finding is, in four evidence levels, said once. The limits of each source, and every source with its date and the engine version behind each figure.",
   },
 ];
 
@@ -121,7 +72,7 @@ export default function SampleReportPage() {
       <PageHero
         kicker="sample reports · real homes · addresses withheld"
         title="What you get."
-        lead="Two real reports for two Philadelphia rowhouses, built by the same models and the same code as a paid report. Every page and every finding, each with its range, and how sure the findings are, set out once at the back. The addresses are withheld and no map marks the house."
+        lead="Two real reports for two Philadelphia rowhouses, built by the same models and the same code as a paid report: flood, heat, ground movement and wind, every finding with its range, and how sure the findings are, set out once at the back. The addresses are withheld and no map marks the house."
         accent="var(--flood)"
       />
 
@@ -130,16 +81,20 @@ export default function SampleReportPage() {
           {SAMPLES.map((x) => (
             <article key={x.id} className="sample-card">
               <a href={`#sample-${x.id}`} className="sample-cover" aria-label={`${x.name}: read it page by page`}>
-                <Image src={`/samples/${x.id}-page-3-thumb.webp`} alt={`${x.name}, page 3: does storm water reach the house?`} width={408} height={528} />
+                <Image src={`${x.dir}/${x.id}-page-2-thumb.webp`} alt={`${x.name}, page 2: How your land works, the block in 3D with four answers`} width={408} height={528} />
               </a>
               <div className="sample-body">
                 <span className="kicker">{x.name}</span>
                 <h3>{x.place}</h3>
-                <p className="sample-stat">
-                  <strong>{x.stat}</strong> {x.statLine}
-                </p>
-                <p>&ldquo;{x.finding}&rdquo;</p>
-                <p className="sample-label">Model output, not a measurement.</p>
+                <ul className="sample-answers">
+                  {x.answers.map((a) => (
+                    <li key={a.kick}>
+                      <span>{a.kick.split(" · ").slice(1, 2).join("")}</span>
+                      <strong>{a.say}</strong>
+                    </li>
+                  ))}
+                </ul>
+                <p className="sample-label">The answers on its title page, as printed. {x.pages.length} pages.</p>
                 <div className="row" style={{ marginTop: 12 }}>
                   <a href={`#sample-${x.id}`} className="btn btn-accent">
                     Read it page by page <span className="arrow">→</span>
@@ -153,12 +108,11 @@ export default function SampleReportPage() {
           ))}
         </div>
         <p className="screening-note" style={{ marginTop: 28 }}>
-          <strong>Samples, not advice.</strong> These show what a report contains. These two were made before ground
-          movement and wind went into every report, so they show flood and heat only. The{" "}
-          <Link href="/example">worked example of Sample A&rsquo;s block</Link> has all four layers, in 3D.
+          <strong>Samples, not advice.</strong> These show what a report contains. Sample B&rsquo;s block has no
+          street-level wind run yet, so its report has storm gusts at the house but not the wind around it, and no
+          winter section. The <Link href="/example">worked example of Sample A&rsquo;s block</Link> has every layer, in 3D.
         </p>
       </Section>
-
 
       <Section sunken kicker="the SPARC Labs Field Kit" title="A report you can open, print and keep.">
         <p className="lead" style={{ maxWidth: 760, margin: "0 0 28px" }}>
@@ -202,17 +156,40 @@ export default function SampleReportPage() {
       </Section>
 
       {SAMPLES.map((x, n) => (
-        <Section key={x.id} sunken={n === 1} kicker={`${x.name} · nine pages`} title={x.place + "."}>
+        <Section key={x.id} sunken={n === 1} kicker={`${x.name} · ${x.pages.length} pages`} title={x.place + "."}>
           <div id={`sample-${x.id}`} className="sample-pages" style={{ scrollMarginTop: 96 }}>
-            {PAGE_NAMES.map((name, i) => (
-              <a key={name} href={`/samples/${x.id}-page-${i + 1}.webp`} target="_blank" rel="noopener" className="sample-page">
-                <Image src={`/samples/${x.id}-page-${i + 1}-thumb.webp`} alt={`${x.name}, page ${i + 1}: ${name}`} width={408} height={528} />
+            {x.pages.map((pg, i) => (
+              <a key={i} href={`${x.dir}/${x.id}-page-${i + 1}.webp`} target="_blank" rel="noopener" className="sample-page">
+                <Image src={`${x.dir}/${x.id}-page-${i + 1}-thumb.webp`} alt={`${x.name}, page ${i + 1}: ${pg.title}`} width={408} height={528} />
                 <span>
-                  {i + 1}. {name}
+                  {i + 1}. {pg.title}
                 </span>
               </a>
             ))}
           </div>
+          <details className="sample-engines">
+            <summary>The engine versions behind {x.name}</summary>
+            <table>
+              <thead>
+                <tr>
+                  <th>Engine</th>
+                  <th>Version</th>
+                  <th>Data and run</th>
+                </tr>
+              </thead>
+              <tbody>
+                {x.engines.map((e) => (
+                  <tr key={e.engine}>
+                    <td>{e.engine}</td>
+                    <td>
+                      <code>{e.version}</code>
+                    </td>
+                    <td>{e.run}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </details>
           <div className="row" style={{ marginTop: 20 }}>
             <a href={x.pdf} className="btn" download>
               Download {x.name} as a PDF
@@ -258,7 +235,6 @@ export default function SampleReportPage() {
             <li key={s.title} className="report-section">
               <div className="report-section-head">
                 <h3>{s.title}</h3>
-                {s.screening && <span className="shelf-state">New</span>}
               </div>
               <p>{s.what}</p>
             </li>

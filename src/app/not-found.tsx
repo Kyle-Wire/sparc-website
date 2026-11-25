@@ -15,7 +15,7 @@ export default function NotFound() {
         />
         <section className="wrap" style={{ padding: "32px var(--wrap-pad) 72px" }}>
           <div className="row" style={{ gap: 12, flexWrap: "wrap" }}>
-            <Link className="btn btn-accent" href="/">Look up a place</Link>
+            <Link className="btn btn-accent" href="/map">Look up a place</Link>
             <Link className="btn btn-ghost" href="/report/sample">See a sample report</Link>
             <Link className="btn btn-ghost" href="/faq">Questions</Link>
             <Link className="btn btn-ghost" href="/contact">Write to us</Link>

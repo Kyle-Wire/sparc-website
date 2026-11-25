@@ -37,7 +37,7 @@ export function PlacesList() {
             Look up an address and press <strong>Save this place</strong>. It will be kept here, in this
             browser, with your note and a snapshot of what the record said that day.
           </p>
-          <Link className="btn btn-accent" href="/">
+          <Link className="btn btn-accent" href="/map">
             Look up an address <span className="arrow">→</span>
           </Link>
         </div>

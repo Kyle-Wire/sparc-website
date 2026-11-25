@@ -34,42 +34,6 @@ export const dynamic = "force-dynamic";
 // both read from the same catalogue entry. docs/payments.md lists what Kyle
 // signs off before it is switched on in production.
 
-const PLANS: { name: string; state: string; who: string; what: string[] }[] = [
-  {
-    name: "The public record",
-    state: "Free · no account",
-    who: "Anyone.",
-    what: [
-      "Any US address",
-      "FEMA flood zones, flood insurance claims nearby, disaster declarations",
-      "Hurricane and tropical storm tracks, sea level rise",
-      "Tree canopy and paving",
-    ],
-  },
-  {
-    name: "The SPARC Labs Field Kit",
-    state: "Planned · bought once",
-    who: "Someone buying a home. You get the report and you are done.",
-    what: [
-      "The house report, an atlas that opens with no internet, maps to print and a year of updates",
-      "Flood, heat, ground movement and wind, modelled for the neighbourhood around one property",
-      "Findings first, with how much evidence stands behind each",
-      "What to check at the house",
-    ],
-  },
-  {
-    name: "A subscription",
-    state: "Planned · monthly",
-    who: "A home owner testing projects over time.",
-    what: [
-      "The flood model in your browser, with your own storms",
-      "Heat runs queued on our server; ground movement and wind worked out for you",
-      "What-if runs: rain garden, French drain, less paving, more trees",
-      "Saved places and runs",
-    ],
-  },
-];
-
 const BEFORE_WE_CHARGE: string[] = [
   "What one report or one month covers, exactly.",
   "What each model has been tested against, and its margins, in a methods paper.",
@@ -84,6 +48,80 @@ const BEFORE_WE_CHARGE: string[] = [
 // optional radon test $150–$250 and sewer scope $175–$295.
 const FOR_SCALE =
   "For scale: a standard home inspection usually costs $296 to $424, and a radon test or sewer scope added to it $150 to $295 (2026 HomeAdvisor figures, via Rocket Mortgage).";
+
+// The four plans (Kyle, 25 Nov 2026): the SPARC Labs Field Kit report;
+// Storm Ahead ("first year free with report, and then 79 a year", price shown
+// here); and, marked coming soon, Storm Ahead with an Acorn sensor and the
+// Field Kit with an Acorn. No sensor price: nothing is built yet.
+function Plans({ price, deliveryDays, includes }: { price?: string; deliveryDays?: number; includes?: string[] }) {
+  return (
+    <div className="plans">
+      <div className="plan plan-main">
+        <div className="kicker">bought once · for one house</div>
+        <h3>The SPARC Labs Field Kit</h3>
+        {price ? (
+          <div className="plan-price">
+            {price}
+            <small>once</small>
+          </div>
+        ) : null}
+        <ul>
+          {(includes ?? ["The house report, the offline atlas and maps to print", "Flood, heat, ground movement and wind for the neighbourhood around the house"]).slice(0, 4).map((w) => (
+            <li key={w}>{w.split(":")[0]}</li>
+          ))}
+          <li>A year of Storm Ahead, free</li>
+        </ul>
+        {deliveryDays ? (
+          <p style={{ fontSize: 13, color: "var(--ink-2)", lineHeight: 1.55, margin: 0 }}>
+            You pay when it is ready. If we cannot model your place, or it is not ready within {deliveryDays} working days and you cancel, you pay nothing.
+          </p>
+        ) : null}
+        <div className="plan-go row" style={{ gap: 8, flexWrap: "wrap" }}>
+          <Link href={price ? "/report/buy" : "/start"} className="btn btn-accent">Get a report <span className="arrow">→</span></Link>
+          <Link href="/report/sample" className="btn">See a sample</Link>
+        </div>
+      </div>
+      <div className="plan">
+        <div className="kicker">yearly · after your free year</div>
+        <h3>Storm Ahead</h3>
+        <div className="plan-price">
+          $79<small>a year</small>
+        </div>
+        <ul>
+          <li>Watches the official forecasts for your house</li>
+          <li>Runs your house&apos;s own flood and wind models when a storm is on course</li>
+          <li>Free for the first year with every report</li>
+          <li>Nothing renews unless you choose to</li>
+        </ul>
+        <div className="plan-go">
+          <Link href="/storm-ahead" className="btn">How Storm Ahead works</Link>
+        </div>
+      </div>
+      <div className="plan plan-soon">
+        <div className="kicker">coming soon</div>
+        <h3>Storm Ahead with Acorn</h3>
+        <ul>
+          <li>Storm Ahead, plus an Acorn sensor in your yard</li>
+          <li>Rain, wind and heat measured at your own house</li>
+        </ul>
+        <div className="plan-go">
+          <Link href="/acorn" className="btn btn-ghost">Meet Acorn</Link>
+        </div>
+      </div>
+      <div className="plan plan-soon">
+        <div className="kicker">coming soon</div>
+        <h3>The Field Kit with Acorn</h3>
+        <ul>
+          <li>The SPARC Labs Field Kit report for your house</li>
+          <li>An Acorn sensor that keeps checking it</li>
+        </ul>
+        <div className="plan-go">
+          <Link href="/acorn" className="btn btn-ghost">Meet Acorn</Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function PricingPage() {
   // The price goes on this page only when anyone can order (ORDERS_OPEN).
@@ -102,45 +140,13 @@ function OnSale() {
         lead="Looking up what is on record costs nothing and needs no account. When you are deciding on one house, the SPARC Labs Field Kit runs our own models for it: a house report, an atlas, maps to print and a year of updates."
         accent="var(--amber)"
       />
-      <Section kicker="two ways to use it" title="Free for the area. Paid for the house.">
-        <div className="grid-2 pricing-tiers" style={{ gap: 18, alignItems: "stretch" }}>
-          <div className="card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 10 }}>
-            <div className="kicker">Free · no account</div>
-            <h3 style={{ margin: 0 }}>{PLANS[0].name}</h3>
-            <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6, margin: 0 }}>What is on public record around any US address.</p>
-            <ul style={{ margin: "4px 0 0", paddingLeft: 18, fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6 }}>
-              {PLANS[0].what.map((w) => (
-                <li key={w}>{w}</li>
-              ))}
-            </ul>
-            <div style={{ marginTop: "auto", paddingTop: 10 }}>
-              <Link href="/" className="btn">Look up a place <span className="arrow">→</span></Link>
-            </div>
-          </div>
-          <div className="card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 10 }}>
-            <div className="kicker">Bought once · for one house</div>
-            <h3 style={{ margin: 0 }}>{REPORT.name}</h3>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-              <span style={{ fontSize: 36, fontWeight: 800, letterSpacing: "-0.03em", color: "var(--ink)" }}>{formatPrice(REPORT.priceCents)}</span>
-              <span style={{ fontSize: 14, color: "var(--muted)" }}>once, plus any sales tax</span>
-            </div>
-            <ul style={{ margin: "4px 0 0", paddingLeft: 18, fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6 }}>
-              {REPORT.includes.map((w) => (
-                <li key={w}>{w}</li>
-              ))}
-            </ul>
-            <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6, margin: "4px 0 0" }}>
-              <strong style={{ color: "var(--ink)" }}>You pay when it is ready.</strong> Nothing is charged when you
-              order. If we cannot model your place, or it is not ready within {REPORT.deliveryDays} working days and
-              you cancel, you pay nothing.
-            </p>
-            <div className="row" style={{ marginTop: "auto", paddingTop: 10, gap: 10, flexWrap: "wrap" }}>
-              <Link href="/report/buy" className="btn btn-accent">Order the SPARC Field Kit <span className="arrow">→</span></Link>
-              <Link href="/report/sample" className="btn">See a sample</Link>
-            </div>
-          </div>
-        </div>
-        <p style={{ marginTop: 20, fontSize: 14, lineHeight: 1.7, color: "var(--ink-2)", maxWidth: 760 }}>{FOR_SCALE}</p>
+      <Section kicker="plans" title="One report for the house. Storm Ahead to keep watching it.">
+        <Plans price={formatPrice(REPORT.priceCents)} deliveryDays={REPORT.deliveryDays} includes={REPORT.includes} />
+        <p style={{ marginTop: 20, fontSize: 14, lineHeight: 1.7, color: "var(--ink-2)", maxWidth: 760 }}>
+          The public record for any US address stays free, with no account: FEMA flood zones, claims nearby, storm
+          tracks, sinkholes and more. <Link href="/map">Look up a home</Link>.
+        </p>
+        <p style={{ marginTop: 8, fontSize: 14, lineHeight: 1.7, color: "var(--ink-2)", maxWidth: 760 }}>{FOR_SCALE}</p>
       </Section>
 
       <Section sunken kicker="what it is not" title="Said before you pay, not after.">
@@ -150,7 +156,7 @@ function OnSale() {
           ))}
         </ul>
         <p style={{ marginTop: 18, fontSize: 14, lineHeight: 1.7, color: "var(--muted)", maxWidth: 760 }}>
-          A subscription for owners trying projects over time is planned, not on sale. Billing and refund terms are in
+          Billing and refund terms are in
           the <Link href="/terms#reports">Terms of Service</Link>. Questions: {EMAIL_PRIMARY}.
         </p>
       </Section>
@@ -166,30 +172,14 @@ function NotOnSale() {
       <Nav active="pricing" />
       <main id="main">
       <PageHero
-        kicker="pricing · nothing on sale yet"
-        title="The public record is free. The models will be paid."
-        lead="Looking up what is on record costs nothing and needs no account. Our own flood, heat, ground movement and wind models will be the paid part. There are no prices here yet, because there is nothing we can sell you today."
+        kicker="pricing · by invitation"
+        title="The public record is free. The SPARC Labs Field Kit is paid."
+        lead="Looking up what is on record costs nothing and needs no account. Our own models, run for one house, are the paid part. Reports are by invitation while we open, and the report's price is given to you in writing."
         accent="var(--amber)"
       />
 
-      <Section kicker="what is planned" title="Three ways to use it.">
-        <div className="grid-3 pricing-tiers" style={{ gap: 18, alignItems: "stretch" }}>
-          {PLANS.map((p) => (
-            <div key={p.name} className="card" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 10 }}>
-              <div className="kicker">{p.state}</div>
-              <h3 style={{ margin: 0 }}>{p.name}</h3>
-              <p style={{ fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6, margin: 0 }}>{p.who}</p>
-              <ul style={{ margin: "4px 0 0", paddingLeft: 18, fontSize: 14, color: "var(--ink-2)", lineHeight: 1.6 }}>
-                {p.what.map((w) => (
-                  <li key={w}>{w}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <p style={{ marginTop: 20, fontSize: 14, lineHeight: 1.7, color: "var(--ink-2)", maxWidth: 760 }}>
-          The two paid plans are a plan, not an offer. What each includes may change before it goes on sale.
-        </p>
+      <Section kicker="plans" title="One report for the house. Storm Ahead to keep watching it.">
+        <Plans />
       </Section>
 
       <Section sunken kicker="today" title="A report, run by hand.">
@@ -225,7 +215,7 @@ function NotOnSale() {
           ))}
         </ul>
         <p style={{ marginTop: 22, fontSize: 14, lineHeight: 1.7, color: "var(--muted)", maxWidth: 760 }}>
-          Until all four exist, this page carries no prices. No support commitment, response time or
+          Until all four exist, the report itself carries no public price. No support commitment, response time or
           discount is offered either. The <Link href="/terms">Terms of Service</Link> state the licence
           position as it stands.
         </p>

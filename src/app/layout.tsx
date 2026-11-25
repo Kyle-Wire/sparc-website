@@ -5,6 +5,7 @@ import "../styles/globals.css";
 import "../styles/cabinet.css";
 import "../styles/quiet.css";
 import "../styles/brand.css";
+import "../styles/models.css";
 import { COMPANY, COMPANY_LEGAL, EMAIL_PRIMARY, OFFICE_CITY, OFFICE_STATE, SITE_TITLE, TAGLINE_LONG, SITE_URL } from "@/lib/brand";
 import { CookieNotice } from "@/components/shell/CookieNotice";
 import { Mist } from "@/components/system/Mist";

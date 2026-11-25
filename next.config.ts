@@ -72,6 +72,11 @@ const config: NextConfig = {
   },
   async redirects() {
     return [
+      // 25 Nov 2026: How it works became the landing page and the map moved
+      // to /map (Kyle). Temporary, so it can be undone without browsers
+      // caching it. Old "/?lat=..&lon=.." map links keep working.
+      { source: "/how-it-works", destination: "/", permanent: false },
+      { source: "/", has: [{ type: "query", key: "lat" }], destination: "/map", permanent: false },
       // Old static-prototype URLs → App Router routes
       { source: "/index.html", destination: "/", permanent: true },
       { source: "/pricing.html", destination: "/pricing", permanent: true },

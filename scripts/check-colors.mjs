@@ -80,6 +80,8 @@ const ROLES = [
   { token: "ground", role: "text", min: 4.5, grounds: ["paper", "white"] },
   { token: "wind", role: "text", min: 4.5, grounds: ["paper", "white"] },
   { token: "fire", role: "text", min: 4.5, grounds: ["paper", "white"] },
+  { token: "hurricane", role: "text", min: 4.5, grounds: ["paper", "white"] },
+  { token: "bristle", role: "text", min: 4.5, grounds: ["paper", "white"] },
   { token: "amber-ink", role: "white text on it", min: 4.5, grounds: ["white"], inverted: true },
   { token: "rule", role: "structural boundary", min: 3, grounds: ["white", "paper", "paper-2", "paper-3"] },
   // The cabinet banner: the page inverted (docs/design/cabinet-frame.md).

@@ -249,7 +249,7 @@ export default function GlossaryPage() {
             ))}
           </div>
           <div className="row" style={{ marginTop: 28, gap: 10 }}>
-            <Link href="/" className="btn btn-accent">Look up an address <span className="arrow">→</span></Link>
+            <Link href="/map" className="btn btn-accent">Look up an address <span className="arrow">→</span></Link>
             <Link href="/models" className="btn">How the models work</Link>
           </div>
         </div>

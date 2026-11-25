@@ -5,17 +5,31 @@ import * as React from "react";
 import { COMPANY, TAGLINE_LONG, COPYRIGHT_YEAR, OFFICE_CITY, OFFICE_STATE } from "@/lib/brand";
 import { NavUserStatus } from "./NavUserStatus";
 import { MobileNav } from "./MobileNav";
+import { NavModels } from "./NavModels";
+import { MODEL_PAGES } from "@/lib/model-pages";
 
-export type NavKey = "home" | "how" | "places" | "models" | "pricing" | "about" | "contact" | "account";
+export type NavKey = "home" | "how" | "places" | "models" | "storm" | "example" | "pricing" | "about" | "contact" | "account";
 
-const NAV_LINKS: { href: Route; label: string; key: NavKey }[] = [
-  { href: "/", label: "Look up a place", key: "home" },
-  { href: "/how-it-works", label: "How it works", key: "how" },
-  { href: "/places", label: "Your places", key: "places" },
-  { href: "/models", label: "The models", key: "models" },
+// The menu bar, agreed with Kyle on 25 Nov 2026 (sitemap v2): How it works is
+// the landing page, the map is "Look up a home", Models opens a dropdown of
+// every model (NavModels), and the same bar sits on the map. "Your places"
+// moved to the footer and the map's own panel.
+const NAV_BEFORE: { href: Route; label: string; key: NavKey }[] = [
+  { href: "/", label: "How it works", key: "how" },
+  { href: "/map", label: "Look up a home", key: "home" },
+];
+const NAV_AFTER: { href: Route; label: string; key: NavKey }[] = [
+  { href: "/storm-ahead", label: "Storm Ahead", key: "storm" },
+  { href: "/example", label: "Example report", key: "example" },
   { href: "/pricing", label: "Pricing", key: "pricing" },
   { href: "/about", label: "About", key: "about" },
 ];
+const DRAWER_TOP: { href: Route; label: string }[] = NAV_BEFORE;
+const DRAWER_MODELS: { href: Route; label: string }[] = [
+  { href: "/models", label: "All the models" },
+  ...MODEL_PAGES.map((m) => ({ href: `/models/${m.slug}` as Route, label: `${m.name} · ${m.slug === "bristlecone" ? "the checker" : m.hazard.toLowerCase()}` })),
+];
+const DRAWER_BOTTOM: { href: Route; label: string }[] = [...NAV_AFTER, { href: "/acorn", label: "Acorn sensor · coming soon" }, { href: "/contact", label: "Contact" }];
 
 // Native aspect ratio of public/sparclabs-logo.png is 3300x2550 ≈ 1.294:1
 const LOGO_ASPECT = 3300 / 2550;
@@ -43,21 +57,24 @@ export function Nav({ active }: { active?: NavKey }) {
           <span className="hide-mobile"><LogoLockup height={56} /></span>
           <span className="show-mobile"><LogoLockup height={36} /></span>
         </Link>
-        <nav className="nav-links">
-          {NAV_LINKS.map((l) => (
+        <nav className="nav-links" aria-label="Site">
+          {NAV_BEFORE.map((l) => (
+            <Link key={l.key} href={l.href} className={active === l.key ? "active" : ""}>
+              {l.label}
+            </Link>
+          ))}
+          <NavModels active={active === "models"} />
+          {NAV_AFTER.map((l) => (
             <Link key={l.key} href={l.href} className={active === l.key ? "active" : ""}>
               {l.label}
             </Link>
           ))}
         </nav>
         <div className="nav-cta hide-tablet">
-          <Link href="/contact" className="btn btn-ghost btn-sm" style={{ fontWeight: 500, fontSize: 12 }}>
-            Contact
-          </Link>
           <NavUserStatus />
         </div>
         <div className="nav-cta show-tablet" style={{ marginLeft: "auto" }}>
-          <MobileNav links={NAV_LINKS} />
+          <MobileNav links={DRAWER_TOP} groups={[{ head: "Models", links: DRAWER_MODELS }]} extraLinks={DRAWER_BOTTOM} />
         </div>
       </div>
       <div className="ramp-strip" aria-hidden />
@@ -79,9 +96,12 @@ export function Footer() {
           </div>
           <div>
             <h2 className="foot-h">The site</h2>
-            <Link href="/">Look up a place</Link>
-            <Link href="/how-it-works">How it works</Link>
+            <Link href="/">How it works</Link>
+            <Link href="/map">Look up a home</Link>
             <Link href="/places">Your places</Link>
+            <Link href="/storm-ahead">Storm Ahead</Link>
+            <Link href="/acorn">Acorn sensor</Link>
+            <Link href="/example">Example report</Link>
             <Link href="/glossary">Plain glossary</Link>
             <Link href="/data">Data sources</Link>
             <Link href="/models">The models</Link>

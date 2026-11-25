@@ -443,7 +443,7 @@ export default async function PlacePage({ params }: Props) {
           <a href="#questions">Questions to take with you</a>
           <a href="#sources">Sources</a>
           <Link href="/glossary">What the words mean</Link>
-          <Link className="place-jump-end" href="/">Look up another address</Link>
+          <Link className="place-jump-end" href="/map">Look up another address</Link>
         </div>
       </nav>
 

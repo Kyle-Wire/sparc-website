@@ -9,9 +9,11 @@ type Item = { href: Route; label: string };
 
 export function MobileNav({
   links,
+  groups,
   extraLinks,
 }: {
   links: Item[];
+  groups?: { head: string; links: Item[] }[];
   extraLinks?: Item[];
 }) {
   const [open, setOpen] = React.useState(false);
@@ -78,9 +80,20 @@ export function MobileNav({
               {l.label}
             </Link>
           ))}
+          {groups?.map((g) => (
+            <div key={g.head}>
+              <div className="drawer-sub-head">{g.head}</div>
+              <div className="drawer-sub">
+                {g.links.map((l) => (
+                  <Link key={l.href} href={l.href}>
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
           {extraLinks && extraLinks.length > 0 ? (
             <>
-              <div className="drawer-divider" />
               {extraLinks.map((l) => (
                 <Link key={l.href} href={l.href}>
                   {l.label}
@@ -94,7 +107,7 @@ export function MobileNav({
 
         <div className="drawer-cta">
           <Link href="/start" className="btn btn-primary" onClick={close}>
-            Ask for a report →
+            Get a report →
           </Link>
         </div>
       </aside>

@@ -3,12 +3,15 @@ import { withPage } from "@/lib/seo";
 import Link from "next/link";
 import { Nav, Footer } from "@/components/shell/Shell";
 import { PageHero, Section } from "@/components/marketing/page-shell";
+import type * as React from "react";
+import type { Route } from "next";
 import { LockedShelf } from "@/components/place/cards";
-import { ENGINES, RUNS_ON_WORDS } from "@/lib/engines";
+import { ModelArt } from "@/components/models/ModelArt";
+import { MODEL_PAGES } from "@/lib/model-pages";
 
 export const metadata: Metadata = withPage("/models", {
   title: "The models",
-  description: "SPARC Labs' own flood, heat, ground movement, wind and wildfire models: what each gives, what it has been checked against, and what it will never say.",
+  description: "SPARC Labs' own models: Alder (flood), Ginkgo (heat), Yew (ground), Poplar (wind), Ash (wildfire), Palm (hurricane), and Bristlecone, the checker.",
 });
 
 // What this page may say about the models, and where each sentence comes
@@ -39,43 +42,29 @@ export default function ModelsPage() {
       <PageHero
         kicker="the models · in every house report"
         title="What the public record can’t tell you."
-        lead="A flood zone is a line on a map. It doesn’t say where the water goes on your street in a hard storm, how warm the block stays on a July night, or whether the ground under it moves differently from the ground around it. That takes a model of the neighbourhood. We built five."
+        lead="A flood zone is a line on a map. It doesn’t say where the water goes on your street in a hard storm, how warm the block stays on a July night, or whether the ground under it moves differently from the ground around it. That takes a model of the neighbourhood. We built six, and a seventh that checks them."
         accent="var(--flood)"
       />
 
-      <Section kicker="five models" title="Flood, heat, ground movement, wind and wildfire, for the neighbourhood around a home.">
-        <div className="engine-grid">
-          {ENGINES.map((e) => (
-            <div key={e.id} className="card engine-card" data-hazard={e.id}>
-              <div className="kicker">
-                {e.hazard} · {RUNS_ON_WORDS[e.runsOn]}
-              </div>
-              <h3>{e.name}</h3>
-              <p className="engine-why">
-                {e.why} <span className="engine-on">Runs on our {e.engine} engine.</span>
-              </p>
-              <p>{e.summary}</p>
-              {e.free && (
-                <>
-                  <div className="kicker" style={{ marginTop: 6 }}>free with every report</div>
-                  <ul>
-                    {e.free.map((f) => (
-                      <li key={f}>{f}</li>
-                    ))}
-                  </ul>
-                </>
-              )}
-              <div className="kicker" style={{ marginTop: 6 }}>{e.free ? "paid" : "what a buyer reads"}</div>
-              <ul>
-                {e.findings.map((f) => (
-                  <li key={f}>{f}</li>
-                ))}
-              </ul>
-              <p className="engine-where">{e.where}</p>
-              <p className="engine-status">
-                <strong>Today:</strong> {e.status}
-              </p>
-            </div>
+      <Section kicker="the grove" title="Six models for the hazards, and one that checks them all.">
+        <div className="grove">
+          {MODEL_PAGES.map((m) => (
+            <Link
+              key={m.slug}
+              href={`/models/${m.slug}` as Route}
+              className={`grove-card${m.slug === "bristlecone" ? " grove-dark" : ""}`}
+              style={{ ["--gc" as string]: m.color } as React.CSSProperties}
+            >
+              <ModelArt slug={m.slug} />
+              <h3>
+                {m.name}
+                <small>{m.slug === "bristlecone" ? "the checker" : m.hazard.toLowerCase()}</small>
+              </h3>
+              <p>{m.line}</p>
+              <span className="grove-go">
+                Meet {m.name} <span className="arrow">→</span>
+              </span>
+            </Link>
           ))}
         </div>
       </Section>
@@ -149,8 +138,8 @@ export default function ModelsPage() {
           <strong>Environmental screening.</strong> Not an engineering study, and not for engineering decisions.
         </p>
         <div className="row" style={{ marginTop: 24, gap: 10 }}>
-          <Link href="/start" className="btn btn-accent">Ask for a report <span className="arrow">→</span></Link>
-          <Link href="/" className="btn">Look up the public record</Link>
+          <Link href="/start" className="btn btn-accent">Get a report <span className="arrow">→</span></Link>
+          <Link href="/map" className="btn">Look up the public record</Link>
         </div>
       </Section>
 

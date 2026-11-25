@@ -275,7 +275,7 @@ export default function FaqPage() {
           The block record, for any US address, with no account: FEMA flood zones, flood insurance claims nearby,
           disaster declarations, storm tracks, ground height, tree canopy and paving, each with its source and date,
           and questions to take to the seller, the inspector and the insurer.{" "}
-          <Link href="/">Look up a place</Link>.
+          <Link href="/map">Look up a place</Link>.
         </p>
       ),
     },

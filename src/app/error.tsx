@@ -20,7 +20,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
       </p>
       <div className="row" style={{ gap: 12, flexWrap: "wrap" }}>
         <button type="button" className="btn btn-accent" onClick={() => reset()}>Try again</button>
-        <Link className="btn btn-ghost" href="/">Back to the map</Link>
+        <Link className="btn btn-ghost" href="/map">Back to the map</Link>
         <Link className="btn btn-ghost" href="/contact">Write to us</Link>
       </div>
       {error.digest && (

@@ -128,7 +128,7 @@ export function Journey({
           </p>
         ) : (
           <p>
-            Start from a place. <Link href="/">Look one up</Link>, read its public record for free, and press
+            Start from a place. <Link href="/map">Look one up</Link>, read its public record for free, and press
             “Get a report or run it yourself” on its page. You can also go on here without one and name the
             place in your note.
           </p>

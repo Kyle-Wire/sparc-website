@@ -140,6 +140,13 @@
   /* Wildfire, the fifth hazard (24 Nov 2026): a burnt orange kept clear of
      the heat crimson. Same rule as the others. */
   --fire: #9a3f0c;
+  /* Hurricane (Palm) and the checker (Bristlecone), given pages of their own
+     on 25 Nov 2026. Palm is a deep storm violet kept clear of the brand
+     purple; Bristlecone is old-wood brown, with a pale ring gold for its dark
+     page (decoration only on paper). */
+  --hurricane: #44408f;
+  --bristle: #6b5222;
+  --bristle-ring: #e2c68a;
 
   --status-live: var(--crimson);
   --status-warn: var(--amber-ink);

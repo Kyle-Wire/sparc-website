@@ -286,7 +286,7 @@ function InfoPanel() {
         <strong>The SPARC Labs Field Kit</strong> is the paid part: our own flood, heat, ground movement and wind models, worked out for one house, with its report, atlas and maps. <Link href="/report/sample">See a sample</Link>.
       </p>
       <p>
-        <Link href="/how-it-works">How it works</Link> · <Link href="/about">Who we are</Link> · <Link href="/data">Every source</Link>
+        <Link href="/">How it works</Link> · <Link href="/about">Who we are</Link> · <Link href="/data">Every source</Link>
       </p>
     </div>
   );
@@ -326,7 +326,7 @@ function SpotCard({ slug, matched, spot, onClose }: { slug: string; matched: str
 }
 
 const MENU: { href: Route; label: string }[] = [
-  { href: "/how-it-works", label: "How it works" },
+  { href: "/", label: "How it works" },
   { href: "/places", label: "Your places" },
   { href: "/models", label: "The models" },
   { href: "/pricing", label: "Pricing and the report" },
@@ -388,7 +388,7 @@ export interface StartView {
   from: "near" | "us";
 }
 
-export function HomeMap({ start }: { start: StartView }) {
+export function HomeMap({ start, underNav = false }: { start: StartView; underNav?: boolean }) {
   const boxRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MlMap | null>(null);
   const [failed, setFailed] = useState(false);
@@ -605,15 +605,19 @@ export function HomeMap({ start }: { start: StartView }) {
   const toggle = (p: Exclude<Panel, null>) => setPanel(panel === p ? null : p);
 
   return (
-    <main id="main" className="home-full" aria-label="Map">
+    <main id="main" className={underNav ? "home-full home-under-nav" : "home-full"} aria-label="Map">
       <div ref={boxRef} className="home-full-map" />
       {failed && <p className="home-map-failed">The map could not start in this browser. The search still works.</p>}
 
       <header className="map-top">
-        <Link className="map-logo" href="/" aria-label="SPARC Labs, home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/sparclabs-logo.png" alt="" height={34} />
-        </Link>
+        {underNav ? (
+          <span aria-hidden />
+        ) : (
+          <Link className="map-logo" href="/" aria-label="SPARC Labs, home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/sparclabs-logo.png" alt="" height={34} />
+          </Link>
+        )}
         <div className="map-search">
           <h1 className="visually-hidden">See what is on public record about any US address</h1>
           <PlaceSearch compact bare onFound={flyToFound} />
@@ -633,7 +637,7 @@ export function HomeMap({ start }: { start: StartView }) {
             </button>
           </div>
         </div>
-        <MapMenu />
+        {underNav ? <span aria-hidden /> : <MapMenu />}
       </header>
 
       {!pin && !picked && !panel && (

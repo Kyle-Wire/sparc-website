@@ -13,7 +13,7 @@ export async function saveProfile(form: FormData) {
   if (!parsed.ok) redirect(`/account/profile?error=${encodeURIComponent(parsed.field)}&why=${encodeURIComponent(parsed.why)}`);
   const { error } = await supabase
     .from("profiles")
-    .upsert({ user_id: user.id, ...parsed.profile, updated_at: new Date().toISOString() }, { onConflict: "user_id" });
+    .upsert({ id: user.id, email: user.email ?? "", ...parsed.profile, updated_at: new Date().toISOString() }, { onConflict: "id" });
   if (error) redirect("/account/profile?error=save");
   revalidatePath("/account", "layout");
   redirect("/account/profile?saved=1");

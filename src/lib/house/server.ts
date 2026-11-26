@@ -42,7 +42,7 @@ export async function ownProfile(): Promise<Profile> {
   const { supabase, user } = await currentUser();
   if (!user) return EMPTY_PROFILE;
   try {
-    const { data } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle<Profile>();
+    const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle<Profile>();
     return data ? { ...EMPTY_PROFILE, ...data } : EMPTY_PROFILE;
   } catch {
     return EMPTY_PROFILE;
